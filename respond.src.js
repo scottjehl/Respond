@@ -174,11 +174,20 @@
 })(
 	this,
 	(function( win ){
-		var ie = /*@cc_on @_jscript_version+@*/0;
+		//cond. comm. IE check by James Padolsey
+		var ie = (function(undef){
+ 		    var v = 3,
+		        div = document.createElement('div'),
+		        all = div.getElementsByTagName('i');
+		 
+		    while(div.innerHTML = '<!--[if gt IE ' + (++v) + ']><i></i><![endif]-->', all[0]);
+		    return v > 4 ? v : undef;
+		}());
+		
 		//for speed, flag browsers with window.matchMedia support and IE 9 as supported
-		if( win.matchMedia || ie > 5.8 ){ return true; }
+		if( win.matchMedia || ie && ie >= 9 ){ return true; }
 		//flag IE 8 and under as false - no test needed
-		if( ie && ie <= 5.8 ){ return false; }
+		if( ie && ie <= 8){ return false; }
 		//otherwise proceed with test
 		var doc 		= win.document,
 			docElem 	= doc.documentElement,
