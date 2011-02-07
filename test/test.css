@@ -1,0 +1,58 @@
+/*
+This is just a test file for making sure the script is working properly.
+If it is, the media queries below will change the body's background color depending on the browser width.
+For a realistic use case for media queries: read up on Responsive Web Design: 
+http://www.alistapart.com/articles/responsive-web-design/
+*/
+
+body {
+	background: black;
+	color: #333;
+	font-family: Helvetica, sans-serif;
+}
+p {
+	width: 60%;
+	min-width: 300px;
+	max-width: 700px;
+	margin: 2em auto;
+	background: #fff;
+	padding: 20px;
+}
+a {
+	color: #333;
+}
+
+/*styles for 480px and up!*/
+@media only screen and (min-width: 480px){
+	body {
+		background: green;
+	}
+}/*/mediaquery*/
+
+/*styles for 620px and up!*/
+@media screen and (min-width: 620px){
+	body {
+		background: red;
+	}
+}/*/mediaquery*/
+
+/*styles for 800px and up!*/
+@media screen and (min-width: 800px){
+	body {
+		background: blue;
+	}
+}/*/mediaquery*/
+
+/*styles for 1100px and up!*/
+@media screen and (min-width: 1100px){
+	body {
+		background: orange;
+	}
+}/*/mediaquery*/
+
+/*styles for 1300px and up!*/
+@media screen and (min-width: 1300px){
+	body {
+		background: navy;
+	}
+}/*/mediaquery*/
