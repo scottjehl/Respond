@@ -5,8 +5,16 @@
  * Usage: Check out the readme file or github.com/scottjehl/respond
 */
 (function( win, mqSupported ){
+	//exposed namespace
+	win.respond			= {};
+	
+	//define update even in native-mq-supporting browsers, to avoid errors
+	respond.update		= function(){};
+	
 	//if media queries are supported, exit here
 	if( mqSupported ){ return; }
+	
+	//define vars
 	var doc 			= win.document,
 		docElem 		= doc.documentElement,
 		mediastyles	 	= [],
@@ -25,18 +33,21 @@
 					href		= sheet.href,
 					parsed		= false;
 				
-				//prevent re-parsing when ripCSS is re-called
-				for( var i in parsedSheets ){
-					if( parsedSheets[ i ] === href ){
-						parsed = true;
+				//only links plz
+				if( !!href ){
+					//prevent re-parsing when ripCSS is re-called
+					for( var i in parsedSheets ){
+						if( parsedSheets[ i ] === href ){
+							parsed = true;
+						}
 					}
-				}	
-					
-				if( !parsed ){
-					ajax( href, function( styles ){
-						translateQueries( styles, href );
-						parsedSheets.push( href );
-					} );
+						
+					if( !parsed ){
+						ajax( href, function( styles ){
+							translateQueries( styles, href );
+							parsedSheets.push( href );
+						} );
+					}
 				}
 			}		
 		},
@@ -176,6 +187,10 @@
 	
 	//translate CSS
 	ripCSS();
+	
+	//expose update for re-running respond later on
+	respond.update = ripCSS;
+	
 	//adjust on resize
 	function callMedia(){
 		applyMedia( true );
