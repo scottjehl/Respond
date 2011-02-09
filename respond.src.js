@@ -14,6 +14,7 @@
 		resizeThrottle	= 0,
 		head 			= doc.getElementsByTagName( "head" )[0] || docElem,
 		links			= head.getElementsByTagName( "link" ),
+		
 		//loop stylesheets, send text content to translateQueries
 		ripCSS			= function(){
 			var sheets 	= doc.styleSheets,
@@ -26,7 +27,7 @@
 				
 				//prevent re-parsing when ripCSS is re-called
 				for( var i in parsedSheets ){
-					if( parsedSheets[ i ] === sheet ){
+					if( parsedSheets[ i ] === href ){
 						parsed = true;
 					}
 				}	
@@ -34,7 +35,7 @@
 				if( !parsed ){
 					ajax( href, function( styles ){
 						translateQueries( styles, href );
-						parsedSheets.push( sheet );
+						parsedSheets.push( href );
 					} );
 				}
 			}		
