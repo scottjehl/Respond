@@ -10,7 +10,8 @@
 	var doc 			= win.document,
 		docElem 		= doc.documentElement,
 		mediastyles	 	= [],
-		resizeThrottle	= 50,
+		parsedSheets	= [],
+		resizeThrottle	= 0,
 		head 			= doc.getElementsByTagName( "head" )[0] || docElem,
 		links			= head.getElementsByTagName( "link" ),
 		//loop stylesheets, send text content to translateQueries
@@ -19,10 +20,23 @@
 				sl 		= sheets.length;
 
 			for( var i = 0; i < sl; i++ ){
-				var href = sheets[ i ].href;
-				ajax( href, function( styles ){
-					translateQueries( styles, href );
-				} );
+				var sheet		= sheets[ i ],
+					href		= sheet.href,
+					parsed		= false;
+				
+				//prevent re-parsing when ripCSS is re-called
+				for( var i in parsedSheets ){
+					if( parsedSheets[ i ] === sheet ){
+						parsed = true;
+					}
+				}	
+					
+				if( !parsed ){
+					ajax( href, function( styles ){
+						translateQueries( styles, href );
+						parsedSheets.push( sheet );
+					} );
+				}
 			}		
 		},
 		//find media blocks in css text, convert to style blocks
