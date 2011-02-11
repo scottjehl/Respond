@@ -36,8 +36,8 @@
 				//only links plz
 				if( !!href ){
 					//prevent re-parsing when ripCSS is re-called
-					for( var i in parsedSheets ){
-						if( parsedSheets[ i ] === href ){
+					for( var j in parsedSheets ){
+						if( parsedSheets[ j ] === href ){
 							parsed = true;
 						}
 					}
