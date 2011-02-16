@@ -6,10 +6,13 @@
 */
 (function( win, mqSupported ){
 	//exposed namespace
-	win.respond			= {};
+	win.respond		= {};
 	
 	//define update even in native-mq-supporting browsers, to avoid errors
-	respond.update		= function(){};
+	respond.update	= function(){};
+	
+	//expose media query support flag for external use
+	respond.mediaQueriesSupported	= mqSupported;
 	
 	//if media queries are supported, exit here
 	if( mqSupported ){ return; }
