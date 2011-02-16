@@ -61,20 +61,20 @@
 				href		= href.substring( 0, href.lastIndexOf( "/" )) + "/";
 				
 			for( var i = 0; i < ql; i++ ){
-				var fullq 		= qs[ i ].match(/(@media |,\s?)(.*)\{([\S\s]+?)$/) && RegExp.$2,
-					eachq		= fullq.split(","),
-					rules 		= RegExp.$3;
+				var fullq	= qs[ i ].match(/(@media |,\s?)(.*)\{([\S\s]+?)$/) && RegExp.$2,
+					eachq	= fullq.split(","),
+					rules	= RegExp.$3;
 					
 				for( var j = 0; j < eachq.length; j++ ){
-					var thisq 	= eachq[ j ],
-						type 	= thisq.match(/(only )?([a-z]+)(\sand)?/) && RegExp.$2,
-						minw 	= thisq.match(/\(min\-width:\s?(\s?[0-9]+)px\s?\)/) && RegExp.$1,
-						maxw 	= thisq.match(/\(max\-width:\s?(\s?[0-9]+)px\s?\)/) && RegExp.$1;
+					var thisq	= eachq[ j ],
+						type	= thisq.match(/(only )?([a-z]+)(\sand)?/) && RegExp.$2,
+						minw	= thisq.match(/\(min\-width:\s?(\s?[0-9]+)px\s?\)/) && RegExp.$1,
+						maxw	= thisq.match(/\(max\-width:\s?(\s?[0-9]+)px\s?\)/) && RegExp.$1;
 
 					//only translate queries that have a type + a min or a max width	
 					if( type ){
-						var	ss 			= doc.createElement( "style" ),
-							placehold 	= doc.createTextNode( "" ),
+						var	ss			= doc.createElement( "style" ),
+							placehold	= doc.createTextNode( "" ),
 							minw		= parseFloat( minw ),
 							maxw		= parseFloat( maxw ),	
 							//replace relative URLs with stylesheet's base path
@@ -83,7 +83,7 @@
 	
 						//must set type for IE
 						ss.type			= "text/css";
-						ss.media 		= type;
+						ss.media		= type;
 				        if ( ss.styleSheet ){ 
 				          ss.styleSheet.cssText = rules;
 				        } 
@@ -112,20 +112,20 @@
 		},
 		lastCall,
 		//enable/disable style blocks based on win width
-		applyMedia 	= function( fromResize ){
+		applyMedia			= function( fromResize ){
 			//throttle resize calls
 			var now = (new Date()).getTime();
 			if( fromResize && lastCall && now - lastCall < resizeThrottle ){
 				return;
 			}
 			else {
-				lastCall = now;
+				lastCall	= now;
 			}
-			var name 		= "clientWidth",
-				docElemProp = docElem[ name ],
-				currWidth 	= doc.compatMode === "CSS1Compat" && docElemProp || doc.body[ name ] || docElemProp,
+			var name		= "clientWidth",
+				docElemProp	= docElem[ name ],
+				currWidth	= doc.compatMode === "CSS1Compat" && docElemProp || doc.body[ name ] || docElemProp,
 				//loop whole array or just one item
-				loopStyles 	= fromResize ? mediastyles : [ mediastyles[ mediastyles.length-1 ] ];
+				loopStyles	= fromResize ? mediastyles : [ mediastyles[ mediastyles.length-1 ] ];
 										
 			for( var i in loopStyles ){
 				var thisstyle = loopStyles[ i ];
@@ -156,9 +156,9 @@
 				if ( req.readyState != 4 || req.status != 200 && req.status != 304 ){
 					return;
 				}
-				callback(req.responseText);
+				callback( req.responseText );
 			}
-			if (req.readyState == 4){
+			if ( req.readyState == 4 ){
 				return;
 			}
 			req.send();
@@ -209,26 +209,26 @@
 	(function( win ){
 		//cond. comm. IE check by James Padolsey
 		var ie = (function(undef){
- 		    var v = 3,
-		        div = document.createElement('div'),
-		        all = div.getElementsByTagName('i');
+ 		    var v 	= 3,
+		        div	= document.createElement( "div" ),
+		        all	= div.getElementsByTagName( "i" );
 		 
-		    while(div.innerHTML = '<!--[if gt IE ' + (++v) + ']><i></i><![endif]-->', all[0]);
+		    while(div.innerHTML = "<!--[if gt IE " + (++v) + "]><i></i><![endif]-->", all[0]);
 		    return v > 4 ? v : undef;
 		}());
 		
 		//for speed, flag browsers with window.matchMedia support and IE 9 as supported
 		if( win.matchMedia || ie && ie >= 9 ){ return true; }
 		//flag IE 8 and under as false - no test needed
-		if( ie && ie <= 8){ return false; }
+		if( ie && ie <= 8 ){ return false; }
 		//otherwise proceed with test
-		var doc 		= win.document,
-			docElem 	= doc.documentElement,
-		    fb 			= doc.createElement( "body" ),
-		    div 		= doc.createElement( "div" ),
-		    se 	= doc.createElement( "style" ),
-			cssrule = "@media only all { #qtest { position: absolute; } }";
-			div.setAttribute( "id", "qtest" );
+		var doc		= win.document,
+			docElem	= doc.documentElement,
+		    fb		= doc.createElement( "body" ),
+		    div		= doc.createElement( "div" ),
+		    se		= doc.createElement( "style" ),
+			cssrule	= "@media only all { #qtest { position: absolute; } }";
+		div.setAttribute( "id", "qtest" );
 			
 		se.type = "text/css";
 		fb.appendChild( div );
@@ -240,7 +240,7 @@
 		} 
 		docElem.insertBefore( fb, docElem.firstChild );
 		docElem.insertBefore( se, fb );
-		support = ( win.getComputedStyle ? win.getComputedStyle( div,null ) : div.currentStyle )["position"] == "absolute";
+		support = ( win.getComputedStyle ? win.getComputedStyle( div, null ) : div.currentStyle )["position"] == "absolute";
 		docElem.removeChild( fb );
 		docElem.removeChild( se );
 		return support;
