@@ -56,18 +56,19 @@
 		},
 		//find media blocks in css text, convert to style blocks
 		translateQueries	= function( styles, href ){
-			var qs			= styles.match(/@media .*{([\S\s]+?)(?=\}\/\*\/mediaquery\*\/)/gmi),
+			var qs			= styles.match(/@media ([^\{]+)\{([\S\s]+?)(?=\}\/\*\/mediaquery\*\/)/gmi),
 				ql			= qs && qs.length || 0,
 				href		= href.substring( 0, href.lastIndexOf( "/" )) + "/";
 				
 			for( var i = 0; i < ql; i++ ){
-				var fullq	= qs[ i ].match(/(@media |,\s?)(.*)\{([\S\s]+?)$/) && RegExp.$2,
+				var fullq	= qs[ i ].match(/@media ([^\{}]+)\{([\S\s]+?)$/) && RegExp.$1,
 					eachq	= fullq.split(","),
-					rules	= RegExp.$3;
+					eql		= eachq.length,
+					rules	= RegExp.$2;
 					
-				for( var j = 0; j < eachq.length; j++ ){
+				for( var j = 0; j < eql; j++ ){
 					var thisq	= eachq[ j ],
-						type	= thisq.match(/(only )?([a-z]+)(\sand)?/) && RegExp.$2,
+						type	= thisq.match(/(only\s+)?([a-zA-Z]+)(\sand)?/) && RegExp.$2,
 						minw	= thisq.match(/\(min\-width:\s?(\s?[0-9]+)px\s?\)/) && RegExp.$1,
 						maxw	= thisq.match(/\(max\-width:\s?(\s?[0-9]+)px\s?\)/) && RegExp.$1;
 
