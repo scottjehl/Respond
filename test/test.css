@@ -23,14 +23,14 @@ a {
 }
 
 /*styles for 480px and up!*/
-@media only screen and (min-width: 480px){
+@media only screen and (min-width: 480px), only screen and (max-width: 620px) {
 	body {
 		background: green;
 	}
 }/*/mediaquery*/
 
 /*styles for 620px and up!*/
-@media screen and (min-width: 620px){
+@media screen and (min-width: 620px), only print, projector {
 	body {
 		background: red;
 	}

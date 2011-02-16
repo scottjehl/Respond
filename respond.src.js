@@ -27,52 +27,57 @@
 		},
 		//find media blocks in css text, convert to style blocks
 		translateQueries	= function( styles, href ){
-			var qs		= styles.match(/@media (only )?[a-z]+\sand(.*)\{([\S\s]+?)(?=\}\/\*\/mediaquery\*\/)/gmi),
-				ql		= qs && qs.length || 0,
-				href	= href.substring( 0, href.lastIndexOf( "/" )) + "/";
+			var qs			= styles.match(/@media .*{([\S\s]+?)(?=\}\/\*\/mediaquery\*\/)/gmi),
+				ql			= qs && qs.length || 0,
+				href		= href.substring( 0, href.lastIndexOf( "/" )) + "/";
 				
 			for( var i = 0; i < ql; i++ ){
-				var query 		= qs[ i ].match(/@media (.*)\{([\S\s]+?)$/) && RegExp.$1,
-					rules 		= RegExp.$2,
-					type 		= query.match(/(only )?([a-z]+)\sand/) && RegExp.$2,
-					minw 	= query.match(/\(min\-width:\s?(\s?[0-9]+)px\s?\)/) && RegExp.$1,
-					maxw 	= query.match(/\(max\-width:\s?(\s?[0-9]+)px\s?\)/) && RegExp.$1;
-				
-				//only translate queries that have a type + a min or a max width	
-				if( type && minw || maxw ){
-					var	ss 			= doc.createElement( "style" ),
-						placehold 	= doc.createTextNode( "" ),
-						minw		= parseFloat( minw ),
-						maxw		= parseFloat( maxw ),	
-						//replace relative URLs with stylesheet's base path
-						//hat tip: css3mediaqueries lib for regexp gotcha
-						rules		= rules.replace( /(url\()['"]?([^\/\)'"][^:\)'"]+)['"]?(\))/g, "$1" + href + "$2$3" );
+				var fullq 		= qs[ i ].match(/(@media |,\s?)(.*)\{([\S\s]+?)$/) && RegExp.$2,
+					eachq		= fullq.split(","),
+					rules 		= RegExp.$3;
+					
+				for( var j = 0; j < eachq.length; j++ ){
+					var thisq 	= eachq[ j ],
+						type 	= thisq.match(/(only )?([a-z]+)(\sand)?/) && RegExp.$2,
+						minw 	= thisq.match(/\(min\-width:\s?(\s?[0-9]+)px\s?\)/) && RegExp.$1,
+						maxw 	= thisq.match(/\(max\-width:\s?(\s?[0-9]+)px\s?\)/) && RegExp.$1;
 
-					//must set type for IE
-					ss.type			= "text/css";
-					ss.media 		= type;
-			        if ( ss.styleSheet ){ 
-			          ss.styleSheet.cssText = rules;
-			        } 
-			        else {
-			          ss.appendChild( doc.createTextNode( rules ) );
-			        } 
+					//only translate queries that have a type + a min or a max width	
+					if( type ){
+						var	ss 			= doc.createElement( "style" ),
+							placehold 	= doc.createTextNode( "" ),
+							minw		= parseFloat( minw ),
+							maxw		= parseFloat( maxw ),	
+							//replace relative URLs with stylesheet's base path
+							//hat tip: css3mediaqueries lib for regexp gotcha
+							rules		= rules.replace( /(url\()['"]?([^\/\)'"][^:\)'"]+)['"]?(\))/g, "$1" + href + "$2$3" );
 	
-			        //append in order to maintain cascade
-		        	var lastSS = mediastyles.length && mediastyles[ mediastyles.length-1 ].ss || links[ links.length-1 ];
-		        	if( head.lastchild == lastSS ) {
-						head.appendChild( ss );
-					} else {
-						head.insertBefore( ss, lastSS.nextSibling );
+						//must set type for IE
+						ss.type			= "text/css";
+						ss.media 		= type;
+				        if ( ss.styleSheet ){ 
+				          ss.styleSheet.cssText = rules;
+				        } 
+				        else {
+				          ss.appendChild( doc.createTextNode( rules ) );
+				        } 
+		
+				        //append in order to maintain cascade
+			        	var lastSS = mediastyles.length && mediastyles[ mediastyles.length-1 ].ss || links[ links.length-1 ];
+			        	if( head.lastchild == lastSS ) {
+							head.appendChild( ss );
+						} else {
+							head.insertBefore( ss, lastSS.nextSibling );
+						}
+				        
+						mediastyles.push( { 
+							"ss"		: ss,
+							"minw"		: minw, 
+							"maxw"		: maxw,
+							"placehold"	: placehold
+						} );	
 					}
-			        
-					mediastyles.push( { 
-						"ss"		: ss,
-						"minw"		: minw, 
-						"maxw"		: maxw,
-						"placehold"	: placehold
-					} );	
-				}
+				}	
 				applyMedia();
 			}
 		},
@@ -95,7 +100,8 @@
 										
 			for( var i in loopStyles ){
 				var thisstyle = loopStyles[ i ];
-				if( ( !thisstyle.minw || thisstyle.minw && currWidth >= thisstyle.minw ) && 
+				if( !thisstyle.minw && !thisstyle.maxq || 
+					( !thisstyle.minw || thisstyle.minw && currWidth >= thisstyle.minw ) && 
 					(!thisstyle.maxw || thisstyle.maxw && currWidth <= thisstyle.maxw ) ){
 					if( thisstyle.placehold.parentNode === head ){
 						head.insertBefore( thisstyle.ss, thisstyle.placehold );
