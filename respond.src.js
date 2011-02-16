@@ -61,7 +61,7 @@
 				href		= href.substring( 0, href.lastIndexOf( "/" )) + "/";
 				
 			for( var i = 0; i < ql; i++ ){
-				var fullq	= qs[ i ].match(/@media ([^\{}]+)\{([\S\s]+?)$/) && RegExp.$1,
+				var fullq	= qs[ i ].match(/@media ([^\{]+)\{([\S\s]+?)$/) && RegExp.$1,
 					eachq	= fullq.split(","),
 					eql		= eachq.length,
 					rules	= RegExp.$2;
