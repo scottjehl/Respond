@@ -27,7 +27,7 @@
 		head 			= doc.getElementsByTagName( "head" )[0] || docElem,
 		links			= head.getElementsByTagName( "link" ),
 		
-		//loop stylesheets, send text content to translateQueries
+		//loop stylesheets, send text content to translate
 		ripCSS			= function(){
 			var sheets 	= doc.styleSheets,
 				sl 		= sheets.length;
@@ -48,7 +48,7 @@
 						
 					if( !parsed ){
 						ajax( href, function( styles ){
-							translateQueries( styles, href );
+							translate( styles, href );
 							parsedSheets.push( href );
 						} );
 					}
@@ -56,7 +56,7 @@
 			}		
 		},
 		//find media blocks in css text, convert to style blocks
-		translateQueries	= function( styles, href ){
+		translate		= function( styles, href ){
 			var qs		= styles.match( /@media ([^\{]+)\{([\S\s]+?)(?=\}\/\*\/mediaquery\*\/)/gmi ),
 				ql		= qs && qs.length || 0,
 				href	= href.substring( 0, href.lastIndexOf( "/" )) + "/";
