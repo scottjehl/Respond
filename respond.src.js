@@ -20,9 +20,9 @@
 	//define vars
 	var doc 			= win.document,
 		docElem 		= doc.documentElement,
-		mediastyles	 	= [],
-		appendedEls		= [],
-		parsedSheets	= [],
+		mediastyles		=
+		appendedEls 	=
+		parsedSheets 	= [],
 		resizeThrottle	= 30,
 		head 			= doc.getElementsByTagName( "head" )[0] || docElem,
 		links			= head.getElementsByTagName( "link" ),
