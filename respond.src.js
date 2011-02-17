@@ -63,7 +63,7 @@
 				
 			for( var i = 0; i < ql; i++ ){
 				var fullq	= qs[ i ].match( /@media ([^\{]+)\{([\S\s]+?)$/ ) && RegExp.$1,
-					eachq	= fullq.split(","),
+					eachq	= fullq.split( "," ),
 					eql		= eachq.length,
 					rules	= RegExp.$2 && RegExp.$2.replace( /(url\()['"]?([^\/\)'"][^:\)'"]+)['"]?(\))/g, "$1" + href + "$2$3" );
 					
@@ -71,10 +71,10 @@
 					var thisq	= eachq[ j ];
 
 					mediastyles.push( { 
-						"media"	: thisq.match( /(only\s+)?([a-zA-Z]+)(\sand)?/ ) && RegExp.$2,
-						"rules"	: rules,
-						"minw"	: thisq.match( /\(min\-width:\s?(\s?[0-9]+)px\s?\)/ ) && parseFloat( RegExp.$1 ), 
-						"maxw"	: thisq.match( /\(max\-width:\s?(\s?[0-9]+)px\s?\)/ ) && parseFloat( RegExp.$1 )
+						media	: thisq.match( /(only\s+)?([a-zA-Z]+)(\sand)?/ ) && RegExp.$2,
+						rules	: rules,
+						minw	: thisq.match( /\(min\-width:\s?(\s?[0-9]+)px\s?\)/ ) && parseFloat( RegExp.$1 ), 
+						maxw	: thisq.match( /\(max\-width:\s?(\s?[0-9]+)px\s?\)/ ) && parseFloat( RegExp.$1 )
 					} );
 				}	
 			}
@@ -228,7 +228,7 @@
 		  se.styleSheet.cssText = cssrule;
 		} 
 		else {
-		  se.appendChild(doc.createTextNode( cssrule );
+		  se.appendChild( doc.createTextNode( cssrule ) );
 		} 
 		docElem.insertBefore( fb, docElem.firstChild );
 		docElem.insertBefore( se, fb );
