@@ -20,9 +20,10 @@
 	//define vars
 	var doc 			= win.document,
 		docElem 		= doc.documentElement,
-		mediastyles		=
-		appendedEls 	=
-		parsedSheets 	= [],
+		mediastyles		= [],
+		rules			= [],
+		appendedEls 	= [],
+		parsedSheets 	= {},
 		resizeThrottle	= 30,
 		head 			= doc.getElementsByTagName( "head" )[0] || docElem,
 		links			= head.getElementsByTagName( "link" ),
@@ -34,24 +35,14 @@
 
 			for( var i = 0; i < sl; i++ ){
 				var sheet		= sheets[ i ],
-					href		= sheet.href,
-					parsed		= false;
+					href		= sheet.href;
 				
-				//only links plz
-				if( !!href ){
-					//prevent re-parsing when ripCSS is re-called
-					for( var j in parsedSheets ){
-						if( parsedSheets[ j ] === href ){
-							parsed = true;
-						}
-					}
-						
-					if( !parsed ){
-						ajax( href, function( styles ){
-							translate( styles, href );
-							parsedSheets.push( href );
-						} );
-					}
+				//only links plz and prevent re-parsing
+				if( !!href && !parsedSheets[ href ] ){
+					ajax( href, function( styles ){
+						translate( styles, href );
+						parsedSheets[ href ] = true;
+					} );
 				}
 			}		
 		},
@@ -64,15 +55,15 @@
 			for( var i = 0; i < ql; i++ ){
 				var fullq	= qs[ i ].match( /@media ([^\{]+)\{([\S\s]+?)$/ ) && RegExp.$1,
 					eachq	= fullq.split( "," ),
-					eql		= eachq.length,
-					rules	= RegExp.$2 && RegExp.$2.replace( /(url\()['"]?([^\/\)'"][^:\)'"]+)['"]?(\))/g, "$1" + href + "$2$3" );
+					eql		= eachq.length;
+					
+				rules.push( RegExp.$2 && RegExp.$2.replace( /(url\()['"]?([^\/\)'"][^:\)'"]+)['"]?(\))/g, "$1" + href + "$2$3" ) );
 					
 				for( var j = 0; j < eql; j++ ){
 					var thisq	= eachq[ j ];
-
 					mediastyles.push( { 
 						media	: thisq.match( /(only\s+)?([a-zA-Z]+)(\sand)?/ ) && RegExp.$2,
-						rules	: rules,
+						rules	: rules.length - 1,
 						minw	: thisq.match( /\(min\-width:\s?(\s?[0-9]+)px\s?\)/ ) && parseFloat( RegExp.$1 ), 
 						maxw	: thisq.match( /\(max\-width:\s?(\s?[0-9]+)px\s?\)/ ) && parseFloat( RegExp.$1 )
 					} );
@@ -113,22 +104,21 @@
 						if( !styleBlocks[ thisstyle.media ] ){
 							styleBlocks[ thisstyle.media ] = [];
 						}
-						styleBlocks[ thisstyle.media ].push( thisstyle.rules );
+						styleBlocks[ thisstyle.media ].push( rules[ thisstyle.rules ] );
 				}
-			}	
+			}
 			
 			//remove any existing respond style element(s)
 			for( var i in appendedEls ){
 				if( appendedEls[ i ] && appendedEls[ i ].parentNode === head ){
 					head.removeChild( appendedEls[ i ] );
 				}
-				
 			}
 			
 			//inject active styles, grouped by media type
 			for( var i in styleBlocks ){
 				var ss		= doc.createElement( "style" ),
-					css		= styleBlocks[ i ].join( "" );
+					css		= styleBlocks[ i ].join( "\n" );
 				
 				ss.type = "text/css";	
 				ss.media	= i;
