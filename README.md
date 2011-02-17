@@ -32,7 +32,7 @@ Support & Caveats
 
 Some notes to keep in mind:
 
-- This script's focus is purposely very narrow: only min-width and max-width media queries (along with their media type) are translated to non-supporting browsers. I wanted to keep things simple for filesize, maintenance, and performance, so I've intentionally limited support to queries that are essential to building a mobile-first responsive design. In the future, I may rework things a bit to include a hook for patching-in additional media query features - stay tuned!
+- This script's focus is purposely very narrow: only min-width and max-width media queries and media types (screen, print, etc) are translated to non-supporting browsers. I wanted to keep things simple for filesize, maintenance, and performance, so I've intentionally limited support to queries that are essential to building a mobile-first responsive design. In the future, I may rework things a bit to include a hook for patching-in additional media query features - stay tuned!
 
 - Browsers that natively support CSS3 Media Queries are opted-out of running this script as quickly as possible. In testing for support, I immediately pass browsers that support the window.matchMedia API (such as recent Chrome releases), and Internet Explorer 9+. Internet Explorer 8 and under are immediately flagged for failed media query support. All other browsers are subjected to a quick feature test to determine whether they support media queries or not before proceeding to run the script.
 
@@ -56,6 +56,15 @@ How's it work?
 Basically, the script loops through the CSS referenced in the page and runs a regular expression or two on their contents to find media queries and their associated blocks of CSS. The closing comment noted above is the marker that the script recognizes the end of a query, so don't forget to add it! Since at least in Internet Explorer, the content of the stylesheet seems to be impossible to retrieve in its pre-parsed state (which in IE 8-, means its media queries are removed from the text), the script re-requests the CSS files using Ajax and parses the text response from there. Obviously, this brings a little undesirable overhead, but it should not result in a additional server requests as long as cache settings are honored (testing is needed to verify).
 
 From there, each query block is appended to the head in order via style elements, and those style elements are enabled and disabled (read: appended and removed from the DOM) depending on how their min/max width compares with the browser width. The media attribute on the style elements will match that of the query in the CSS, so it could be "screen", "projector", or whatever you want. Any relative paths contained in the CSS will be prefixed by their stylesheet's href, so image paths will direct to their proper destination
+
+API Options?
+======
+Sure, a couple:
+
+- respond.update() : rerun the parser (helpful if you added a stylesheet to the page and it needs to be translated)
+- respond.mediaQueriesSupported: set to true if the browser natively supports media queries
+
+
 
 
 Alternatives to this script
