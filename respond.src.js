@@ -23,7 +23,7 @@
 		mediastyles	 	= [],
 		appendedEls		= [],
 		parsedSheets	= [],
-		resizeThrottle	= 0,
+		resizeThrottle	= 30,
 		head 			= doc.getElementsByTagName( "head" )[0] || docElem,
 		links			= head.getElementsByTagName( "link" ),
 		
@@ -83,6 +83,8 @@
         	
 		lastCall,
 		
+		resizeDefer,
+		
 		//enable/disable styles
 		applyMedia			= function( fromResize ){
 			var name		= "clientWidth",
@@ -93,6 +95,8 @@
 			
 			//throttle resize calls	
 			if( fromResize && lastCall && now - lastCall < resizeThrottle ){
+				clearTimeout( resizeDefer );
+				resizeDefer = setTimeout( applyMedia, resizeThrottle );
 				return;
 			}
 			else {
