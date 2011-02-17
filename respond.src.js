@@ -88,9 +88,10 @@
 		//enable/disable styles
 		applyMedia			= function( fromResize ){
 			var name		= "clientWidth",
-				docElemProp	= docElem[ name ]
+				docElemProp	= docElem[ name ],
 				currWidth 	= doc.compatMode === "CSS1Compat" && docElemProp || doc.body[ name ] || docElemProp,
 				styleBlocks	= {},
+				lastLink	= links[ links.length-1 ],
 				now 		= (new Date()).getTime();
 			
 			//throttle resize calls	
@@ -126,8 +127,9 @@
 			//inject active styles, grouped by media type
 			for( var i in styleBlocks ){
 				var ss		= doc.createElement( "style" ),
-					css		= styleBlocks[ i ].join("");
-					
+					css		= styleBlocks[ i ].join( "" );
+				
+				ss.type = "text/css";	
 				ss.media	= i;
 				
 				if ( ss.styleSheet ){ 
@@ -136,8 +138,8 @@
 		        else {
 					ss.appendChild( doc.createTextNode( css ) );
 		        }
-				
-				head.appendChild( ss );
+		        
+				head.insertBefore( ss, ( appendedEls.length ? appendedEls[appendedEls.length-1] : lastLink ).nextSibling );
 				appendedEls.push( ss );
 			}
 		},
