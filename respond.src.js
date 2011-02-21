@@ -15,7 +15,7 @@
 	respond.mediaQueriesSupported	= mqSupported;
 	
 	//if media queries are supported, exit here
-	if( mqSupported ){ return; }
+	//if( mqSupported ){ return; }
 	
 	//define vars
 	var doc 			= win.document,
@@ -39,10 +39,16 @@
 				
 				//only links plz and prevent re-parsing
 				if( !!href && !parsedSheets[ href ] ){
-					ajax( href, function( styles ){
-						translate( styles, href );
+					if( !/^([a-zA-Z]+?:(\/\/)?(www\.)?)/.test( href ) 
+						|| href.replace( RegExp.$1, "" ).split( "/" )[0] === win.location.host ){
+						ajax( href, function( styles ){
+							translate( styles, href );
+							parsedSheets[ href ] = true;
+						} );
+					}
+					else{
 						parsedSheets[ href ] = true;
-					} );
+					}	
 				}
 			}		
 		},
