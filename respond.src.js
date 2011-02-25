@@ -15,7 +15,7 @@
 	respond.mediaQueriesSupported	= mqSupported;
 	
 	//if media queries are supported, exit here
-	//if( mqSupported ){ return; }
+	if( mqSupported ){ return; }
 	
 	//define vars
 	var doc 			= win.document,
