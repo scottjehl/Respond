@@ -104,7 +104,7 @@
 										
 			for( var i in mediastyles ){
 				var thisstyle = mediastyles[ i ];
-				if( !thisstyle.minw && !thisstyle.maxq || 
+				if( !thisstyle.minw && !thisstyle.maxw || 
 					( !thisstyle.minw || thisstyle.minw && currWidth >= thisstyle.minw ) && 
 					(!thisstyle.maxw || thisstyle.maxw && currWidth <= thisstyle.maxw ) ){						
 						if( !styleBlocks[ thisstyle.media ] ){
