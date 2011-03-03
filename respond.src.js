@@ -41,9 +41,10 @@
 				if( !!href && !parsedSheets[ href ] ){
 					if( !/^([a-zA-Z]+?:(\/\/)?(www\.)?)/.test( href ) 
 						|| href.replace( RegExp.$1, "" ).split( "/" )[0] === win.location.host ){
+						var fullhref = href;
 						ajax( href, function( styles ){
-							translate( styles, href );
-							parsedSheets[ href ] = true;
+							translate( styles, fullhref );
+							parsedSheets[ fullhref ] = true;
 						} );
 					}
 					else{
@@ -56,7 +57,11 @@
 		translate		= function( styles, href ){
 			var qs		= styles.match( /@media ([^\{]+)\{([\S\s]+?)(?=\}\/\*\/mediaquery\*\/)/gmi ),
 				ql		= qs && qs.length || 0,
-				href	= href.substring( 0, href.lastIndexOf( "/" )) + "/";
+				//try to get CSS path
+				href	= href.substring( 0, href.lastIndexOf( "/" ));
+			
+			//if path exists, tack on trailing slash
+			if( href.length ){ href += "/"; }	
 				
 			for( var i = 0; i < ql; i++ ){
 				var fullq	= qs[ i ].match( /@media ([^\{]+)\{([\S\s]+?)$/ ) && RegExp.$1,
