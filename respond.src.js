@@ -250,42 +250,28 @@
 })(
 	this,
 	(function( win ){
-		//cond. comm. IE check by James Padolsey
-		var ie = (function(undef){
- 		    var v 	= 3,
-		        div	= document.createElement( "div" ),
-		        all	= div.getElementsByTagName( "i" );
-		 
-		    while(div.innerHTML = "<!--[if gt IE " + (++v) + "]><i></i><![endif]-->", all[0]);
-		    return v > 4 ? v : undef;
-		}());
 		
 		//for speed, flag browsers with window.matchMedia support and IE 9 as supported
-		if( win.matchMedia || ie && ie >= 9 ){ return true; }
-		//flag IE 8 and under as false - no test needed
-		if( ie && ie <= 8 ){ return false; }
-		//otherwise proceed with test
-		var doc		= win.document,
-			docElem	= doc.documentElement,
-		    fb		= doc.createElement( "body" ),
-		    div		= doc.createElement( "div" ),
-		    se		= doc.createElement( "style" ),
-			cssrule	= "@media only all { #qtest { position: absolute; } }";
-		div.setAttribute( "id", "qtest" );
+		if( win.matchMedia ){ return true; }
+
+		var bool,
+			doc			= document,
+			docElem		= doc.documentElement,
+			refNode		= docElem.firstElementChild || docElem.firstChild,
+			// fakeBody required for <FF4 when executed in <head>
+			fakeBody	= doc.createElement( "body" ),
+			div			= doc.createElement( "div" ),
+			q			= "only all";
 			
-		se.type = "text/css";
-		fb.appendChild( div );
-		if ( se.styleSheet ){ 
-		  se.styleSheet.cssText = cssrule;
-		} 
-		else {
-		  se.appendChild( doc.createTextNode( cssrule ) );
-		} 
-		docElem.insertBefore( fb, docElem.firstChild );
-		docElem.insertBefore( se, fb );
-		support = ( win.getComputedStyle ? win.getComputedStyle( div, null ) : div.currentStyle )["position"] == "absolute";
-		docElem.removeChild( fb );
-		docElem.removeChild( se );
-		return support;
+		div.id = "mq-test-1";
+		div.style.cssText = "position:absolute;top:-99em";
+		fakeBody.appendChild( div );
+		
+		div.innerHTML = '_<style media="'+q+'"> #mq-test-1 { width: 9px; }</style>';
+		docElem.insertBefore( fakeBody, refNode );
+		div.removeChild( div.firstChild );
+		bool = div.offsetWidth == 9;  
+		docElem.removeChild( fakeBody );
+		return bool;
 	})( this )
 );
