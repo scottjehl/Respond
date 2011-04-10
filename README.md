@@ -52,6 +52,8 @@ Some notes to keep in mind:
 
 - While this script has been tested against very complex responsive designs, I make no guarantees that it will work with yours. Feel free to file an issue if it doesn't work as described, and I might be able to help you out!
 
+- Currently, media attributes on link elements are supported, but only if the linked stylesheet contains no media queries. If it does contain queries, the media attribute will be ignored and the internal queries will be parsed normally.
+
 
 How's it work?
 ======
