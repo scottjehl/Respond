@@ -27,48 +27,88 @@
 		resizeThrottle	= 30,
 		head 			= doc.getElementsByTagName( "head" )[0] || docElem,
 		links			= head.getElementsByTagName( "link" ),
+		requestQueue	= [],
 		
 		//loop stylesheets, send text content to translate
 		ripCSS			= function(){
-			var sheets 	= doc.styleSheets,
-				sl 		= sheets.length;
+			var sheets 	= links,
+				sl 		= sheets.length;			
 
 			for( var i = 0; i < sl; i++ ){
 				var sheet		= sheets[ i ],
-					href		= sheet.href;
+					href		= sheet.href,
+					media		= sheet.media;
 				
 				//only links plz and prevent re-parsing
 				if( !!href && !parsedSheets[ href ] ){
 					if( !/^([a-zA-Z]+?:(\/\/)?(www\.)?)/.test( href ) 
 						|| href.replace( RegExp.$1, "" ).split( "/" )[0] === win.location.host ){
-						var fullhref = href;
-						ajax( href, function( styles ){
-							translate( styles, fullhref );
-							parsedSheets[ fullhref ] = true;
+						requestQueue.push( {
+							href: href,
+							media: media
 						} );
 					}
 					else{
 						parsedSheets[ href ] = true;
 					}	
 				}
-			}		
+			}
+			makeRequests();
+				
 		},
+		
+		//recurse through request queue, get css text
+		makeRequests	= function(){
+			if( requestQueue.length ){
+				var thisRequest = requestQueue.shift();
+				
+				ajax( thisRequest.href, function( styles ){
+					translate( styles, thisRequest.href, thisRequest.media );
+					parsedSheets[ thisRequest.href ] = true;
+					makeRequests();
+				} );
+			}
+		},
+		
 		//find media blocks in css text, convert to style blocks
-		translate		= function( styles, href ){
+		translate		= function( styles, href, media ){
 			var qs		= styles.match( /@media ([^\{]+)\{([\S\s]+?)(?=\}\/\*\/mediaquery\*\/)/gmi ),
 				ql		= qs && qs.length || 0,
 				//try to get CSS path
-				href	= href.substring( 0, href.lastIndexOf( "/" ));
+				href	= href.substring( 0, href.lastIndexOf( "/" )),
+				repUrls = function( css ){
+					return css.replace( /(url\()['"]?([^\/\)'"][^:\)'"]+)['"]?(\))/g, "$1" + href + "$2$3" );
+				},
+				useMedia = !ql && media;
 			
 			//if path exists, tack on trailing slash
 			if( href.length ){ href += "/"; }	
 				
+			//if no internal queries exist, but media attr does, use that	
+			//note: this currently lacks support for situations where a media attr is specified on a link AND
+				//its associated stylesheet has internal CSS media queries.
+				//In those cases, the media attribute will currently be ignored.
+			if( useMedia ){
+				ql = 1;
+			}
+			
+
 			for( var i = 0; i < ql; i++ ){
-				var fullq	= qs[ i ].match( /@media ([^\{]+)\{([\S\s]+?)$/ ) && RegExp.$1,
-					eachq	= fullq.split( "," ),
+				var fullq;
+				
+				//media attr
+				if( useMedia ){
+					fullq = media;
+					rules.push( repUrls( styles ) );
+				}
+				//parse for styles
+				else{
+					fullq	= qs[ i ].match( /@media ([^\{]+)\{([\S\s]+?)$/ ) && RegExp.$1;
+					rules.push( RegExp.$2 && repUrls( RegExp.$2 ) );
+				}
+			
+				var eachq	= fullq.split( "," ),
 					eql		= eachq.length;
-					
-				rules.push( RegExp.$2 && RegExp.$2.replace( /(url\()['"]?([^\/\)'"][^:\)'"]+)['"]?(\))/g, "$1" + href + "$2$3" ) );
 					
 				for( var j = 0; j < eql; j++ ){
 					var thisq	= eachq[ j ];
@@ -80,6 +120,7 @@
 					} );
 				}	
 			}
+
 			applyMedia();
 		},
         	

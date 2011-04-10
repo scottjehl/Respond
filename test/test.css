@@ -22,6 +22,11 @@ a {
 	color: #333;
 }
 
+/* hide the attribute-test element. test2.css will show it */
+#attribute-test {
+	display: none;
+}
+
 /*styles for 480px and up!*/
 @media only screen and (min-width: 480px), only screen and (max-width: 620px) {
 	body {
