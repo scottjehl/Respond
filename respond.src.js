@@ -37,10 +37,11 @@
 			for( var i = 0; i < sl; i++ ){
 				var sheet		= sheets[ i ],
 					href		= sheet.href,
-					media		= sheet.media;
-				
+					media		= sheet.media,
+					isCSS		= sheet.rel && sheet.rel.toLowerCase() === "stylesheet";
+
 				//only links plz and prevent re-parsing
-				if( !!href && !parsedSheets[ href ] ){
+				if( !!href && isCSS && !parsedSheets[ href ] ){
 					if( !/^([a-zA-Z]+?:(\/\/)?(www\.)?)/.test( href ) 
 						|| href.replace( RegExp.$1, "" ).split( "/" )[0] === win.location.host ){
 						requestQueue.push( {
