@@ -278,6 +278,9 @@
 		if( fakeUsed ){
 			docElem.removeChild( fakeBody );
 		}	
+		else{
+			fakeBody.removeChild( div );
+		}
 		return bool;
 	})( this )
 );
