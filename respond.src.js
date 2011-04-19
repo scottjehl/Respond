@@ -260,7 +260,8 @@
 			docElem		= doc.documentElement,
 			refNode		= docElem.firstElementChild || docElem.firstChild,
 			// fakeBody required for <FF4 when executed in <head>
-			fakeBody	= doc.createElement( "body" ),
+			fakeUsed	= !doc.body,
+			fakeBody	= doc.body || doc.createElement( "body" ),
 			div			= doc.createElement( "div" ),
 			q			= "only all";
 			
@@ -269,10 +270,14 @@
 		fakeBody.appendChild( div );
 		
 		div.innerHTML = '_<style media="'+q+'"> #mq-test-1 { width: 9px; }</style>';
-		docElem.insertBefore( fakeBody, refNode );
+		if( fakeUsed ){
+			docElem.insertBefore( fakeBody, refNode );
+		}	
 		div.removeChild( div.firstChild );
 		bool = div.offsetWidth == 9;  
-		docElem.removeChild( fakeBody );
+		if( fakeUsed ){
+			docElem.removeChild( fakeBody );
+		}	
 		return bool;
 	})( this )
 );
