@@ -32,7 +32,9 @@ a {
 	body {
 		background: green;
 	}
-}/*/mediaquery*/
+}
+
+/*/mediaquery*/
 
 /*styles for 620px and up!*/
 @media screen and (min-width: 620px), only print, projector {
