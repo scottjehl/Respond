@@ -73,7 +73,7 @@
 		
 		//find media blocks in css text, convert to style blocks
 		translate		= function( styles, href, media ){
-			var qs		= styles.match( /@media ([^\{]+)\{([\S\s]+?)(?=\}[\s]*\/\*\/mediaquery\*\/)/gmi ),
+			var qs		= styles.match( /@media ([^\{]+)\{((?!@media)[\s\S])*(?=\}[\s]*\/\*\/mediaquery\*\/)/gmi ),
 				ql		= qs && qs.length || 0,
 				//try to get CSS path
 				href	= href.substring( 0, href.lastIndexOf( "/" )),
@@ -81,7 +81,7 @@
 					return css.replace( /(url\()['"]?([^\/\)'"][^:\)'"]+)['"]?(\))/g, "$1" + href + "$2$3" );
 				},
 				useMedia = !ql && media;
-			
+
 			//if path exists, tack on trailing slash
 			if( href.length ){ href += "/"; }	
 				
