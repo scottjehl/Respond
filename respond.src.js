@@ -73,8 +73,8 @@
 		
 		//find media blocks in css text, convert to style blocks
 		translate		= function( styles, href, media ){
-			var qs		= (window.parseMediaQueries
-  			  ? window.parseMediaQueries(styles)
+			var qs		= (window.parseMQs
+  			  ? parseMQs(styles)
   			  : styles.match( /@media ([^\{]+)\{((?!@media)[\s\S])*(?=\}[\s]*\/\*\/mediaquery\*\/)/gmi )),
 				ql		= qs && qs.length || 0,
 				//try to get CSS path
@@ -253,7 +253,7 @@
 })(
 	this,
 	(function( win ){
-
+    return false;
 		//for speed, flag browsers with window.matchMedia support and IE 9 as supported
 		if( win.matchMedia ){ return true; }
 
