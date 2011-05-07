@@ -21,10 +21,8 @@
         case '}':
           stack.pop();
           if (stack.length === 0 && inMediaQuery) {
-            // We might be in a media query!
             if (media.length) {
-              var start = media.pop();
-              queries.push(str.substring(start, index));
+              queries.push(str.substring(media.pop(), index));
             }
             inMediaQuery = false;
           }
@@ -37,12 +35,10 @@
             while (str[index] !== '{' && index++ < len);
             
             // Save the location of this media query.  If we hit the end of the file
-            // just fucking, i don't know, return.
+            // just fucking, i don't know.
             if (str[index] === '{') {
               media.push(start);
               index--;
-            } else {
-              return;
             }
           }
           break;
@@ -64,10 +60,6 @@
             // Zip to the end of this comment block.
             while (str[++index] !== '/' && str[index - 1] !== '*');
           }
-          break;
-        
-        default:
-          // wat.
           break;
       };
 
