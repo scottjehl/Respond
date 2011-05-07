@@ -1,5 +1,5 @@
 
-(function(global, doc, undefined) {
+(function(win, doc, undefined) {
 
   var parseMQs = function(str) {
     var index = 0,
@@ -73,7 +73,8 @@
     
     return queries;
   };
-
-  global.parseMQs = parseMQs;
+  
+  win.respond = win.respond || {};
+  win.respond.parseMQs = parseMQs;
 
 })(window, document);

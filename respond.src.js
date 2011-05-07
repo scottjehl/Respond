@@ -6,7 +6,7 @@
 */
 (function( win, mqSupported ){
 	//exposed namespace
-	win.respond		= {};
+	win.respond = win.respond || {};
 	
 	//define update even in native-mq-supporting browsers, to avoid errors
 	respond.update	= function(){};
@@ -73,8 +73,8 @@
 		
 		//find media blocks in css text, convert to style blocks
 		translate		= function( styles, href, media ){
-			var qs		= (window.parseMQs
-  			  ? parseMQs(styles)
+			var qs		= (respond.parseMQs
+  			  ? respond.parseMQs(styles)
   			  : styles.match( /@media ([^\{]+)\{((?!@media)[\s\S])*(?=\}[\s]*\/\*\/mediaquery\*\/)/gmi )),
 				ql		= qs && qs.length || 0,
 				//try to get CSS path
