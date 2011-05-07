@@ -11,13 +11,15 @@
 
     while (index < len) {
       switch (str[index]) {
+        // Start of a block.
         case '{':
           stack.push('{');
           if (stack.length === 2) {
             inMediaQuery = true;
           }
           break;
-
+        
+        // End of a block.
         case '}':
           stack.pop();
           if (stack.length === 0 && inMediaQuery) {
@@ -27,12 +29,13 @@
             inMediaQuery = false;
           }
           break;
-          
+        
+        // @media queries.
         case '@':
           if (str.substring(index + 1, index + 6) === 'media') {
             var start = index;
             // Zip forward to the start of the media query.
-            while (str[index] !== '{' && index++ < len);
+            while (++index < len && str[index] !== '{');
             
             // Save the location of this media query.  If we hit the end of the file
             // just fucking, i don't know.
@@ -45,12 +48,12 @@
         
         // Doubley quoted strings.
         case '"':
-          while (str[++index] !== '"');
+          while (++index < len && str[index] !== '"');
           break;
         
         // Singley quoted strings.
         case "'":
-          while (str[++index] !== "'");
+          while (++index < len && str[index] !== "'");
           break;
         
         // Comments.
@@ -58,7 +61,7 @@
           if (str[index + 1] == '*') {
             index += 2;
             // Zip to the end of this comment block.
-            while (str[++index] !== '/' && str[index - 1] !== '*');
+            while (++index < len && str[index] !== '/' && str[index - 1] !== '*');
           }
           break;
       };
