@@ -253,7 +253,7 @@
 })(
 	this,
 	(function( win ){
-    return false;
+	  
 		//for speed, flag browsers with window.matchMedia support and IE 9 as supported
 		if( win.matchMedia ){ return true; }
 
