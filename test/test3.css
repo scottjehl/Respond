@@ -1,0 +1,21 @@
+
+/* Try to trick the parser. */
+a:before {
+	content: "}'☺'{";
+}
+a:after {
+	content: '{""}';
+}
+/*/** /*
+@media screen and (min-width: 1300px){
+	body {
+		background: navy;
+	}
+}
+*/
+
+@media screen and (min-width: 50000px){
+	body {
+		background: blanchedalmond;
+	}
+}

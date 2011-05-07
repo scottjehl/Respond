@@ -69,6 +69,8 @@
       index++;
     }
     
+    // console.log(queries);
+    
     return queries;
   };
 
