@@ -1,0 +1,56 @@
+
+
+.launcher #qunit-testrunner-toolbar,
+.launcher #qunit-userAgent,
+.launcher #qunit-tests,
+.launcher #qunit-testresult {
+	display: none;
+}
+.launcher #launcher {
+
+	font: 1.5em/1 bold Helvetica, sans-serif;
+}
+
+#testelem {
+	width: 50px;
+}
+
+/*styles for 480px and up */
+@media screen and (min-width: 480px) {
+	#testelem {
+		width: 150px;
+	}
+}/*/mediaquery*/
+
+/*styles for 500px and under*/
+@media screen and (max-width: 480px) {
+	#testelem {
+		height: 150px;
+	}
+}/*/mediaquery*/
+
+
+
+
+/*styles for 620px and up */
+@media only screen and (min-width: 620px) {
+	#testelem {
+		width: 250px;
+	}
+}/*/mediaquery*/
+
+
+/*styles for 760px and up */
+@media only print, only screen and (min-width: 760px) {
+	#testelem {
+		width: 350px;
+	}
+}/*/mediaquery*/
+
+
+/*styles for print that shouldn't apply */
+@media only print and (min-width: 800px) {
+	#testelem {
+		width: 500px;
+	}
+}/*/mediaquery*/
