@@ -29,7 +29,12 @@
 	}
 }
 
-
+/*style evaluates: !(width >= 540px) */
+@media not screen and (min-width: 540px) {
+    #testelem {
+        height: 10px;
+    }
+}
 
 
 /*styles for 620px and up */
@@ -53,4 +58,8 @@
 	#testelem {
 		width: 500px;
 	}
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> Added support for logical NOT. Added test cases. Seems to work in limited testing.

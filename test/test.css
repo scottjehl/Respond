@@ -27,17 +27,33 @@ a {
 	display: none;
 }
 
+/*style evaluates: !(width >= 320px) OR (width >= 360px AND width <= 460px) */
+@media not screen and (min-width: 320px), screen and (min-width: 360px) and (max-width: 460px) {
+    body {
+        background: pink;
+    }
+}
+
 /*styles for 480px and up!*/
-@media only screen and (min-width: 480px), only screen and (max-width: 620px) {
+@media only screen and (min-width: 480px) {
 	body {
 		background: green;
 	}
 }
 
 
+<<<<<<< HEAD
 
 /*styles for 620px and up! (let's try this one minified )*/
 @media screen and (min-width: 620px),only print,projector{body{background:red;}}
+=======
+/*styles for 620px and up!*/
+@media screen and (min-width: 620px), only print, projection {
+	body {
+		background: red;
+	}
+}
+>>>>>>> Added support for logical NOT. Added test cases. Seems to work in limited testing.
 
 /*styles for 800px and up!*/
 @media screen and (min-width: 800px){
@@ -58,4 +74,8 @@ a {
 	body {
 		background: navy;
 	}
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> Added support for logical NOT. Added test cases. Seems to work in limited testing.
