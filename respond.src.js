@@ -110,14 +110,14 @@
 			
 				var eachq	= fullq.split( "," ),
 					eql		= eachq.length,
-                    reMedia = /all|braille|embossed|handheld|print|projection|screen|speech|tty|tv/i,
-                    reLogic = /and|not|only/i;
+					reMedia = /all|braille|embossed|handheld|print|projection|screen|speech|tty|tv/i,
+					reLogic = /and|not|only/i;
 					
 				for( var j = 0; j < eql; j++ ){
 					var thisq	= eachq[ j ];
 					mediastyles.push( { 
 						media	: thisq.match( reMedia ),
-                        logic   : thisq.match( reLogic ),
+						logic   : thisq.match( reLogic ),
 						rules	: rules.length - 1,
 						minw	: thisq.match( /\(min\-width:[\s]*([\s]*[0-9]+)px[\s]*\)/ ) && parseFloat( RegExp.$1 ), 
 						maxw	: thisq.match( /\(max\-width:[\s]*([\s]*[0-9]+)px[\s]*\)/ ) && parseFloat( RegExp.$1 )
@@ -154,16 +154,16 @@
 										
 			for( var i in mediastyles ){
 				var thisstyle = mediastyles[ i ];
-                if( !thisstyle.logic || thisstyle.logic && thisstyle.logic != "not" ){
-                    if( !thisstyle.minw && !thisstyle.maxw || 
-                        ( !thisstyle.minw || thisstyle.minw && currWidth >= thisstyle.minw ) && 
-                        (!thisstyle.maxw || thisstyle.maxw && currWidth <= thisstyle.maxw ) ){						
-                            if( !styleBlocks[ thisstyle.media ] ){
-                                styleBlocks[ thisstyle.media ] = [];
-                            }
-                            styleBlocks[ thisstyle.media ].push( rules[ thisstyle.rules ] );
-                    }
-                }
+				if( !thisstyle.logic || thisstyle.logic && thisstyle.logic != "not" ){
+					if( !thisstyle.minw && !thisstyle.maxw || 
+						( !thisstyle.minw || thisstyle.minw && currWidth >= thisstyle.minw ) && 
+						(!thisstyle.maxw || thisstyle.maxw && currWidth <= thisstyle.maxw ) ){						
+							if( !styleBlocks[ thisstyle.media ] ){
+								styleBlocks[ thisstyle.media ] = [];
+							}
+							styleBlocks[ thisstyle.media ].push( rules[ thisstyle.rules ] );
+					}
+				}
 			}
 			
 			//remove any existing respond style element(s)
