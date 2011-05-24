@@ -4,9 +4,9 @@
  * Dual licensed under the MIT or GPL Version 2 licenses. 
  * Usage: Check out the readme file or github.com/scottjehl/respond
 */
-(function( win, mqSupported ){
+(function( win, mqSupported, undefined ){
 	//exposed namespace
-	win.respond = win.respond || {};
+	win.respond		= {};
 	
 	//define update even in native-mq-supporting browsers, to avoid errors
 	respond.update	= function(){};
@@ -71,11 +71,80 @@
 			}
 		},
 		
+		//media query parser - contributed by pifantastic
+		parseMQs = function( str ) {
+			var index = 0,
+				len = str.length,
+				stack = [],
+				media = [],
+				queries = [],
+				inMediaQuery = false;
+	        
+			while (index < len) {
+				switch ( str.charAt( index ) ) {
+				// Start of a block.
+				case '{':
+					stack.push('{');
+					if (stack.length === 2) {
+						inMediaQuery = true;
+					}
+					break;
+	
+				// End of a block.
+				case '}':
+					stack.pop();
+					if (stack.length === 0 && inMediaQuery) {
+						if (media.length) {
+							queries.push(str.substring(media.pop(), index));
+						}
+						inMediaQuery = false;
+					}
+					break;
+	        
+				// @media queries.
+				case '@':
+					if (str.substring(index, index + 7) === '@media ') {
+						var start = index;
+						// Zip forward to the start of the media query.
+						while (++index < len && str.charAt(index) !== '{');
+	            
+						// Save the location of this media query. 
+						if (str.charAt(index) === '{') {
+							media.push(start);
+							index--;
+						}
+					}
+				break;
+
+				// Doubley quoted strings.
+				case '"':
+					while (++index < len && str.charAt(index) !== '"');
+				break;
+
+				// Singley quoted strings.
+				case "'":
+					while (++index < len && str.charAt(index) !== "'");
+				break;
+
+				// Comments.
+				case "/":
+					if (str.charAt(index + 1) == '*') {
+						index += 2;
+						// Zip to the end of this comment block.
+						while (++index < len && str.charAt(index) !== '/' && str.charAt(index - 1) !== '*');
+					}
+					break;
+				};
+	
+				index++;
+			}
+	
+			return queries;
+		},
+		
 		//find media blocks in css text, convert to style blocks
 		translate		= function( styles, href, media ){
-			var qs		= (respond.parseMQs
-  			  ? respond.parseMQs(styles)
-  			  : styles.match( /@media ([^\{]+)\{((?!@media)[\s\S])*(?=\}[\s]*\/\*\/mediaquery\*\/)/gmi )),
+			var qs		= parseMQs( styles ),
 				ql		= qs && qs.length || 0,
 				//try to get CSS path
 				href	= href.substring( 0, href.lastIndexOf( "/" )),
@@ -250,10 +319,11 @@
 	else if( win.attachEvent ){
 		win.attachEvent( "onresize", callMedia );
 	}
+
 })(
 	this,
 	(function( win ){
-	  
+		
 		//for speed, flag browsers with window.matchMedia support and IE 9 as supported
 		if( win.matchMedia ){ return true; }
 
