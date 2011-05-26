@@ -73,7 +73,7 @@
 		
 		//find media blocks in css text, convert to style blocks
 		translate		= function( styles, href, media ){
-			var qs		= styles.match( /@media ([^\{]+)\{((?!@media)[\s\S])*(?=\}(?![^\{]*\}))/gmi ),
+			var qs		= styles.match( /@media [^\{]+\{((?!@media)[\s\S])*\}(?=[^\{]*\})/gmi ),
 				ql		= qs && qs.length || 0,
 				//try to get CSS path
 				href	= href.substring( 0, href.lastIndexOf( "/" )),
