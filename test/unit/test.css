@@ -20,14 +20,14 @@
 	#testelem {
 		width: 150px;
 	}
-}/*/mediaquery*/
+}
 
 /*styles for 500px and under*/
 @media screen and (max-width: 460px) {
 	#testelem {
 		height: 150px;
 	}
-}/*/mediaquery*/
+}
 
 
 
@@ -37,7 +37,7 @@
 	#testelem {
 		width: 250px;
 	}
-}/*/mediaquery*/
+}
 
 
 /*styles for 760px and up */
@@ -45,7 +45,7 @@
 	#testelem {
 		width: 350px;
 	}
-}/*/mediaquery*/
+}
 
 
 /*styles for print that shouldn't apply */
@@ -53,4 +53,4 @@
 	#testelem {
 		width: 500px;
 	}
-}/*/mediaquery*/
+}

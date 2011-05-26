@@ -14,19 +14,11 @@ If you're unfamiliar with the concepts surrounding Responsive Web Design, you ca
 Usage Instructions
 ======
 
-- Craft your CSS with min/max-width media queries to adapt your layout from mobile (first) all the way up to desktop
+1. Craft your CSS with min/max-width media queries to adapt your layout from mobile (first) all the way up to desktop
 
-- Follow each of your media query closing braces with this closing comment (handy for scanning the stylesheet anyway, IMHO):
+2. Reference the respond.min.js script (1kb min/gzipped) after all of your CSS
 
-<pre>
-    @media screen and (min-width: 480px){
-        ...styles for 480px and up go here
-    }/*/mediaquery*/
-</pre>
-
-- Reference the respond.min.js script (1kb min/gzipped) after all of your CSS
-
-- Crack open Internet Explorer and pump fists in delight
+3. Crack open Internet Explorer and pump fists in delight
 
 
 Support & Caveats
@@ -36,13 +28,11 @@ Some notes to keep in mind:
 
 - This script's focus is purposely very narrow: only min-width and max-width media queries and media types (screen, print, etc) are translated to non-supporting browsers. I wanted to keep things simple for filesize, maintenance, and performance, so I've intentionally limited support to queries that are essential to building a mobile-first responsive design. In the future, I may rework things a bit to include a hook for patching-in additional media query features - stay tuned!
 
-- Browsers that natively support CSS3 Media Queries are opted-out of running this script as quickly as possible. In testing for support, I immediately pass browsers that support the window.matchMedia API (such as recent Chrome releases), and Internet Explorer 9+. Internet Explorer 8 and under are immediately flagged for failed media query support. All other browsers are subjected to a quick feature test to determine whether they support media queries or not before proceeding to run the script.
+- Browsers that natively support CSS3 Media Queries are opted-out of running this script as quickly as possible. In testing for support, I immediately pass browsers that support the window.matchMedia API (such as recent Chrome releases), and Internet Explorer 9+. All other browsers are subjected to a quick feature test to determine whether they support media queries or not before proceeding to run the script.
 
-- This script relies on no other scripts or frameworks, and is optimized for mobile delivery (~1kb total filesize)
+- This script relies on no other scripts or frameworks, and is optimized for mobile delivery (~1.5kb total file size)
 
 - During translation, cascade order is preserved, so you can count on styles applying in the order you wrote them.
-
-- As you might guess by the closing-comment requirement, this implementation is quite dumb in regards to CSS parsing rules. This is a good thing, because it makes it run really fast, but it's looseness may also cause unexpected behavior. For example: if you enclose a whole media query in a comment intending to disable its rules, you'll probably find that those rules will end up enabled in non-media-query-supporting browsers. Keep things simple and you'll be less likely to encounter issues.
 
 - It may not work with @import'd CSS files right now, and it probably won't ever work with media queries within style elements, as those styles can't be re-requested for parsing.
 
@@ -57,7 +47,7 @@ Some notes to keep in mind:
 
 How's it work?
 ======
-Basically, the script loops through the CSS referenced in the page and runs a regular expression or two on their contents to find media queries and their associated blocks of CSS. The closing comment noted above is the marker that the script recognizes the end of a query, so don't forget to add it! Since at least in Internet Explorer, the content of the stylesheet seems to be impossible to retrieve in its pre-parsed state (which in IE 8-, means its media queries are removed from the text), the script re-requests the CSS files using Ajax and parses the text response from there. Obviously, this brings a little undesirable overhead, but it should not result in a additional server requests as long as cache settings are honored (testing is needed to verify).
+Basically, the script loops through the CSS referenced in the page and runs a regular expression or two on their contents to find media queries and their associated blocks of CSS. The closing comment noted above is the marker that the script recognizes the end of a query, so don't forget to add it! Since at least in Internet Explorer, the content of the stylesheet seems to be impossible to retrieve in its pre-parsed state (which in IE 8-, means its media queries are removed from the text), the script re-requests the CSS files using Ajax and parses the text response from there. Obviously, this brings a little undesirable overhead, but it should not result in a additional server requests as long as cache settings are proper.
 
 From there, each query block is appended to the head in order via style elements, and those style elements are enabled and disabled (read: appended and removed from the DOM) depending on how their min/max width compares with the browser width. The media attribute on the style elements will match that of the query in the CSS, so it could be "screen", "projector", or whatever you want. Any relative paths contained in the CSS will be prefixed by their stylesheet's href, so image paths will direct to their proper destination
 

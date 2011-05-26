@@ -4,7 +4,7 @@
  * Dual licensed under the MIT or GPL Version 2 licenses. 
  * Usage: Check out the readme file or github.com/scottjehl/respond
 */
-(function( win, mqSupported ){
+(function( win, mqSupported, undefined ){
 	//exposed namespace
 	win.respond		= {};
 	
@@ -71,9 +71,39 @@
 			}
 		},
 		
+		//media query parser - contributed by pifantastic
+		parseMQs=function(str){
+		    // split the stylesheet
+			var splits=str.split(/@media/gmi),
+                j=splits.length,
+                contents,
+                pos,
+                end,
+                nodes,
+                medias=[];
+            for(var i=1;i<j;++i){
+                // init
+                contents=splits[i]; // cache the value for better performance
+                pos=0;
+                end=contents.length; // cache, performance, blahblah
+                nodes=0;
+                // loop until we find the good closing bracket
+                do{
+                    if(contents.charAt(pos)=='{') ++nodes;
+                    if(contents.charAt(pos)=='}' && --nodes==0) break;
+                }
+                while(++pos<=end);
+                // yipikaye!
+                if(nodes==0){
+                    medias.push('@media'+contents.substring(0,pos));
+                }
+            }
+            return medias;
+		},
+		
 		//find media blocks in css text, convert to style blocks
 		translate		= function( styles, href, media ){
-			var qs		= styles.match( /@media ([^\{]+)\{((?!@media)[\s\S])*(?=\}[\s]*\/\*\/mediaquery\*\/)/gmi ),
+			var qs		= parseMQs( styles ),
 				ql		= qs && qs.length || 0,
 				//try to get CSS path
 				href	= href.substring( 0, href.lastIndexOf( "/" )),
@@ -248,6 +278,7 @@
 	else if( win.attachEvent ){
 		win.attachEvent( "onresize", callMedia );
 	}
+
 })(
 	this,
 	(function( win ){
