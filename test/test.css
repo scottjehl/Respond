@@ -45,12 +45,8 @@ a {
 
 
 
-/*styles for 620px and up!*/
-@media screen and (min-width: 620px), only print, projector {
-	body {
-		background: red;
-	}
-}
+/*styles for 620px and up! (let's try this one minified )*/
+@media screen and (min-width: 620px),only print,projector{body{background:red;}}
 
 /*styles for 800px and up!*/
 @media screen and (min-width: 800px){
