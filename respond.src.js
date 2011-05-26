@@ -72,74 +72,33 @@
 		},
 		
 		//media query parser - contributed by pifantastic
-		parseMQs = function( str ) {
-			var index = 0,
-				len = str.length,
-				stack = [],
-				media = [],
-				queries = [],
-				inMediaQuery = false;
-	        
-			while (index < len) {
-				switch ( str.charAt( index ) ) {
-				// Start of a block.
-				case '{':
-					stack.push('{');
-					if (stack.length === 2) {
-						inMediaQuery = true;
-					}
-					break;
-	
-				// End of a block.
-				case '}':
-					stack.pop();
-					if (stack.length === 0 && inMediaQuery) {
-						if (media.length) {
-							queries.push(str.substring(media.pop(), index));
-						}
-						inMediaQuery = false;
-					}
-					break;
-	        
-				// @media queries.
-				case '@':
-					if (str.substring(index, index + 7) === '@media ') {
-						var start = index;
-						// Zip forward to the start of the media query.
-						while (++index < len && str.charAt(index) !== '{');
-	            
-						// Save the location of this media query. 
-						if (str.charAt(index) === '{') {
-							media.push(start);
-							index--;
-						}
-					}
-				break;
-
-				// Doubley quoted strings.
-				case '"':
-					while (++index < len && str.charAt(index) !== '"');
-				break;
-
-				// Singley quoted strings.
-				case "'":
-					while (++index < len && str.charAt(index) !== "'");
-				break;
-
-				// Comments.
-				case "/":
-					if (str.charAt(index + 1) == '*') {
-						index += 2;
-						// Zip to the end of this comment block.
-						while (++index < len && str.charAt(index) !== '/' && str.charAt(index - 1) !== '*');
-					}
-					break;
-				};
-	
-				index++;
-			}
-	
-			return queries;
+		parseMQs=function(str){
+		    // split the stylesheet
+			var splits=str.split(/@media/gmi),
+                j=splits.length,
+                contents,
+                pos,
+                end,
+                nodes,
+                medias=[];
+            for(var i=1;i<j;++i){
+                // init
+                contents=splits[i]; // cache the value for better performance
+                pos=0;
+                end=contents.length; // cache, performance, blahblah
+                nodes=0;
+                // loop until we find the good closing bracket
+                do{
+                    if(contents.charAt(pos)=='{') ++nodes;
+                    if(contents.charAt(pos)=='}' && --nodes==0) break;
+                }
+                while(++pos<=end);
+                // yipikaye!
+                if(nodes==0){
+                    medias.push('@media'+contents.substring(0,pos));
+                }
+            }
+            return medias;
 		},
 		
 		//find media blocks in css text, convert to style blocks
