@@ -212,8 +212,6 @@
 			var xmlhttpmethod = false,
 				attempts = [
 					function(){ return new ActiveXObject("Microsoft.XMLHTTP") },
-					function(){ return new ActiveXObject("Msxml3.XMLHTTP") },
-					function(){ return new ActiveXObject("Msxml2.XMLHTTP") },
 					function(){ return new XMLHttpRequest() }		
 				],
 				al = attempts.length;
