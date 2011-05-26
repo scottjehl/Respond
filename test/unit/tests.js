@@ -91,6 +91,14 @@ window.onload = function(){
 				start();
 			}, 900);	
 		});
+
+		asyncTest( "Stylesheets within a media query starting with logical NOT operator do not apply", function(){
+			window.resizeTo(540,600);
+			setTimeout(function(){
+				ok( !widthApplied( 10 ), "test elem is not 10px wide when window is 540px wide" );
+				start();
+			}, 50);
+		});
 		
 	}
 	
