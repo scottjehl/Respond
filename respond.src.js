@@ -74,7 +74,7 @@
 		//media query parser - contributed by pifantastic
 		parseMQs=function(str){
 		    // split the stylesheet
-			var splits=str.split(/@media/gmi),
+			var splits=str.split('@media'),
                 j=splits.length,
                 contents,
                 pos,
