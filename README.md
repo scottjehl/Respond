@@ -42,17 +42,18 @@ Some notes to keep in mind:
 
 - During translation, cascade order is preserved, so you can count on styles applying in the order you wrote them.
 
-- As you might guess by the closing-comment requirement, this implementation is quite dumb in regards to CSS parsing rules. This is a good thing, because it makes it run really fast, but it's looseness may also cause unexpected behavior. For example: if you enclose a whole media query in a comment intending to disable its rules, you'll probably find that those rules will end up enabled in non-media-query-supporting browsers. Keep things simple and you'll be less likely to encounter issues.
+- As you might guess, this implementation is quite dumb in regards to CSS parsing rules. This is a good thing, because it makes it run really fast, but it's looseness may also cause unexpected behavior. For example: if you enclose a whole media query in a comment intending to disable its rules, you'll probably find that those rules will end up enabled in non-media-query-supporting browsers. Keep things simple and you'll be less likely to encounter issues.
 
-- It may not work with @import'd CSS files right now, and it probably won't ever work with media queries within style elements, as those styles can't be re-requested for parsing.
+- Respond.js doesn't parse CSS refrenced via @import, nor does it work with media queries within style elements, as those styles can't be re-requested for parsing.
 
-- Due to security restrictions, some browsers may not allow this script to work on file:// urls (because it uses xmlHttpRequest). 
+- Due to security restrictions, some browsers may not allow this script to work on file:// urls (because it uses xmlHttpRequest). Run it on a web server.
 
 - Currently, this script will only work with same-domain CSS files, though I may patch that up soon.
 
-- While this script has been tested against very complex responsive designs, I make no guarantees that it will work with yours. Feel free to file an issue if it doesn't work as described, and I might be able to help you out!
 
 - Currently, media attributes on link elements are supported, but only if the linked stylesheet contains no media queries. If it does contain queries, the media attribute will be ignored and the internal queries will be parsed normally.
+
+- WARNING: Do not include @font-face rules inside a media query. This will crash IE7 and IE8. Simply place @font-face rules in the wide open, as a sibling to other media queries. Isolated test here to demostrate (note: test crashes IE 7&8): http://jsfiddle.net/scottjehl/Ejyj5/1/
 
 
 How's it work?

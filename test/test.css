@@ -32,14 +32,6 @@ a {
 	body {
 		background: green;
 	}
-	@font-face {
-        font-family: "TEST";
-        src: url("test.eot") format("eot");
-        src: url("test.eot?iefix") format("eot"),
-                url("test.woff") format("woff"),
-                url("test.ttf") format("truetype"),
-                url("test.svg") format("svg");
-	}
 }
 
 
