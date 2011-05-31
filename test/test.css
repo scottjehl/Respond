@@ -42,18 +42,11 @@ a {
 }
 
 
-<<<<<<< HEAD
+
 
 /*styles for 620px and up! (let's try this one minified )*/
 @media screen and (min-width: 620px),only print,projector{body{background:red;}}
-=======
-/*styles for 620px and up!*/
-@media screen and (min-width: 620px), only print, projection {
-	body {
-		background: red;
-	}
-}
->>>>>>> Added support for logical NOT. Added test cases. Seems to work in limited testing.
+
 
 /*styles for 800px and up!*/
 @media screen and (min-width: 800px){
@@ -74,8 +67,4 @@ a {
 	body {
 		background: navy;
 	}
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> Added support for logical NOT. Added test cases. Seems to work in limited testing.
