@@ -1,8 +1,4 @@
-/*
- * respond.js - A small and fast polyfill for min/max-width CSS3 Media Queries
- * Copyright 2011, Scott Jehl, scottjehl.com
- * MIT License. github.com/scottjehl/respond
-*/
+/*! Respond.js: min/max-width media query polyfill. © Scott Jehl. MIT License. github.com/scottjehl/respond */
 (function( win, mqSupported ){
 	//exposed namespace
 	win.respond		= {};
