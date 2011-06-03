@@ -244,8 +244,7 @@
 					}, 50);
 				}
 				
-				iframe.src = proxyURL + "?css=" + url;
-				
+				iframe.src = proxyURL + "?url=" + redirectURL + "&css=" + url;
 				return;
 			} else {
 				var req = xmlHttp();
