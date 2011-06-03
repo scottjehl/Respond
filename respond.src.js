@@ -25,12 +25,25 @@
 		requestQueue	= [],
 		isExtRegExp     = /^([a-zA-Z]+?:(\/\/)?(www\.)?)/,
 	    fallbackMeta    = doc.getElementById("respond-proxy"),
-	    proxyURL        = fallbackMeta ? fallbackMeta.content : null,
+	    proxyURL,
+	    redirectURL,
 		thisRequest,
 		iframe,
 		
 		//loop stylesheets, send text content to translate
 		ripCSS			= function(){
+			if (fallbackMeta) {
+				var props = fallbackMeta.content.split(/,\s?/),
+				    values = {}, i, j, pairs, loc = window.location;
+				
+				for (i = 0, j = props.length; i < j; i++) {
+					pairs = props[i].split("=");
+					values[pairs[0]] = pairs[1];
+				}
+				
+				proxyURL = values["external-proxy"];
+				redirectURL = loc.protocol + "//" + loc.hostname + (loc.port ? ":" + loc.port : "") + "/" + values["redirect-to"];
+			}
 			var sheets 	= links,
 				sl 		= sheets.length,
 				i		= 0,
