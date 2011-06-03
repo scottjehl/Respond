@@ -27,6 +27,16 @@ Usage Instructions
 
 # Crack open Internet Explorer and pump fists in delight
 
+CDN/X-Domain Setup
+======
+
+# See test/test-x-domain.html for a demo
+
+- Upload `test/proxy/respond-proxy.html` to your external domain
+- Upload `x-domain-end-point.html` to your origin domain
+- Reference both files via `<meta />` element:
+	- `<meta name="respond-proxy" id="respond-proxy" content="external-proxy=http://externalcdn.com/respond-proxy.html, redirect-to=/x-domain-end-point.html">`
+	- Note: `external-proxy` is an absolute URL. `redirect-to` is relative to the origin root.
 
 Support & Caveats
 ======
@@ -44,9 +54,6 @@ Some notes to keep in mind:
 - Respond.js doesn't parse CSS refrenced via @import, nor does it work with media queries within style elements, as those styles can't be re-requested for parsing.
 
 - Due to security restrictions, some browsers may not allow this script to work on file:// urls (because it uses xmlHttpRequest). Run it on a web server.
-
-- Due to its use of Ajax, this script will only work with same-domain CSS files, though I may patch that up soon.
-
 
 - Currently, media attributes on link elements are supported, but only if the linked stylesheet contains no media queries. If it does contain queries, the media attribute will be ignored and the internal queries will be parsed normally.
 
