@@ -23,6 +23,7 @@
 		head 			= doc.getElementsByTagName( "head" )[0] || docElem,
 		links			= head.getElementsByTagName( "link" ),
 		requestQueue	= [],
+		isExtRegExp     = /^([a-zA-Z]+?:(\/\/)?(www\.)?)/,
 		
 		//loop stylesheets, send text content to translate
 		ripCSS			= function(){
@@ -40,8 +41,8 @@
 
 				//only links plz and prevent re-parsing
 				if( !!href && isCSS && !parsedSheets[ href ] ){
-					if( !/^([a-zA-Z]+?:(\/\/)?(www\.)?)/.test( href ) 
 						|| href.replace( RegExp.$1, "" ).split( "/" )[0] === win.location.host ){
+					if( !isExtRegExp.test( href ) 
 						requestQueue.push( {
 							href: href,
 							media: media
