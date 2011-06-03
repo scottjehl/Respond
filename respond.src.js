@@ -45,8 +45,9 @@
 
 				//only links plz and prevent re-parsing
 				if( !!href && isCSS && !parsedSheets[ href ] ){
-						|| href.replace( RegExp.$1, "" ).split( "/" )[0] === win.location.host ){
 					if( !isExtRegExp.test( href ) 
+						|| href.replace( RegExp.$1, "" ).split( "/" )[0] === win.location.host
+						|| proxyURL ){
 						requestQueue.push( {
 							href: href,
 							media: media
