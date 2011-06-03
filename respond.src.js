@@ -247,6 +247,12 @@
 	//expose update for re-running respond later on
 	respond.update = ripCSS;
 	
+	// Semi-private variables accessed via proxy iframe
+	respond._ajax = ajax;
+	
+	// Receives cssText for parsing
+	respond._receiveCSSText = receiveCSSText;
+	
 	//adjust on resize
 	function callMedia(){
 		applyMedia( true );
