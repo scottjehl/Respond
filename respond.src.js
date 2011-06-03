@@ -62,16 +62,19 @@
 				
 		},
 		
+		// Parse CSS Text
+		receiveCSSText = function( styles ){
+			translate( styles, thisRequest.href, thisRequest.media );
+			parsedSheets[ thisRequest.href ] = true;
+			makeRequests();
+		},
+		
 		//recurse through request queue, get css text
 		makeRequests	= function(){
 			if( requestQueue.length ){
 				thisRequest = requestQueue.shift();
 				
-				ajax( thisRequest.href, function( styles ){
-					translate( styles, thisRequest.href, thisRequest.media );
-					parsedSheets[ thisRequest.href ] = true;
-					makeRequests();
-				} );
+				ajax( thisRequest.href, receiveCSSText );
 			}
 		},
 		
