@@ -30,7 +30,7 @@ Usage Instructions
 CDN/X-Domain Setup
 ======
 
-# See test/test-x-domain.html for a demo
+See test/test-x-domain.html for a demo:
 
 - Upload `test/proxy/respond-proxy.html` to your external domain
 - Upload `x-domain-end-point.html` to your origin domain
