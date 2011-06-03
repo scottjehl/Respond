@@ -27,6 +27,7 @@
 	    fallbackMeta    = doc.getElementById("respond-proxy"),
 	    proxyURL,
 	    redirectURL,
+		proxyInterval,
 		thisRequest,
 		iframe,
 		
@@ -90,6 +91,10 @@
 				ajax( thisRequest.href, receiveCSSText );
 			} else if (iframe) {
 				iframe.parentNode.removeChild(iframe);
+				
+				if (proxyInterval) {
+					window.clearInterval(proxyInterval);
+				}
 			}
 		},
 		
@@ -224,6 +229,19 @@
 					iframe = doc.createElement("iframe");
 					iframe.style.cssText = "position:absolute;top:-99em";
 					docElem.insertBefore( iframe, refNode );
+					
+					proxyInterval = window.setInterval(function () {
+						var cssText;
+						
+						try {
+							cssText = iframe.contentWindow.name;
+							
+							if (cssText) {
+								cssText = window.decodeURIComponent(cssText);
+								callback(cssText);
+							}
+						} catch (e) {}
+					}, 50);
 				}
 				
 				iframe.src = proxyURL + "?css=" + url;
