@@ -14,7 +14,7 @@ If you're unfamiliar with the concepts surrounding Responsive Web Design, you ca
 Usage Instructions
 ======
 
-# Craft your CSS with min/max-width media queries to adapt your layout from mobile (first) all the way up to desktop
+1. Craft your CSS with min/max-width media queries to adapt your layout from mobile (first) all the way up to desktop
 
 
 <pre>
@@ -23,9 +23,9 @@ Usage Instructions
     }
 </pre>
 
-# Reference the respond.min.js script (1kb min/gzipped) after all of your CSS
+2. Reference the respond.min.js script (1kb min/gzipped) after all of your CSS
 
-# Crack open Internet Explorer and pump fists in delight
+3. Crack open Internet Explorer and pump fists in delight
 
 
 Support & Caveats
