@@ -201,22 +201,36 @@
 			head.insertBefore( dFrag, lastLink.nextSibling );
 		},
 		//tweaked Ajax functions from Quirksmode
-		ajax = function( url, callback ) {
-			var req = xmlHttp();
-			if (!req){
+		ajax = function( url, callback, external ) {
+			if (proxyURL && !external && isExtRegExp.test(url)) {
+				var refNode = docElem.firstElementChild || docElem.firstChild;
+				
+				if (!iframe) {
+					iframe = doc.createElement("iframe");
+					iframe.style.cssText = "position:absolute;top:-99em";
+					docElem.insertBefore( iframe, refNode );
+				}
+				
+				iframe.src = proxyURL + "?css=" + url;
+				
 				return;
-			}	
-			req.open( "GET", url, true );
-			req.onreadystatechange = function () {
-				if ( req.readyState != 4 || req.status != 200 && req.status != 304 ){
+			} else {
+				var req = xmlHttp();
+				if (!req){
+					return;
+				}	
+				req.open( "GET", url, true );
+				req.onreadystatechange = function () {
+					if ( req.readyState != 4 || req.status != 200 && req.status != 304 ){
+						return;
+					}
+					callback( req.responseText );
+				}
+				if ( req.readyState == 4 ){
 					return;
 				}
-				callback( req.responseText );
+				req.send();
 			}
-			if ( req.readyState == 4 ){
-				return;
-			}
-			req.send();
 		},
 		//define ajax obj 
 		xmlHttp = (function() {
