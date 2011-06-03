@@ -24,6 +24,8 @@
 		links			= head.getElementsByTagName( "link" ),
 		requestQueue	= [],
 		isExtRegExp     = /^([a-zA-Z]+?:(\/\/)?(www\.)?)/,
+	    fallbackMeta    = doc.getElementById("respond-proxy"),
+	    proxyURL        = fallbackMeta ? fallbackMeta.content : null,
 		thisRequest,
 		iframe,
 		
