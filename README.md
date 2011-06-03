@@ -30,12 +30,16 @@ Usage Instructions
 CDN/X-Domain Setup
 ======
 
-See test/test-x-domain.html for a demo:
+Respond.js works by requesting a pristine copy of your CSS via AJAX, so if you host your stylesheets on a CDN (or a subdomain), you'll need to upload a proxy page to enable cross-domain communication.
 
-- Upload `test/proxy/respond-proxy.html` to your external domain
-- Upload `x-domain-end-point.html` to your origin domain
+See `test/test-x-domain.html` for a demo:
+
+- Upload `x-domain/respond-proxy.html` to your external domain
+- Upload `x-domain/favicon.ico` to your origin domain
+	- Note: This file can be any existing file of your choosing. The proxy merely needs to redirect back to a file on your origin domain.
+	- _Note: The dummy file should not be an HTML page. It can lead to an infinite loop scenario._
 - Reference both files via `<meta />` element:
-	- `<meta name="respond-proxy" id="respond-proxy" content="external-proxy=http://externalcdn.com/respond-proxy.html, redirect-to=/x-domain-end-point.html">`
+	- `<meta name="respond-proxy" id="respond-proxy" content="external-proxy=http://externalcdn.com/respond-proxy.html, redirect-to=/favicon.ico" />`
 	- Note: `external-proxy` is an absolute URL. `redirect-to` is relative to the origin root.
 
 Support & Caveats
