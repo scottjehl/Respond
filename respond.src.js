@@ -75,6 +75,8 @@
 				thisRequest = requestQueue.shift();
 				
 				ajax( thisRequest.href, receiveCSSText );
+			} else if (iframe) {
+				iframe.parentNode.removeChild(iframe);
 			}
 		},
 		
