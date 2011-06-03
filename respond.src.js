@@ -24,6 +24,8 @@
 		links			= head.getElementsByTagName( "link" ),
 		requestQueue	= [],
 		isExtRegExp     = /^([a-zA-Z]+?:(\/\/)?(www\.)?)/,
+		thisRequest,
+		iframe,
 		
 		//loop stylesheets, send text content to translate
 		ripCSS			= function(){
@@ -60,7 +62,7 @@
 		//recurse through request queue, get css text
 		makeRequests	= function(){
 			if( requestQueue.length ){
-				var thisRequest = requestQueue.shift();
+				thisRequest = requestQueue.shift();
 				
 				ajax( thisRequest.href, function( styles ){
 					translate( styles, thisRequest.href, thisRequest.media );
