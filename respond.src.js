@@ -221,8 +221,8 @@
 			head.insertBefore( dFrag, lastLink.nextSibling );
 		},
 		//tweaked Ajax functions from Quirksmode
-		ajax = function( url, callback, external ) {
-			if (proxyURL && !external && isExtRegExp.test(url)) {
+		ajax = function( url, callback ) {
+			if (proxyURL && isExtRegExp.test(url)) {
 				var refNode = docElem.firstElementChild || docElem.firstChild;
 				
 				if (!iframe) {
