@@ -261,7 +261,6 @@
 							cssText = iframe.contentWindow.name;
 							
 							if (cssText) {
-								cssText = window.decodeURIComponent(cssText);
 								callback(cssText);
 							}
 						} catch (e) {}

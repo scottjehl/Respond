@@ -69,9 +69,7 @@
 			
 			if (css) {
 				ajax(css, function (response) {
-					var encodedText = window.encodeURIComponent(response);
-					
-					window.name = encodedText;
+					window.name = response;
 					window.location.href = domain;
 				});
 			}
