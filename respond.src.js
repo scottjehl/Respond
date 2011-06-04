@@ -27,6 +27,7 @@
 		isExtRegExp     = /^([a-zA-Z]+?:(\/\/)?(www\.)?)/,
 		proxyURL        = (doc.getElementById("respond-proxy") || {}).href,
 		redirectURL     = (doc.getElementById("respond-redirect") || win.location).href,
+		matchDomain,
 		proxyInterval,
 		thisRequest,
 		iframe,
@@ -39,6 +40,10 @@
 				i		= 0,
 				//vars for loop:
 				sheet, href, media, isCSS;
+			
+			if (proxyURL) {
+				matchDomain = proxyURL.match(/^[^\.]+\.[a-z]{2,4}/);
+			}
 
 			for( ; i < sl; i++ ){
 				sheet	= sheets[ i ],
@@ -50,7 +55,7 @@
 				if( !!href && isCSS && !parsedSheets[ href ] ){
 					if( !isExtRegExp.test( href ) 
 						|| href.replace( RegExp.$1, "" ).split( "/" )[0] === host
-						|| proxyURL && win.top === win.self ){
+						|| proxyURL && win.top === win.self && ~ href.indexOf(matchDomain)){
 						requestQueue.push( {
 							href: href,
 							media: media
@@ -223,7 +228,7 @@
 		},
 		//tweaked Ajax functions from Quirksmode
 		ajax = function( url, callback ) {
-			if (proxyURL && redirectURL && isExtRegExp.test(url)) {
+			if (proxyURL && ~ url.indexOf(matchDomain) && isExtRegExp.test(url)) {
 				var refNode = docElem.firstElementChild || docElem.firstChild;
 				
 				if (!iframe) {
