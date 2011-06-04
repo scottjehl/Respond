@@ -25,9 +25,8 @@
 		links			= head.getElementsByTagName( "link" ),
 		requestQueue	= [],
 		isExtRegExp     = /^([a-zA-Z]+?:(\/\/)?(www\.)?)/,
-		fallbackMeta    = doc.getElementById("respond-proxy"),
-		proxyURL,
-		redirectURL,
+		proxyURL        = (doc.getElementById("respond-proxy") || {}).href,
+		redirectURL     = (doc.getElementById("respond-redirect") || win.location).href,
 		proxyInterval,
 		thisRequest,
 		iframe,
@@ -40,24 +39,6 @@
 				i		= 0,
 				//vars for loop:
 				sheet, href, media, isCSS;
-				
-			if (fallbackMeta) {
-				var contentRegExp = (/([a-zA-Z]+)=([^,\s?]+)/img),
-				    content = fallbackMeta.content,
-				    match, values = {};
-				
-				while (match = contentRegExp.exec(content)) {
-					switch (match[1]) {
-					case "external" :
-						proxyURL = match[2];
-						break;
-					
-					case "redirect" :
-						redirectURL = "//" + host + match[2];
-						break;
-					}
-				}
-			}
 
 			for( ; i < sl; i++ ){
 				sheet	= sheets[ i ],
