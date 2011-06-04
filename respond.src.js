@@ -15,6 +15,7 @@
 	//define vars
 	var doc 			= win.document,
 		docElem 		= doc.documentElement,
+		host            = win.location.host,
 		mediastyles		= [],
 		rules			= [],
 		appendedEls 	= [],
@@ -41,20 +42,20 @@
 				sheet, href, media, isCSS;
 				
 			if (fallbackMeta) {
-				var props = fallbackMeta.content.split(/,\s?/),
-				    values = {}, k, l, pairs, rdc,
-				    loc = window.location;
+				var contentRegExp = (/([a-zA-Z]+)=([^,\s?]+)/img),
+				    content = fallbackMeta.content,
+				    match, values = {};
 				
-				for (k = 0, l = props.length; k < l; k++) {
-					pairs = props[k].split("=");
-					values[pairs[0]] = pairs[1];
-				}
-				
-				proxyURL = values["external-proxy"];
-				rdc = values["redirect-to"];
-				
-				if (rdc) {
-					redirectURL = loc.protocol + "//" + loc.hostname + (loc.port ? ":" + loc.port : "") + "/" + rdc;
+				while (match = contentRegExp.exec(content)) {
+					switch (match[1]) {
+					case "external" :
+						proxyURL = match[2];
+						break;
+					
+					case "redirect" :
+						redirectURL = "//" + host + match[2];
+						break;
+					}
 				}
 			}
 
@@ -67,7 +68,7 @@
 				//only links plz and prevent re-parsing
 				if( !!href && isCSS && !parsedSheets[ href ] ){
 					if( !isExtRegExp.test( href ) 
-						|| href.replace( RegExp.$1, "" ).split( "/" )[0] === win.location.host
+						|| href.replace( RegExp.$1, "" ).split( "/" )[0] === host
 						|| (proxyURL && redirectURL) ){
 						requestQueue.push( {
 							href: href,
@@ -104,15 +105,14 @@
 				// Per http://j.mp/kn9EPh, not taking any chances. Flushing the ActiveXObject
 				if (AXO) {
 					AXO = null;
-					delete AXO;
 					
-					if (window.CollectGarbage) {
-						window.CollectGarbage();
+					if (win.CollectGarbage) {
+						win.CollectGarbage();
 					}
 				}
 				
 				if (proxyInterval) {
-					window.clearInterval(proxyInterval);
+					win.clearInterval(proxyInterval);
 				}
 			}
 		},
@@ -248,7 +248,7 @@
 					
 					// All hail Google http://j.mp/iKMI19
 					// Behold, an iframe proxy without annoying clicky noises.
-					if ("ActiveXObject" in window) {
+					if ("ActiveXObject" in win) {
 						AXO = new ActiveXObject("htmlfile");
 						AXO.open();
 						AXO.write('<iframe id="x"></iframe>');
@@ -260,7 +260,7 @@
 						docElem.insertBefore(iframe, refNode);
 					}
 					
-					proxyInterval = window.setInterval(function () {
+					proxyInterval = win.setInterval(function () {
 						var cssText;
 						
 						try {
