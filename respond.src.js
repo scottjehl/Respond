@@ -50,7 +50,7 @@
 				if( !!href && isCSS && !parsedSheets[ href ] ){
 					if( !isExtRegExp.test( href ) 
 						|| href.replace( RegExp.$1, "" ).split( "/" )[0] === host
-						|| (proxyURL && redirectURL) ){
+						|| proxyURL && win.top === win.self ){
 						requestQueue.push( {
 							href: href,
 							media: media
