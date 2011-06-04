@@ -245,9 +245,9 @@
 					if ("ActiveXObject" in window) {
 						AXO = new ActiveXObject("htmlfile");
 						AXO.open();
-						AXO.write('<html><body><iframe id="iframe"></iframe></body></html>');
+						AXO.write('<iframe id="x"></iframe>');
 						AXO.close();
-						iframe = AXO.getElementById("iframe");
+						iframe = AXO.getElementById("x");
 					} else {
 						iframe = doc.createElement("iframe");
 						iframe.style.cssText = "position:absolute;top:-99em";
