@@ -82,6 +82,7 @@
 				
 				// Remove iframe
 				iframe.parentNode.removeChild(iframe);
+				iframe = null;
 				
 				// Per http://j.mp/kn9EPh, not taking any chances. Flushing the ActiveXObject
 				if (AXO) {
