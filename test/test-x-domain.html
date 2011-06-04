@@ -2,8 +2,14 @@
 <html>
 <head>
 	<meta charset="utf-8" />
-	<meta name="respond-proxy" id="respond-proxy" content="external=http://doctyper.com/stuff/respond/respond-proxy.html, redirect=/x-domain/favicon.ico" />
 	<title>Respond JS Test Page</title>
+	
+	<!-- Respond.js proxy on external server -->
+	<link href="http://doctyper.com/stuff/respond/respond-proxy.html" id="respond-proxy" rel="respond-proxy" />
+	
+	<!-- Respond.js redirect (optional, defaults to current page) -->
+	<link href="/x-domain/favicon.ico" id="respond-redirect" rel="respond-redirect" />
+	
 	<link href="http://doctyper.com/stuff/respond/test.css" rel="stylesheet"/>
 	<link href="http://doctyper.com/stuff/respond/test2.css" media="screen and (min-width: 600px)" rel="stylesheet"/>
 	<script src="../respond.src.js"></script>
