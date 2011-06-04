@@ -265,11 +265,11 @@
 						
 						try {
 							cssText = iframe.contentWindow.name;
-							
-							if (cssText) {
-								callback(cssText);
-							}
 						} catch (e) {}
+						
+						if (cssText) {
+							callback(cssText);
+						}
 					}, 50);
 				}
 				
