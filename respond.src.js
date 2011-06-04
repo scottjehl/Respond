@@ -34,23 +34,29 @@
 		
 		//loop stylesheets, send text content to translate
 		ripCSS			= function(){
-			if (fallbackMeta) {
-				var props = fallbackMeta.content.split(/,\s?/),
-				    values = {}, i, j, pairs, loc = window.location;
-				
-				for (i = 0, j = props.length; i < j; i++) {
-					pairs = props[i].split("=");
-					values[pairs[0]] = pairs[1];
-				}
-				
-				proxyURL = values["external-proxy"];
-				redirectURL = loc.protocol + "//" + loc.hostname + (loc.port ? ":" + loc.port : "") + "/" + values["redirect-to"];
-			}
 			var sheets 	= links,
 				sl 		= sheets.length,
 				i		= 0,
 				//vars for loop:
 				sheet, href, media, isCSS;
+				
+			if (fallbackMeta) {
+				var props = fallbackMeta.content.split(/,\s?/),
+				    values = {}, k, l, pairs, rdc,
+				    loc = window.location;
+				
+				for (k = 0, l = props.length; k < l; k++) {
+					pairs = props[k].split("=");
+					values[pairs[0]] = pairs[1];
+				}
+				
+				proxyURL = values["external-proxy"];
+				rdc = values["redirect-to"];
+				
+				if (rdc) {
+					redirectURL = loc.protocol + "//" + loc.hostname + (loc.port ? ":" + loc.port : "") + "/" + rdc;
+				}
+			}
 
 			for( ; i < sl; i++ ){
 				sheet	= sheets[ i ],
@@ -62,7 +68,7 @@
 				if( !!href && isCSS && !parsedSheets[ href ] ){
 					if( !isExtRegExp.test( href ) 
 						|| href.replace( RegExp.$1, "" ).split( "/" )[0] === win.location.host
-						|| proxyURL ){
+						|| (proxyURL && redirectURL) ){
 						requestQueue.push( {
 							href: href,
 							media: media
@@ -235,7 +241,7 @@
 		},
 		//tweaked Ajax functions from Quirksmode
 		ajax = function( url, callback ) {
-			if (proxyURL && isExtRegExp.test(url)) {
+			if (proxyURL && redirectURL && isExtRegExp.test(url)) {
 				var refNode = docElem.firstElementChild || docElem.firstChild;
 				
 				if (!iframe) {
