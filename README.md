@@ -41,11 +41,11 @@ See `test/test-x-domain.html` for a demo:
 - Reference both files via `<meta />` element:
 
 <pre>
-	<!-- Respond.js proxy on external server -->
-	<link href="http://doctyper.com/stuff/respond/respond-proxy.html" id="respond-proxy" rel="respond-proxy" />
+	&lt;!-- Respond.js proxy on external server --&gt;
+	&lt;link href=&quot;http://doctyper.com/stuff/respond/respond-proxy.html&quot; id=&quot;respond-proxy&quot; rel=&quot;respond-proxy&quot; /&gt;
 	
-	<!-- Respond.js redirect (optional, defaults to current page) -->
-	<link href="/x-domain/favicon.ico" id="respond-redirect" rel="respond-redirect" />
+	&lt;!-- Respond.js redirect (optional, defaults to current page) --&gt;
+	&lt;link href=&quot;/x-domain/favicon.ico&quot; id=&quot;respond-redirect&quot; rel=&quot;respond-redirect&quot; /&gt;
 </pre>
 
 Support & Caveats
