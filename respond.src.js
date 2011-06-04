@@ -30,6 +30,7 @@
 		proxyInterval,
 		thisRequest,
 		iframe,
+		AXO,
 		
 		//loop stylesheets, send text content to translate
 		ripCSS			= function(){
@@ -90,7 +91,19 @@
 				
 				ajax( thisRequest.href, receiveCSSText );
 			} else if (iframe) {
+				
+				// Remove iframe
 				iframe.parentNode.removeChild(iframe);
+				
+				// Per http://j.mp/kn9EPh, not taking any chances. Flushing the ActiveXObject
+				if (AXO) {
+					AXO = null;
+					delete AXO;
+					
+					if (window.CollectGarbage) {
+						window.CollectGarbage();
+					}
+				}
 				
 				if (proxyInterval) {
 					window.clearInterval(proxyInterval);
@@ -226,9 +239,20 @@
 				var refNode = docElem.firstElementChild || docElem.firstChild;
 				
 				if (!iframe) {
-					iframe = doc.createElement("iframe");
-					iframe.style.cssText = "position:absolute;top:-99em";
-					docElem.insertBefore( iframe, refNode );
+					
+					// All hail Google http://j.mp/iKMI19
+					// Behold, an iframe proxy without annoying clicky noises.
+					if ("ActiveXObject" in window) {
+						AXO = new ActiveXObject("htmlfile");
+						AXO.open();
+						AXO.write('<html><body><iframe id="iframe"></iframe></body></html>');
+						AXO.close();
+						iframe = AXO.getElementById("iframe");
+					} else {
+						iframe = doc.createElement("iframe");
+						iframe.style.cssText = "position:absolute;top:-99em";
+						docElem.insertBefore(iframe, refNode);
+					}
 					
 					proxyInterval = window.setInterval(function () {
 						var cssText;
