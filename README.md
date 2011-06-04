@@ -35,10 +35,9 @@ Respond.js works by requesting a pristine copy of your CSS via AJAX, so if you h
 See `test/test-x-domain.html` for a demo:
 
 - Upload `x-domain/respond-proxy.html` to your external domain
-- Upload `x-domain/favicon.ico` to your origin domain (optional)
-	- Note: This file can be any existing file of your choosing. The proxy merely needs to redirect back to a file on your origin domain.
-	- _Note: The dummy file should not be an HTML page. It can lead to an infinite loop scenario._
-- Reference both files via `<meta />` element:
+- Upload `x-domain/favicon.ico` to your origin domain
+	- Note: This file is optional. It can be any existing file of your choosing. The proxy merely needs to redirect back to a file on your origin domain.
+- Reference the file(s) via `<link />` element(s):
 
 <pre>
 	&lt;!-- Respond.js proxy on external server --&gt;
