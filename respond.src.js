@@ -253,6 +253,9 @@
 						} catch (e) {}
 						
 						if (cssText) {
+							// We've got what we need. Stop the iframe from loading further content.
+							iframe.src = "about:blank";
+							
 							callback(cssText);
 						}
 					}, 50);
