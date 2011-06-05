@@ -15,7 +15,8 @@
 	//define vars
 	var doc 			= win.document,
 		docElem 		= doc.documentElement,
-		host            = win.location.host,
+		location		= win.location,
+		host            = location.host,
 		mediastyles		= [],
 		rules			= [],
 		appendedEls 	= [],
@@ -26,7 +27,7 @@
 		requestQueue	= [],
 		isExtRegExp     = /^([a-zA-Z]+?:(\/\/)?(www\.)?)/,
 		proxyURL        = (doc.getElementById("respond-proxy") || {}).href,
-		redirectURL     = (doc.getElementById("respond-redirect") || win.location).href,
+		redirectURL     = (doc.getElementById("respond-redirect") || location).href,
 		matchDomain,
 		proxyInterval,
 		thisRequest,
