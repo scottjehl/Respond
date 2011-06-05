@@ -28,7 +28,6 @@
 		isExtRegExp     = /^([a-zA-Z]+?:(\/\/)?(www\.)?)/,
 		proxyURL        = (doc.getElementById("respond-proxy") || {}).href,
 		redirectURL     = (doc.getElementById("respond-redirect") || location).href,
-		matchDomain,
 		proxyInterval,
 		thisRequest,
 		iframe,
@@ -40,7 +39,8 @@
 				sl 		= sheets.length,
 				i		= 0,
 				//vars for loop:
-				sheet, href, media, isCSS;
+				sheet, href, media, isCSS,
+				matchDomain, isProxyable;
 
 			for( ; i < sl; i++ ){
 				sheet	= sheets[ i ],
@@ -52,10 +52,11 @@
 				if( !!href && isCSS && !parsedSheets[ href ] ){
 					if( !isExtRegExp.test( href ) 
 						|| (matchDomain = href.replace( RegExp.$1, "" ).split( "/" )[0]) === host
-						|| proxyURL && win.top === win.self && ~ proxyURL.indexOf(matchDomain)){
+						|| (isProxyable = proxyURL && (win.top === win.self) && ~ proxyURL.indexOf(matchDomain)) ){
 						requestQueue.push( {
 							href: href,
-							media: media
+							media: media,
+							proxy: isProxyable && matchDomain !== host
 						} );
 					}
 					else{
@@ -79,7 +80,7 @@
 			if( requestQueue.length ){
 				thisRequest = requestQueue.shift();
 				
-				ajax( thisRequest.href, receiveCSSText );
+				ajax( thisRequest.href, thisRequest.proxy, receiveCSSText );
 			} else if (iframe) {
 				
 				// Remove iframe
@@ -225,8 +226,8 @@
 			head.insertBefore( dFrag, lastLink.nextSibling );
 		},
 		//tweaked Ajax functions from Quirksmode
-		ajax = function( url, callback ) {
-			if (proxyURL && ~ url.indexOf(matchDomain) && isExtRegExp.test(url)) {
+		ajax = function( url, proxy, callback ) {
+			if (proxy) {
 				var refNode = docElem.firstElementChild || docElem.firstChild;
 				
 				if (!iframe) {
