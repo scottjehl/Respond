@@ -40,10 +40,6 @@
 				i		= 0,
 				//vars for loop:
 				sheet, href, media, isCSS;
-			
-			if (proxyURL) {
-				matchDomain = proxyURL.match(/^[^\.]+\.[a-z]{2,4}/);
-			}
 
 			for( ; i < sl; i++ ){
 				sheet	= sheets[ i ],
@@ -54,7 +50,7 @@
 				//only links plz and prevent re-parsing
 				if( !!href && isCSS && !parsedSheets[ href ] ){
 					if( !isExtRegExp.test( href ) 
-						|| href.replace( RegExp.$1, "" ).split( "/" )[0] === host
+						|| (matchDomain = href.replace( RegExp.$1, "" ).split( "/" )[0]) === host
 						|| proxyURL && win.top === win.self && ~ href.indexOf(matchDomain)){
 						requestQueue.push( {
 							href: href,
