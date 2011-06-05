@@ -35,8 +35,9 @@ Respond.js works by requesting a pristine copy of your CSS via AJAX, so if you h
 See `test/test-x-domain.html` for a demo:
 
 - Upload `x-domain/respond-proxy.html` to your external domain
-- Upload `x-domain/favicon.ico` to your origin domain
-	- Note: This file is optional. It can be any existing file of your choosing. The proxy merely needs to redirect back to a file on your origin domain.
+- Upload `x-domain/favicon.ico` to your origin domain (Optional)
+	- Note: The remote proxy must redirect back to your origin domain after it completes its tasks. If none is set, it defaults to the current page.
+	- The advantage to declaring a redirect is speed. Redirecting to `favicon.ico` is faster than re-loading the current page within the iframe.
 - Reference the file(s) via `<link />` element(s):
 
 <pre>
