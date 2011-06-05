@@ -52,7 +52,7 @@
 				if( !!href && isCSS && !parsedSheets[ href ] ){
 					if( !isExtRegExp.test( href ) 
 						|| (matchDomain = href.replace( RegExp.$1, "" ).split( "/" )[0]) === host
-						|| proxyURL && win.top === win.self && ~ href.indexOf(matchDomain)){
+						|| proxyURL && win.top === win.self && ~ proxyURL.indexOf(matchDomain)){
 						requestQueue.push( {
 							href: href,
 							media: media
