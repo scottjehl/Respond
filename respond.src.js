@@ -95,6 +95,7 @@
 					}
 				}
 				
+				// Kill proxy interval check
 				if (proxyInterval) {
 					win.clearInterval(proxyInterval);
 				}
