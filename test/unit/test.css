@@ -15,8 +15,8 @@
 	width: 50px;
 }
 
-/*styles for 480px and up */
-@media screen and (min-width: 480px) {
+/*styles for 400px and up */
+@media screen and (min-width: 400px) {
 	#testelem {
 		width: 150px;
 	}

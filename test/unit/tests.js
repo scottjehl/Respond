@@ -92,6 +92,14 @@ window.onload = function(){
 			}, 900);	
 		});
 		
+		asyncTest( "stylesheets from an external domain apply properly", function() { 
+			window.resizeTo(1100,600);
+			setTimeout(function(){
+				ok( widthApplied( 32 ), "testelem is 32px wide when window is 1100px wide" );
+				start();
+			}, 900);	
+		});
+		
 	}
 	
 };

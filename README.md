@@ -27,6 +27,26 @@ Usage Instructions
 
 3. Crack open Internet Explorer and pump fists in delight
 
+CDN/X-Domain Setup
+======
+
+Respond.js works by requesting a pristine copy of your CSS via AJAX, so if you host your stylesheets on a CDN (or a subdomain), you'll need to upload a proxy page to enable cross-domain communication.
+
+See `test/test-x-domain.html` for a demo:
+
+- Upload `x-domain/respond-proxy.html` to your external domain
+- Upload `x-domain/favicon.ico` to your origin domain (Optional)
+	- Note: The remote proxy must redirect back to your origin domain after it completes its tasks. If none is set, it defaults to the current page.
+	- The advantage to declaring a redirect is speed. Redirecting to `favicon.ico` is faster than re-loading the current page within the iframe.
+- Reference the file(s) via `<link />` element(s):
+
+<pre>
+	&lt;!-- Respond.js proxy on external server --&gt;
+	&lt;link href=&quot;http://externalcdn.com/respond-proxy.html&quot; id=&quot;respond-proxy&quot; rel=&quot;respond-proxy&quot; /&gt;
+	
+	&lt;!-- Respond.js redirect (optional, defaults to current page) --&gt;
+	&lt;link href=&quot;/path/to/favicon.ico&quot; id=&quot;respond-redirect&quot; rel=&quot;respond-redirect&quot; /&gt;
+</pre>
 
 Support & Caveats
 ======
@@ -44,9 +64,6 @@ Some notes to keep in mind:
 - Respond.js doesn't parse CSS refrenced via @import, nor does it work with media queries within style elements, as those styles can't be re-requested for parsing.
 
 - Due to security restrictions, some browsers may not allow this script to work on file:// urls (because it uses xmlHttpRequest). Run it on a web server.
-
-- Due to its use of Ajax, this script will only work with same-domain CSS files, though I may patch that up soon.
-
 
 - Currently, media attributes on link elements are supported, but only if the linked stylesheet contains no media queries. If it does contain queries, the media attribute will be ignored and the internal queries will be parsed normally.
 

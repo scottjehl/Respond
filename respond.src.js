@@ -15,6 +15,8 @@
 	//define vars
 	var doc 			= win.document,
 		docElem 		= doc.documentElement,
+		location		= win.location,
+		host            = location.host,
 		mediastyles		= [],
 		rules			= [],
 		appendedEls 	= [],
@@ -23,6 +25,13 @@
 		head 			= doc.getElementsByTagName( "head" )[0] || docElem,
 		links			= head.getElementsByTagName( "link" ),
 		requestQueue	= [],
+		isExtRegExp     = /^([a-zA-Z]+?:(\/\/)?(www\.)?)/,
+		proxyURL        = (doc.getElementById("respond-proxy") || {}).href,
+		redirectURL     = (doc.getElementById("respond-redirect") || location).href,
+		proxyInterval,
+		thisRequest,
+		iframe,
+		AXO,
 		
 		//loop stylesheets, send text content to translate
 		ripCSS			= function(){
@@ -30,7 +39,8 @@
 				sl 		= sheets.length,
 				i		= 0,
 				//vars for loop:
-				sheet, href, media, isCSS;
+				sheet, href, media, isCSS,
+				matchDomain, isProxyable;
 
 			for( ; i < sl; i++ ){
 				sheet	= sheets[ i ],
@@ -40,11 +50,13 @@
 
 				//only links plz and prevent re-parsing
 				if( !!href && isCSS && !parsedSheets[ href ] ){
-					if( !/^([a-zA-Z]+?:(\/\/)?(www\.)?)/.test( href ) 
-						|| href.replace( RegExp.$1, "" ).split( "/" )[0] === win.location.host ){
+					if( !isExtRegExp.test( href ) 
+						|| (matchDomain = href.replace( RegExp.$1, "" ).split( "/" )[0]) === host
+						|| (isProxyable = proxyURL && (win.top === win.self) && ~ proxyURL.indexOf(matchDomain)) ){
 						requestQueue.push( {
 							href: href,
-							media: media
+							media: media,
+							proxy: isProxyable && matchDomain !== host
 						} );
 					}
 					else{
@@ -56,16 +68,38 @@
 				
 		},
 		
+		// Parse CSS Text
+		receiveCSSText = function( styles ){
+			translate( styles, thisRequest.href, thisRequest.media );
+			parsedSheets[ thisRequest.href ] = true;
+			makeRequests();
+		},
+		
 		//recurse through request queue, get css text
 		makeRequests	= function(){
 			if( requestQueue.length ){
-				var thisRequest = requestQueue.shift();
+				thisRequest = requestQueue.shift();
 				
-				ajax( thisRequest.href, function( styles ){
-					translate( styles, thisRequest.href, thisRequest.media );
-					parsedSheets[ thisRequest.href ] = true;
-					makeRequests();
-				} );
+				ajax( thisRequest.href, thisRequest.proxy, receiveCSSText );
+			} else if (iframe) {
+				
+				// Remove iframe
+				iframe.parentNode.removeChild(iframe);
+				iframe = null;
+				
+				// Per http://j.mp/kn9EPh, not taking any chances. Flushing the ActiveXObject
+				if (AXO) {
+					AXO = null;
+					
+					if (win.CollectGarbage) {
+						win.CollectGarbage();
+					}
+				}
+				
+				// Kill proxy interval check
+				if (proxyInterval) {
+					win.clearInterval(proxyInterval);
+				}
 			}
 		},
 		
@@ -192,22 +226,61 @@
 			head.insertBefore( dFrag, lastLink.nextSibling );
 		},
 		//tweaked Ajax functions from Quirksmode
-		ajax = function( url, callback ) {
-			var req = xmlHttp();
-			if (!req){
+		ajax = function( url, proxy, callback ) {
+			if (proxy) {
+				var refNode = docElem.firstElementChild || docElem.firstChild;
+				
+				if (!iframe) {
+					
+					// All hail Google http://j.mp/iKMI19
+					// Behold, an iframe proxy without annoying clicky noises.
+					if ("ActiveXObject" in win) {
+						AXO = new ActiveXObject("htmlfile");
+						AXO.open();
+						AXO.write('<iframe id="x"></iframe>');
+						AXO.close();
+						iframe = AXO.getElementById("x");
+					} else {
+						iframe = doc.createElement("iframe");
+						iframe.style.cssText = "position:absolute;top:-99em";
+						docElem.insertBefore(iframe, refNode);
+					}
+					
+					proxyInterval = win.setInterval(function () {
+						var cssText;
+						
+						try {
+							cssText = iframe.contentWindow.name;
+						} catch (e) {}
+						
+						if (cssText) {
+							// We've got what we need. Stop the iframe from loading further content.
+							iframe.src = "about:blank";
+							
+							callback(cssText);
+						}
+					}, 50);
+				}
+				
+				iframe.src = proxyURL + "?url=" + redirectURL + "&css=" + url;
 				return;
-			}	
-			req.open( "GET", url, true );
-			req.onreadystatechange = function () {
-				if ( req.readyState != 4 || req.status != 200 && req.status != 304 ){
+			} else {
+				var req = xmlHttp();
+				if (!req){
+					return;
+				}	
+				req.open( "GET", url, true );
+				req.onreadystatechange = function () {
+					if ( req.readyState != 4 || req.status != 200 && req.status != 304 ){
+						return;
+					}
+					callback( req.responseText );
+				}
+				if ( req.readyState == 4 ){
 					return;
 				}
-				callback( req.responseText );
+				req.send();
 			}
-			if ( req.readyState == 4 ){
-				return;
-			}
-			req.send();
 		},
 		//define ajax obj 
 		xmlHttp = (function() {
