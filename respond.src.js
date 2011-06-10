@@ -40,7 +40,7 @@
 
 				//only links plz and prevent re-parsing
 				if( !!href && isCSS && !parsedSheets[ href ] ){
-					if( !/^([a-zA-Z]+?:(\/\/)?(www\.)?)/.test( href ) 
+					if( !/^([a-zA-Z]+?:(\/\/)?)/.test( href ) 
 						|| href.replace( RegExp.$1, "" ).split( "/" )[0] === win.location.host ){
 						requestQueue.push( {
 							href: href,
