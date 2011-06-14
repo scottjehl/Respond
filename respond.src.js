@@ -207,7 +207,7 @@
 			if ( req.readyState == 4 ){
 				return;
 			}
-			req.send();
+			req.send( null );
 		},
 		//define ajax obj 
 		xmlHttp = (function() {
