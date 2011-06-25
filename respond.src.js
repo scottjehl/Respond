@@ -117,7 +117,6 @@
 				for( ; j < eql; j++ ){
 					thisq	= eachq[ j ];
 					mediastyles.push( { 
-						id		: i + j,
 						media	: thisq.match( /(only\s+)?([a-zA-Z]+)(\sand)?/ ) && RegExp.$2,
 						rules	: rules.length - 1,
 						minw	: thisq.match( /\(min\-width:[\s]*([\s]*[0-9]+)px[\s]*\)/ ) && parseFloat( RegExp.$1 ), 
@@ -141,7 +140,7 @@
 				styleBlocks	= {},
 				lastLink	= links[ links.length-1 ],
 				now 		= (new Date()).getTime(),
-				newIds 		= [];
+				newIds		= [];
 			
 			//throttle resize calls	
 			if( fromResize && lastCall && now - lastCall < resizeThrottle ){
@@ -161,7 +160,7 @@
 						if( !styleBlocks[ thisstyle.media ] ){
 							styleBlocks[ thisstyle.media ] = [];
 						}
-						newIds.push( thisstyle.id );
+						newIds.push( i );
 						styleBlocks[ thisstyle.media ].push( rules[ thisstyle.rules ] );
 				}
 			}
