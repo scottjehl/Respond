@@ -137,7 +137,6 @@
 				docElemProp	= docElem[ name ],
 				currWidth 	= doc.compatMode === "CSS1Compat" && docElemProp || doc.body[ name ] || docElemProp,
 				styleBlocks	= {},
-				dFrag		= doc.createDocumentFragment(),
 				lastLink	= links[ links.length-1 ],
 				now 		= (new Date()).getTime();
 			
@@ -177,6 +176,9 @@
 				
 				ss.type = "text/css";	
 				ss.media	= i;
+			
+				//append to DOM first for IE7
+				head.insertBefore( ss, lastLink.nextSibling );
 				
 				if ( ss.styleSheet ){ 
 		        	ss.styleSheet.cssText = css;
@@ -184,12 +186,8 @@
 		        else {
 					ss.appendChild( doc.createTextNode( css ) );
 		        }
-		        dFrag.appendChild( ss );
 				appendedEls.push( ss );
 			}
-			
-			//append to DOM at once
-			head.insertBefore( dFrag, lastLink.nextSibling );
 		},
 		//tweaked Ajax functions from Quirksmode
 		ajax = function( url, callback ) {
