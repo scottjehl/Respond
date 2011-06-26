@@ -223,8 +223,8 @@
 		xmlHttp = (function() {
 			var xmlhttpmethod = false,
 				attempts = [
-					function(){ return new ActiveXObject("Microsoft.XMLHTTP") },
-					function(){ return new XMLHttpRequest() }		
+					function(){ return new XMLHttpRequest() },
+					function(){ return new ActiveXObject("Microsoft.XMLHTTP") }
 				],
 				al = attempts.length;
 		
