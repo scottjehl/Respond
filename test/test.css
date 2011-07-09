@@ -51,7 +51,7 @@ a {
 */
 @media all and (min-width:900px){
     #attribute-test {
-        color: yellow;
+        font-size:1.5em;
     }
 }
 
@@ -66,7 +66,7 @@ a {
      * because style blocks are grouped by media type
     */
     #attribute-test {
-        color: red;
+        font-size:1em;
     }
 }
 
