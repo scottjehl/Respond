@@ -46,15 +46,35 @@ a {
 	}
 }
 
+/*styles for 900px and up
+ * Test for query order in conjuction with test that follows
+*/
+@media all and (min-width:900px){
+    #attribute-test {
+        color: yellow;
+    }
+}
+
 /*styles for 1100px and up!*/
 @media screen and (min-width: 1100px){
 	body {
 		background: orange;
 	}
+
+    /* Test for query order. Currently fails.
+     * This should override the style for 900px but fails
+     * because style blocks are grouped by media type
+    */
+    #attribute-test {
+        color: red;
+    }
 }
 
-/*styles for 1300px and up!*/
-@media screen and (min-width: 1300px){
+/*styles for 1300px and up!
+ * Test for shorthand syntax
+ * See Example V: http://www.w3.org/TR/css3-mediaqueries/#media0
+*/
+@media (min-width: 1300px){
 	body {
 		background: navy;
 	}
