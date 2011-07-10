@@ -40,16 +40,22 @@
 
 				//only links plz and prevent re-parsing
 				if( !!href && isCSS && !parsedSheets[ href ] ){
-					if( !/^([a-zA-Z]+?:(\/\/)?)/.test( href ) 
-						|| href.replace( RegExp.$1, "" ).split( "/" )[0] === win.location.host ){
-						requestQueue.push( {
-							href: href,
-							media: media
-						} );
-					}
-					else{
+					// selectivizr exposes css through the rawCssText expando
+					if (sheet.styleSheet.rawCssText) {
+						translate( sheet.styleSheet.rawCssText, href, media );
 						parsedSheets[ href ] = true;
-					}	
+					} else {
+						if( !/^([a-zA-Z]+?:(\/\/)?)/.test( href )
+							|| href.replace( RegExp.$1, "" ).split( "/" )[0] === win.location.host ){
+							requestQueue.push( {
+								href: href,
+								media: media
+							} );
+						}
+						else{
+							parsedSheets[ href ] = true;
+						}
+					}
 				}
 			}
 			makeRequests();
