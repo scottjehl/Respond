@@ -70,6 +70,15 @@ a {
     }
 }
 
+/* Test that invalid media type is ignored by browser
+ * and not mistakenly set to "all" by Respond
+*/
+@media fake and (min-width: 1300px){
+    body {
+        color: red;
+    }
+}
+
 /*styles for 1300px and up!
  * Test for shorthand syntax
  * See Example V: http://www.w3.org/TR/css3-mediaqueries/#media0
