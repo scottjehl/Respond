@@ -84,7 +84,7 @@
 				useMedia	= !ql && media,
 				//vars used in loop
 				i			= 0,
-				j, fullq, thisq, eachq, eql;
+				j, fullq, thisq, eachq, eql, type;
 
 			//if path exists, tack on trailing slash
 			if( href.length ){ href += "/"; }	
@@ -118,8 +118,10 @@
 					
 				for( ; j < eql; j++ ){
 					thisq	= eachq[ j ];
+                    type = thisq.match( /(only\s+)?((?:\()|([a-zA-Z]+))(?:\sand)?/ );
+                    type = (!type[3]) ? "all" : (type[1]) ? type[1] + type[2] : type[2];
 					mediastyles.push( { 
-						media	: thisq.match( /all|aural|braille|embossed|handheld|print|projection|screen|speech|tty|tv/ ) || "all",
+						media	: type,
 						rules	: rules.length - 1,
 						minw	: thisq.match( /\(min\-width:[\s]*([\s]*[0-9]+)px[\s]*\)/ ) && parseFloat( RegExp.$1 ), 
 						maxw	: thisq.match( /\(max\-width:[\s]*([\s]*[0-9]+)px[\s]*\)/ ) && parseFloat( RegExp.$1 )
