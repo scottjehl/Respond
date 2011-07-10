@@ -118,8 +118,8 @@
 					
 				for( ; j < eql; j++ ){
 					thisq	= eachq[ j ];
-                    type = thisq.match( /(only\s+)?((?:\()|([a-zA-Z]+))(?:\sand)?/ );
-                    type = (!type[3]) ? "all" : (type[1]) ? type[1] + type[2] : type[2];
+					type = thisq.match( /(only\s+)?((?:\()|([a-zA-Z]+))(?:\sand)?/ );
+					type = (!type[3]) ? "all" : (type[1]) ? type[1] + type[2] : type[2];
 					mediastyles.push( { 
 						media	: type,
 						rules	: rules.length - 1,
