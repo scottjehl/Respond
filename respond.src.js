@@ -211,21 +211,12 @@
 		},
 		//define ajax obj 
 		xmlHttp = (function() {
-			var xmlhttpmethod = false,
-				attempts = [
-					function(){ return new ActiveXObject("Microsoft.XMLHTTP") },
-					function(){ return new XMLHttpRequest() }		
-				],
-				al = attempts.length;
-		
-			while( al-- ){
-				try {
-					xmlhttpmethod = attempts[ al ]();
-				}
-				catch(e) {
-					continue;
-				}
-				break;
+			var xmlhttpmethod = false;	
+			try {
+				xmlhttpmethod = XMLHttpRequest();
+			}
+			catch( e ){
+				xmlhttpmethod = new ActiveXObject( "Microsoft.XMLHTTP" );
 			}
 			return function(){
 				return xmlhttpmethod;
