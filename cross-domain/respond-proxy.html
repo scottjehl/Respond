@@ -1,0 +1,80 @@
+<!-- Respond.js: min/max-width media query polyfill. Remote proxy (c) Scott Jehl. MIT Lic. j.mp/respondjs -->
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>Respond JS Proxy</title>
+</head> 
+<body>
+	<script>
+		(function () {
+			var domain, css, url, match, file, ajax, xmlHttp;
+			
+			ajax = function( url, callback ) {
+				var req = xmlHttp();
+				if (!req){
+					return;
+				}	
+				req.open( "GET", url, true );
+				req.onreadystatechange = function () {
+					if ( req.readyState != 4 || req.status != 200 && req.status != 304 ){
+						return;
+					}
+					callback( req.responseText );
+				};
+				if ( req.readyState == 4 ){
+					return;
+				}
+				req.send();
+			};
+			
+			//define ajax obj 
+			xmlHttp = (function() {
+				var xmlhttpmethod = false,
+					attempts = [
+						function(){ return new XMLHttpRequest(); },
+						function(){ return new ActiveXObject("Microsoft.XMLHTTP"); },
+						function(){ return new ActiveXObject("MSXML2.XMLHTTP.3.0"); }
+					],
+					al = attempts.length;
+
+				while( al-- ){
+					try {
+						xmlhttpmethod = attempts[ al ]();
+					}
+					catch(e) {
+						continue;
+					}
+					break;
+				}
+				return function(){
+					return xmlhttpmethod;
+				};
+			})();
+			
+			url = window.location.href;
+			
+			if (url) {
+				match = (/css\=(.*\.css)$/).exec(url.slice(url.indexOf('?') + 1));
+				
+				if (match && match[1]) {
+					css = match[1];
+				}
+				
+				match = (/url\=([^&]+)/).exec(url);
+				
+				if (match && match[1]) {
+					domain = match[1];
+				}
+			}
+			
+			if (css) {
+				ajax(css, function (response) {
+					window.name = response;
+					window.location.href = domain;
+				});
+			}
+		}());
+	</script>
+</body>
+</html>

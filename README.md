@@ -28,6 +28,31 @@ Usage Instructions
 3. Crack open Internet Explorer and pump fists in delight
 
 
+CDN/X-Domain Setup
+======
+
+Respond.js works by requesting a pristine copy of your CSS via AJAX, so if you host your stylesheets on a CDN (or a subdomain), you'll need to upload a proxy page to enable cross-domain communication.
+
+See `cross-domain/example.html` for a demo:
+
+- Upload `cross-domain/respond-proxy.html` to your external domain
+- Upload `cross-domain/respond.proxy.gif` to your origin domain
+- Reference the file(s) via `<link />` element(s):
+
+<pre>
+	&lt;!-- Respond.js proxy on external server --&gt;
+	&lt;link href=&quot;http://externalcdn.com/respond-proxy.html&quot; id=&quot;respond-proxy&quot; rel=&quot;respond-proxy&quot; /&gt;
+	
+	&lt;!-- Respond.js redirect location on local server --&gt;
+	&lt;link href=&quot;/path/to/respond.proxy.gif&quot; id=&quot;respond-redirect&quot; rel=&quot;respond-redirect&quot; /&gt;
+	
+	&lt;!-- Respond.js proxy script on local server --&gt;
+	&lt;script src="/path/to/respond.proxy.js"&gt;&lt;/script&gt;
+</pre>
+
+Note: HUGE thanks to @doctyper for the contributions in the cross-domain proxy!
+
+
 Support & Caveats
 ======
 
