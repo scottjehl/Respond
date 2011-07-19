@@ -52,9 +52,6 @@
 								media: media
 							} );
 						}
-						else{
-							parsedSheets[ href ] = true;
-						}
 					}
 				}
 			}
