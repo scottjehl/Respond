@@ -23,6 +23,7 @@
 		head 			= doc.getElementsByTagName( "head" )[0] || docElem,
 		links			= head.getElementsByTagName( "link" ),
 		requestQueue	= [],
+		isXDomainRequest = window.XDomainRequest,
 		
 		//loop stylesheets, send text content to translate
 		ripCSS			= function(){
@@ -52,6 +53,14 @@
 								media: media
 							} );
 						}
+						else if (isXDomainRequest){
+							// browser can handle cross-domain CSS lookups
+							requestQueue.push({
+								href: href,
+								media: media,
+								isXDomainRequest: true
+							});
+						}
 						else{
 							parsedSheets[ href ] = true;
 						}
@@ -71,7 +80,7 @@
 					translate( styles, thisRequest.href, thisRequest.media );
 					parsedSheets[ thisRequest.href ] = true;
 					makeRequests();
-				} );
+				}, thisRequest.isXDomainRequest );
 			}
 		},
 		
@@ -132,7 +141,7 @@
 
 			applyMedia();
 		},
-        	
+			
 		lastCall,
 		
 		resizeDefer,
@@ -185,12 +194,12 @@
 				ss.media	= i;
 				
 				if ( ss.styleSheet ){ 
-		        	ss.styleSheet.cssText = css;
-		        } 
-		        else {
+					ss.styleSheet.cssText = css;
+				} 
+				else {
 					ss.appendChild( doc.createTextNode( css ) );
-		        }
-		        dFrag.appendChild( ss );
+				}
+				dFrag.appendChild( ss );
 				appendedEls.push( ss );
 			}
 			
@@ -198,22 +207,48 @@
 			head.insertBefore( dFrag, lastLink.nextSibling );
 		},
 		//tweaked Ajax functions from Quirksmode
-		ajax = function( url, callback ) {
-			var req = xmlHttp();
-			if (!req){
-				return;
-			}	
-			req.open( "GET", url, true );
-			req.onreadystatechange = function () {
-				if ( req.readyState != 4 || req.status != 200 && req.status != 304 ){
+		ajax = function( url, callback, isxd ) {
+			
+			var xhr = function() {
+				var req = xmlHttp();
+				
+				if (!req){
+					return;
+				}	
+				req.open( "GET", url, true );
+				req.onreadystatechange = function () {
+					if ( req.readyState != 4 || req.status != 200 && req.status != 304 ){
+						return;
+					}
+					callback( req.responseText );
+				}
+				if ( req.readyState == 4 ){
 					return;
 				}
-				callback( req.responseText );
+				req.send( null );
+				
+			};
+			
+			if (!!isxd)
+			{
+				// This is an XDomainRequest in IE 8--time to get weird...
+				var xdr = new XDomainRequest();
+				
+				if (!xdr){
+				    xhr();
+					return;
+				}
+				xdr.open("GET", url);
+				xdr.onerror = xhr;
+				xdr.onload = function () {
+					callback(xdr.responseText);
+				};
+				xdr.send();
 			}
-			if ( req.readyState == 4 ){
-				return;
+			else{
+				xhr();
 			}
-			req.send( null );
+			
 		},
 		//define ajax obj 
 		xmlHttp = (function() {
