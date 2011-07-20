@@ -23,7 +23,7 @@
 		head 			= doc.getElementsByTagName( "head" )[0] || docElem,
 		links			= head.getElementsByTagName( "link" ),
 		requestQueue	= [],
-		isXDomainRequest = window.XDomainRequest,
+		isXDomainRequest = win.XDomainRequest,
 		
 		//loop stylesheets, send text content to translate
 		ripCSS			= function(){
