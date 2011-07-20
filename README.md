@@ -70,9 +70,6 @@ Some notes to keep in mind:
 
 - Due to security restrictions, some browsers may not allow this script to work on file:// urls (because it uses xmlHttpRequest). Run it on a web server.
 
-- Due to its use of Ajax, this script will only work with same-domain CSS files, though I may patch that up soon.
-
-
 - Currently, media attributes on link elements are supported, but only if the linked stylesheet contains no media queries. If it does contain queries, the media attribute will be ignored and the internal queries will be parsed normally.
 
 - WARNING: Do not include @font-face rules inside a media query. This will crash IE7 and IE8. Simply place @font-face rules in the wide open, as a sibling to other media queries. Isolated test here to demostrate (note: test crashes IE 7&8): http://jsfiddle.net/scottjehl/Ejyj5/1/
