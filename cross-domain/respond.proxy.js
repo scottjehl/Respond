@@ -61,6 +61,26 @@
 		win.setTimeout(checkFrameName, 500);
 	}
 	
+	function checkRedirectURL() {
+		// IE6 & IE7 don't build out absolute urls in <link /> attributes.
+		// So respond.proxy.gif remains relative instead of http://example.com/respond.proxy.gif.
+		// This trickery resolves that issue.
+		if (~ !redirectURL.indexOf(location.host)) {
+
+			// Inject an <a> attribute, with the redirectURL
+			var fakeLink = doc.createElement("div");
+
+			fakeLink.innerHTML = '<a href="' + redirectURL + '"></a>';
+			docElem.insertBefore(fakeLink, docElem.firstElementChild || docElem.firstChild );
+
+			// Grab the parsed URL from that dummy object
+			redirectURL = fakeLink.firstChild.href;
+
+			// Clean up
+			fakeLink.parentNode.removeChild(fakeLink);
+			fakeLink = null;
+		}
+	}
 	
 	function buildUrls(){
 		var links = doc.getElementsByTagName( "link" );
@@ -86,6 +106,7 @@
 	}
 	
 	if( !respond.mediaQueriesSupported ){
+		checkRedirectURL();
 		buildUrls();
 	}
 
