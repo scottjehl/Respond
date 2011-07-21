@@ -1,4 +1,4 @@
-/*! Respond.js: min/max-width media query polyfill. Remote proxy (c) Scott Jehl. MIT Lic. j.mp/respondjs  */
+/*! Respond.js: min/max-width media query polyfill. Remote proxy (c) Scott Jehl. MIT/GPLv2 Lic. j.mp/respondjs  */
 (function(win, doc, undefined){
 	var docElem			= doc.documentElement,
 		proxyURL		= doc.getElementById("respond-proxy").href,
