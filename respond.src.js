@@ -41,7 +41,7 @@
 				//only links plz and prevent re-parsing
 				if( !!href && isCSS && !parsedSheets[ href ] ){
 					// selectivizr exposes css through the rawCssText expando
-					if (sheet.styleSheet.rawCssText) {
+					if (sheet.styleSheet && sheet.styleSheet.rawCssText) {
 						translate( sheet.styleSheet.rawCssText, href, media );
 						parsedSheets[ href ] = true;
 					} else {
