@@ -37,7 +37,7 @@ a {
 
 
 /*styles for 620px and up! (let's try this one minified )*/
-@media screen and (min-width: 620px),only print,projector{body{background:red;}}
+@media screen and (min-width: 620px),only print,projection{body{background:red;}}
 
 /*styles for 800px and up!*/
 @media screen and (min-width: 800px){
@@ -46,15 +46,44 @@ a {
 	}
 }
 
+/*styles for 900px and up
+ * Test for query order in conjuction with test that follows
+*/
+@media all and (min-width:900px){
+    #attribute-test {
+        font-size:1.5em;
+    }
+}
+
 /*styles for 1100px and up!*/
 @media screen and (min-width: 1100px){
 	body {
 		background: orange;
 	}
+
+    /* Test for query order. Currently fails.
+     * This should override the style for 900px but fails
+     * because style blocks are grouped by media type
+    */
+    #attribute-test {
+        font-size:1em;
+    }
 }
 
-/*styles for 1300px and up!*/
-@media screen and (min-width: 1300px){
+/* Test that invalid media type is ignored by browser
+ * and not mistakenly set to "all" by Respond
+*/
+@media fake and (min-width: 1300px){
+    body {
+        color: red;
+    }
+}
+
+/*styles for 1300px and up!
+ * Test for shorthand syntax
+ * See Example V: http://www.w3.org/TR/css3-mediaqueries/#media0
+*/
+@media (min-width: 1300px){
 	body {
 		background: navy;
 	}
