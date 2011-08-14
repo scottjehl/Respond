@@ -216,7 +216,7 @@
 		xmlHttp = (function() {
 			var xmlhttpmethod = false;	
 			try {
-				xmlhttpmethod = XMLHttpRequest();
+				xmlhttpmethod = new XMLHttpRequest();
 			}
 			catch( e ){
 				xmlhttpmethod = new ActiveXObject( "Microsoft.XMLHTTP" );
