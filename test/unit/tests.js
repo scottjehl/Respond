@@ -47,6 +47,15 @@ window.onload = function(){
 			}, 900);	
 		});
 		
+		asyncTest( "Shorthand media query syntax parses properly, and fake media types are ignored", function() { 
+			window.resizeTo(575,600);
+			setTimeout(function(){
+				ok( heightApplied( 200 ), "testelem is 200px tall when window is 575px wide" );
+				start();
+
+			}, 900);	
+		});
+		
 		asyncTest( 'styles within max-width media queries apply properly', function() { 
 			window.resizeTo(300,600);
 			setTimeout(function(){
@@ -91,6 +100,8 @@ window.onload = function(){
 				start();
 			}, 900);	
 		});
+		
+		
 		
 	}
 	

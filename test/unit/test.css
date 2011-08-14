@@ -29,7 +29,19 @@
 	}
 }
 
+/* testing shorthand syntax */
+@media (min-width: 550px) {
+	#testelem {
+		height: 200px;
+	}
+}
 
+/* unknown media type - this should be ignored */
+@media fake and (max-width: 550px) {
+	#testelem {
+		height: 150px;
+	}
+}
 
 
 /*styles for 620px and up */
