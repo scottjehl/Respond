@@ -1,4 +1,4 @@
-/*! Respond.js: min/max-width media query polyfill. (c) Scott Jehl. MIT/GPLv2 Lic. j.mp/respondjs  */
+/*! Respond.js v1.0.0: min/max-width media query polyfill. (c) Scott Jehl. MIT/GPLv2 Lic. j.mp/respondjs  */
 (function( win, mqSupported ){
 	//exposed namespace
 	win.respond		= {};
