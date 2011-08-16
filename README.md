@@ -60,7 +60,7 @@ Some notes to keep in mind:
 
 - This script's focus is purposely very narrow: only min-width and max-width media queries and all media types (screen, print, etc) are translated to non-supporting browsers. I wanted to keep things simple for filesize, maintenance, and performance, so I've intentionally limited support to queries that are essential to building a mobile-first responsive design. In the future, I may rework things a bit to include a hook for patching-in additional media query features - stay tuned!
 
-- Browsers that natively support CSS3 Media Queries are opted-out of running this script as quickly as possible. In testing for support, I immediately pass browsers that support the window.matchMedia API (such as recent Chrome releases), and Internet Explorer 9+. All other browsers are subjected to a quick feature test to determine whether they support media queries or not before proceeding to run the script.
+- Browsers that natively support CSS3 Media Queries are opted-out of running this script as quickly as possible. In testing for support, I immediately pass browsers that support the window.matchMedia API. All other browsers are subjected to a quick feature test to determine whether they support media queries or not before proceeding to run the script.
 
 - This script relies on no other scripts or frameworks, and is optimized for mobile delivery (~1kb total filesize)
 
