@@ -46,8 +46,8 @@ a {
 
 @media screen and (min-width: 40em),only print,projector{body{background:red;}}
 
-/*styles for 800px and up!*/
-@media screen and (min-width: 50em){
+/*styles for 888px and up!*/
+@media screen and (min-width: 55.5em){
 	body {
 		background: blue;
 	}

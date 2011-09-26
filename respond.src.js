@@ -120,8 +120,8 @@
 					mediastyles.push( { 
 						media	: thisq.match( /(only\s+)?([a-zA-Z]+)(\sand)?/ ) && RegExp.$2,
 						rules	: rules.length - 1,
-						minw	: thisq.match( /\(min\-width:[\s]*([\s]*[0-9]+)(px|em)[\s]*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" ), 
-						maxw	: thisq.match( /\(max\-width:[\s]*([\s]*[0-9]+)(px|em)[\s]*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" )
+						minw	: thisq.match( /\(min\-width:[\s]*([\s]*[0-9]+\.*[0-9]*)(px|em)[\s]*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" ), 
+						maxw	: thisq.match( /\(max\-width:[\s]*([\s]*[0-9]+\.*[0-9]*)(px|em)[\s]*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" )
 					} );
 				}	
 			}
@@ -142,7 +142,19 @@
 				dFrag		= doc.createDocumentFragment(),
 				lastLink	= links[ links.length-1 ],
 				now 		= (new Date()).getTime(),
-				eminpx		= parseFloat( docElem.currentStyle ? body.currentStyle.fontSize : document.defaultView.getComputedStyle( body, null ).getPropertyValue( "font-size" ) );
+				eminpx		= 16, //
+				fontSize 	= docElem.currentStyle ? docElem.currentStyle.fontSize : document.defaultView.getComputedStyle( docElem, null ).getPropertyValue( "font-size" );
+				
+			if (fontSize.indexOf('pt') > -1) {
+				// convert points to pixels: 
+				// 1pt = 1/72 inch 
+				// 96 pixels = 1 inch
+				eminpx = 96 * parseFloat(fontSize)/72; 
+			} else {
+				// might also need to add tests for other cases
+				// where fontSize is not expressed in pixels
+				eminpx = parseFloat(fontSize);				
+			}
 
 			//throttle resize calls	
 			if( fromResize && lastCall && now - lastCall < resizeThrottle ){
@@ -161,13 +173,13 @@
 
 				if( min ){
 					min = min.replace( "px", "" );
-					if( min.indexOf( "em" ) ){
+					if( min.indexOf( "em" ) > -1 ){
 						min = parseFloat( min.replace( "em", "" ) ) * eminpx;
 					}
 				}
 				if( max ){
 					max = max.replace( "px", "" );
-					if( max.indexOf( "em" ) ){
+					if( max.indexOf( "em" ) > -1 ){
 						max = parseFloat( max.replace( "em", "" ) ) * eminpx;
 					}
 				}	
