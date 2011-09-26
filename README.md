@@ -66,6 +66,8 @@ Some notes to keep in mind:
 
 - As you might guess, this implementation is quite dumb in regards to CSS parsing rules. This is a good thing, because that allows it to run really fast, but it's looseness may also cause unexpected behavior. For example: if you enclose a whole media query in a comment intending to disable its rules, you'll probably find that those rules will end up enabled in non-media-query-supporting browsers.
 
+- WARNING: Really, you need to delete all commented-out media queries from your CSS
+
 - Respond.js doesn't parse CSS refrenced via @import, nor does it work with media queries within style elements, as those styles can't be re-requested for parsing.
 
 - Due to security restrictions, some browsers may not allow this script to work on file:// urls (because it uses xmlHttpRequest). Run it on a web server.
@@ -73,6 +75,14 @@ Some notes to keep in mind:
 - Currently, media attributes on link elements are supported, but only if the linked stylesheet contains no media queries. If it does contain queries, the media attribute will be ignored and the internal queries will be parsed normally.
 
 - WARNING: Do not include @font-face rules inside a media query. This will crash IE7 and IE8. Simply place @font-face rules in the wide open, as a sibling to other media queries. Isolated test here to demostrate (note: test crashes IE 7&8): http://jsfiddle.net/scottjehl/Ejyj5/1/
+
+- Now supporting media queries in EM units, but with a fixed conversion of 1em = 16px
+
+<pre>
+    @media screen and (min-width: 55.5em){
+        ...styles for 55.5em  (55.5 x 16 = 888px) and up go here
+    }
+</pre>
 
 
 How's it work?

@@ -20,6 +20,7 @@
 		appendedEls 	= [],
 		parsedSheets 	= {},
 		resizeThrottle	= 30,
+		pixelsToEm		= 16,
 		head 			= doc.getElementsByTagName( "head" )[0] || docElem,
 		links			= head.getElementsByTagName( "link" ),
 		requestQueue	= [],
@@ -121,8 +122,8 @@
 					mediastyles.push( { 
 						media	: thisq.match( /(only\s+)?([a-zA-Z]+)(\sand)?/ ) && RegExp.$2,
 						rules	: rules.length - 1,
-						minw	: thisq.match( /\(min\-width:[\s]*([\s]*[0-9]+)px[\s]*\)/ ) && parseFloat( RegExp.$1 ), 
-						maxw	: thisq.match( /\(max\-width:[\s]*([\s]*[0-9]+)px[\s]*\)/ ) && parseFloat( RegExp.$1 )
+						minw	: thisq.match( /\(min\-width:[\s]*([\s]*[0-9]+\.*[0-9]*)(em|px)[\s]*\)/ ) && (RegExp.$2=='px' ? parseFloat( RegExp.$1 ) : pixelsToEm * parseFloat( RegExp.$1 )),
+						maxw	: thisq.match( /\(max\-width:[\s]*([\s]*[0-9]+\.*[0-9]*)(em|px)[\s]*\)/ ) && (RegExp.$2=='px' ? parseFloat( RegExp.$1 ) : pixelsToEm * parseFloat( RegExp.$1 ))
 					} );
 				}	
 			}
@@ -231,6 +232,11 @@
 	
 	//expose update for re-running respond later on
 	respond.update = ripCSS;
+	
+	//maybe someday expose for adjusting pixelToEm ratio?
+	//would need to re-run translate to be effective
+	//TBD
+	//respond.pixelsToEm = 16;
 	
 	//adjust on resize
 	function callMedia(){
