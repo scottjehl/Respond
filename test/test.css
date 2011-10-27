@@ -12,8 +12,8 @@ body {
 }
 p {
 	width: 60%;
-	min-width: 300px;
-	max-width: 700px;
+	min-width: 18.75em; /* 300px @ 16px */
+	max-width: 43.75; /* 700px @ 16px */
 	margin: 2em auto;
 	background: #fff;
 	padding: 20px;
@@ -27,15 +27,17 @@ a {
 	display: none;
 }
 
-/*styles for 300 and up!*/
-@media only screen and (min-width: 15em) {
+/*styles for 300 and up @ 16px!*/
+/* The max-width declaration below blocks this from ever working */
+@media only screen and (min-width: 18.75em){
 	body {
 		background: yellow;
 	}
 }
 
 
-@media only screen and (min-width: 24em), only screen and (max-width: 40em) {
+/*styles for 480px - 620px @ 16px!*/
+@media only screen and (min-width: 30em) and (max-width: 38.75em) {
 	body {
 		background: green;
 	}
@@ -44,23 +46,33 @@ a {
 
 
 
-@media screen and (min-width: 40em),only print,projector{body{background:red;}}
+@media screen and (min-width: 38.75em),only print,projector{body{background:red;}}
 
-/*styles for 800px and up!*/
+/*styles for 800px and up @ 16px!*/
 @media screen and (min-width: 50em){
 	body {
 		background: blue;
 	}
 }
 
-
-@media screen and (min-width: 70em){
+/*styles for 1100px and up @ 16px!*/
+@media screen and (min-width: 68.75em){
 	body {
 		background: orange;
 	}
 }
 
 /*one with pixels too! */
+/* NOTE - if the user were to increase his browser font size to 20px (chrome: Large), 
+			the above (68.75em) media query will be incorrectly ignored!!!
+			
+			Assuming 20px browser setting, we would expect to see this progression:
+			yellow > green > red > blue > NAVY > orange
+			
+			However, the orange never kicks in... which seems like a browser bug!
+			Here's the math (assuming 20px browser setting):
+			1200/20 = 60em     <     68.75em
+*/
 @media screen and (min-width: 1200px){
 	body {
 		background: navy;
