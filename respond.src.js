@@ -45,7 +45,7 @@
 						translate( sheet.styleSheet.rawCssText, href, media );
 						parsedSheets[ href ] = true;
 					} else {
-						if( !/^([a-zA-Z]+?:(\/\/)?)/.test( href )
+						if( !/^(([a-zA-Z]+:)?(\/\/))/.test( href )
 							|| href.replace( RegExp.$1, "" ).split( "/" )[0] === win.location.host ){
 							requestQueue.push( {
 								href: href,
