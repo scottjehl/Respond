@@ -10,7 +10,7 @@
 	respond.mediaQueriesSupported	= mqSupported;
 	
 	//if media queries are supported, exit here
-	//if( mqSupported ){ return; }
+	if( mqSupported ){ return; }
 	
 	//define vars
 	var doc 			= win.document,
@@ -60,7 +60,6 @@
 				}
 			}
 			makeRequests();
-				
 		},
 		
 		//recurse through request queue, get css text
@@ -124,8 +123,8 @@
 					mediastyles.push( { 
 						media	: thisq.match( /(only\s+)?([a-zA-Z]+)(\sand)?/ ) && RegExp.$2,
 						rules	: rules.length - 1,
-						minw	: thisq.match( /\(min\-width:[\s]*([\s]*[0-9]+)(px|em)[\s]*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" ), 
-						maxw	: thisq.match( /\(max\-width:[\s]*([\s]*[0-9]+)(px|em)[\s]*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" )
+						minw	: thisq.match( /\(min\-width:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" ), 
+						maxw	: thisq.match( /\(max\-width:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" )
 					} );
 				}	
 			}
@@ -165,7 +164,6 @@
 								}
 								
 								ret = div.offsetWidth;
-								console.log('w: ' + ret);
 								
 								if( fakeUsed ){
 									docElem.removeChild( fakeBody );
@@ -190,41 +188,24 @@
 				var thisstyle = mediastyles[ i ],
 					min = thisstyle.minw,
 					max = thisstyle.maxw;
-				console.log('BEFORE: min: ' + min +', max: ' + max);
+				
 				if( !!min ){
-					min = parseFloat( min )
-					if() {
-						min *= eminpx;
-					}
-					
-					min = /em/i.test( min ) ? 
+					min = parseFloat( min ) * ( /em/i.test( min ) ? eminpx : 1 );
 				}
-				if( max && /em/i.test( max ) ){
-					max = parseFloat( max ) * eminpx;
+				if( !!max ){
+					max = parseFloat( max ) * ( /em/i.test( max ) ? eminpx : 1 );
 				}
-				min = parseFloat(min);
-				max = parseFloat(max);
 				
-				console.log('AFTER: min: ' + min +', max: ' + max);
-				console.log('         min || max: ' + (!!min || !!max));
-				console.log('         ( !!min && currWidth >= min ) : ' + ( !!min && currWidth >= min ) );
-				console.log('         ( !!max && currWidth <= max ) : ' + ( !!max && currWidth <= max ) );
-				
-				if( (!!min || !!max) && 
-					(
-						( !!min && currWidth >= min ) || 
-						( !!max && currWidth <= max )
-					) ){						
+				if(!min && !max || 
+					( !min || min && currWidth >= min ) && 
+					( !max || max && currWidth <= max )){						
 						if( !styleBlocks[ thisstyle.media ] ){
 							styleBlocks[ thisstyle.media ] = [];
 						}
-						console.log('INSIDE');
 						styleBlocks[ thisstyle.media ].push( rules[ thisstyle.rules ] );
 				}
 			}
 			
-			console.log('---- styleblocks:');
-			console.log(styleBlocks);
 			//remove any existing respond style element(s)
 			for( var i in appendedEls ){
 				if( appendedEls[ i ] && appendedEls[ i ].parentNode === head ){

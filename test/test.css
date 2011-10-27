@@ -13,7 +13,7 @@ body {
 p {
 	width: 60%;
 	min-width: 18.75em; /* 300px @ 16px */
-	max-width: 43.75; /* 700px @ 16px */
+	max-width: 43.75em; /* 700px @ 16px */
 	margin: 2em auto;
 	background: #fff;
 	padding: 20px;
