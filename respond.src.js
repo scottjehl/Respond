@@ -10,11 +10,15 @@
 	respond.mediaQueriesSupported	= mqSupported;
 	
 	//if media queries are supported, exit here
-	if( mqSupported ){ return; }
+	//if( mqSupported ){ return; }
 	
 	//define vars
 	var doc 			= win.document,
 		docElem 		= doc.documentElement,
+			refNode		= docElem.firstElementChild || docElem.firstChild,
+			// fakeBody required for <FF4 when executed in <head>
+			fakeUsed	= !doc.body,
+			fakeBody	= doc.body || doc.createElement( "body" ),
 		mediastyles		= [],
 		rules			= [],
 		appendedEls 	= [],
@@ -142,7 +146,35 @@
 				dFrag		= doc.createDocumentFragment(),
 				lastLink	= links[ links.length-1 ],
 				now 		= (new Date()).getTime(),
-				eminpx		= parseFloat( docElem.currentStyle ? body.currentStyle.fontSize : document.defaultView.getComputedStyle( body, null ).getPropertyValue( "font-size" ) );
+				eminpx		= (function() {
+								var ret;
+								/* -- old method
+								if(docElem.currentStyle) { 
+									ret = docElem.currentStyle.fontSize;
+								} else {
+									ret = document.defaultView.getComputedStyle( docElem, null ).getPropertyValue( "font-size" ) 
+								}
+								*/
+								var div = doc.createElement('div');
+								div.id = "mq-test-1";
+								div.style.cssText = "position:absolute;top:-99em;width:1em";
+								fakeBody.appendChild( div );
+								
+								if( fakeUsed ){
+									docElem.insertBefore( fakeBody, refNode );
+								}
+								
+								ret = div.offsetWidth;
+								console.log('w: ' + ret);
+								
+								if( fakeUsed ){
+									docElem.removeChild( fakeBody );
+								}
+									
+								fakeBody.removeChild( div );
+								
+								return parseFloat(ret);
+							})();
 
 			//throttle resize calls	
 			if( fromResize && lastCall && now - lastCall < resizeThrottle ){
@@ -158,30 +190,41 @@
 				var thisstyle = mediastyles[ i ],
 					min = thisstyle.minw,
 					max = thisstyle.maxw;
-
-				if( min ){
-					min = min.replace( "px", "" );
-					if( min.indexOf( "em" ) ){
-						min = parseFloat( min.replace( "em", "" ) ) * eminpx;
+				console.log('BEFORE: min: ' + min +', max: ' + max);
+				if( !!min ){
+					min = parseFloat( min )
+					if() {
+						min *= eminpx;
 					}
+					
+					min = /em/i.test( min ) ? 
 				}
-				if( max ){
-					max = max.replace( "px", "" );
-					if( max.indexOf( "em" ) ){
-						max = parseFloat( max.replace( "em", "" ) ) * eminpx;
-					}
-				}	
+				if( max && /em/i.test( max ) ){
+					max = parseFloat( max ) * eminpx;
+				}
+				min = parseFloat(min);
+				max = parseFloat(max);
 				
-				if( !min && !max || 
-					( !min || min && currWidth >= min ) && 
-					( !max || max && currWidth <= max ) ){						
+				console.log('AFTER: min: ' + min +', max: ' + max);
+				console.log('         min || max: ' + (!!min || !!max));
+				console.log('         ( !!min && currWidth >= min ) : ' + ( !!min && currWidth >= min ) );
+				console.log('         ( !!max && currWidth <= max ) : ' + ( !!max && currWidth <= max ) );
+				
+				if( (!!min || !!max) && 
+					(
+						( !!min && currWidth >= min ) || 
+						( !!max && currWidth <= max )
+					) ){						
 						if( !styleBlocks[ thisstyle.media ] ){
 							styleBlocks[ thisstyle.media ] = [];
 						}
+						console.log('INSIDE');
 						styleBlocks[ thisstyle.media ].push( rules[ thisstyle.rules ] );
 				}
 			}
 			
+			console.log('---- styleblocks:');
+			console.log(styleBlocks);
 			//remove any existing respond style element(s)
 			for( var i in appendedEls ){
 				if( appendedEls[ i ] && appendedEls[ i ].parentNode === head ){
