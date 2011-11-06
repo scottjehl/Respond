@@ -247,8 +247,8 @@
 	(function( win ){
 		
 		//for speed, flag browsers with window.matchMedia support and IE 9 as supported
-		if( win.matchMedia ){ return true; }
-
+		if( win.matchMedia ){  return true; } 
+		
 		var bool,
 			doc			= document,
 			docElem		= doc.documentElement,
@@ -263,18 +263,23 @@
 		div.style.cssText = "position:absolute;top:-99em";
 		fakeBody.appendChild( div );
 		
-		div.innerHTML = '_<style media="'+q+'"> #mq-test-1 { width: 9px; }</style>';
-		if( fakeUsed ){
-			docElem.insertBefore( fakeBody, refNode );
-		}	
-		div.removeChild( div.firstChild );
-		bool = div.offsetWidth == 9;  
-		if( fakeUsed ){
-			docElem.removeChild( fakeBody );
-		}	
-		else{
-			fakeBody.removeChild( div );
-		}
-		return bool;
+		win.matchMedia = function(q) {
+			div.innerHTML = '_<style media="'+q+'"> #mq-test-1 { width: 9px; }</style>';
+			if( fakeUsed ){
+				docElem.insertBefore( fakeBody, refNode );
+			}	
+			div.removeChild( div.firstChild );
+			bool = div.offsetWidth == 9;  
+			if( fakeUsed ){
+				docElem.removeChild( fakeBody );
+			}		
+			else{
+				fakeBody.removeChild( div );
+			}
+			
+    		return { matches: bool, media: q };
+		};
+		return matchMedia(q).matches;
+		
 	})( this )
 );
