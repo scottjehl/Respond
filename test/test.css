@@ -27,8 +27,15 @@ a {
 	display: none;
 }
 
-/*styles for 480px and up!*/
-@media only screen and (min-width: 480px), only screen and (max-width: 620px) {
+/*styles for 300 and up!*/
+@media only screen and (min-width: 15em) {
+	body {
+		background: yellow;
+	}
+}
+
+
+@media only screen and (min-width: 24em), only screen and (max-width: 40em) {
 	body {
 		background: green;
 	}
@@ -36,25 +43,25 @@ a {
 
 
 
-/*styles for 620px and up! (let's try this one minified )*/
-@media screen and (min-width: 620px),only print,projector{body{background:red;}}
 
-/*styles for 800px and up!*/
-@media screen and (min-width: 800px){
+@media screen and (min-width: 40em),only print,projector{body{background:red;}}
+
+/*styles for 888px and up!*/
+@media screen and (min-width: 55.5em){
 	body {
 		background: blue;
 	}
 }
 
-/*styles for 1100px and up!*/
-@media screen and (min-width: 1100px){
+
+@media screen and (min-width: 70em){
 	body {
 		background: orange;
 	}
 }
 
-/*styles for 1300px and up!*/
-@media screen and (min-width: 1300px){
+/*one with pixels too! */
+@media screen and (min-width: 1200px){
 	body {
 		background: navy;
 	}

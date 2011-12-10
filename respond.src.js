@@ -114,15 +114,14 @@
 				
 				eachq	= fullq.split( "," );
 				eql		= eachq.length;
-				
 					
 				for( ; j < eql; j++ ){
 					thisq	= eachq[ j ];
 					mediastyles.push( { 
 						media	: thisq.match( /(only\s+)?([a-zA-Z]+)(\sand)?/ ) && RegExp.$2,
 						rules	: rules.length - 1,
-						minw	: thisq.match( /\(min\-width:[\s]*([\s]*[0-9]+)px[\s]*\)/ ) && parseFloat( RegExp.$1 ), 
-						maxw	: thisq.match( /\(max\-width:[\s]*([\s]*[0-9]+)px[\s]*\)/ ) && parseFloat( RegExp.$1 )
+						minw	: thisq.match( /\(min\-width:[\s]*([\s]*[0-9]+\.*[0-9]*)(px|em)[\s]*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" ), 
+						maxw	: thisq.match( /\(max\-width:[\s]*([\s]*[0-9]+\.*[0-9]*)(px|em)[\s]*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" )
 					} );
 				}	
 			}
@@ -142,8 +141,19 @@
 				styleBlocks	= {},
 				dFrag		= doc.createDocumentFragment(),
 				lastLink	= links[ links.length-1 ],
-				now 		= (new Date()).getTime();
-			
+				now 		= (new Date()).getTime(),
+				eminpx		= 16, //
+				fontSize 	= docElem.currentStyle ? docElem.currentStyle.fontSize : document.defaultView.getComputedStyle( docElem, null ).getPropertyValue( "font-size" );
+				
+			if (fontSize.indexOf('pt') > -1) {
+				// convert points to pixels: 
+				// 1pt = 1/72 inch 
+				// 96 pixels = 1 inch
+				eminpx = 96 * parseFloat(fontSize)/72; 
+			} else if (fontSize.indexOf('px') > -1) {
+				eminpx = parseFloat(fontSize);				
+			}
+
 			//throttle resize calls	
 			if( fromResize && lastCall && now - lastCall < resizeThrottle ){
 				clearTimeout( resizeDefer );
@@ -155,10 +165,26 @@
 			}
 										
 			for( var i in mediastyles ){
-				var thisstyle = mediastyles[ i ];
-				if( !thisstyle.minw && !thisstyle.maxw || 
-					( !thisstyle.minw || thisstyle.minw && currWidth >= thisstyle.minw ) && 
-					(!thisstyle.maxw || thisstyle.maxw && currWidth <= thisstyle.maxw ) ){						
+				var thisstyle = mediastyles[ i ],
+					min = thisstyle.minw,
+					max = thisstyle.maxw;
+
+				if( min ){
+					min = min.replace( "px", "" );
+					if( min.indexOf( "em" ) > -1 ){
+						min = parseFloat( min.replace( "em", "" ) ) * eminpx;
+					}
+				}
+				if( max ){
+					max = max.replace( "px", "" );
+					if( max.indexOf( "em" ) > -1 ){
+						max = parseFloat( max.replace( "em", "" ) ) * eminpx;
+					}
+				}	
+				
+				if( !min && !max || 
+					( !min || min && currWidth >= min ) && 
+					( !max || max && currWidth <= max ) ){						
 						if( !styleBlocks[ thisstyle.media ] ){
 							styleBlocks[ thisstyle.media ] = [];
 						}
