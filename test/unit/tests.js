@@ -27,6 +27,23 @@ window.onload = function(){
 		function heightApplied( val ){
 			return testElem.offsetHeight === val;
 		}
+		
+		// A short snippet for detecting versions of IE in JavaScript - author: @padolsey
+		var ie = (function(){
+
+		    var undef,
+		        v = 3,
+		        div = document.createElement('div'),
+		        all = div.getElementsByTagName('i');
+    
+		    while (
+		        div.innerHTML = '<!--[if gt IE ' + (++v) + ']><i></i><![endif]-->',
+		        all[0]
+		    );
+    
+		    return v > 4 ? v : undef;
+    
+		}());
 
 		window.moveTo(0,0);
 		
@@ -40,12 +57,24 @@ window.onload = function(){
 		});
 		
 		asyncTest( 'styles within min-width media queries apply properly', function() { 
-			window.resizeTo(500,600);
+			window.resizeTo(520,600);
 			setTimeout(function(){
 				ok( widthApplied( 150 ), 'testelem is 150px wide when window is 500px wide'  );
 				start();
 			}, 900);	
 		});
+		
+		// This test is for a feature in IE7 and up
+		if(  ie >= 7 ){
+			asyncTest( "attribute selectors still work (where supported) after respond runs its course", function() { 
+				window.resizeTo(520,600);
+				setTimeout(function(){
+					ok( heightApplied( 200 ), "testelem is 200px tall when window is 500px wide" );
+					start();
+				}, 900);	
+			});
+		}
+		
 		
 		asyncTest( 'styles within max-width media queries apply properly', function() { 
 			window.resizeTo(300,600);
@@ -78,7 +107,7 @@ window.onload = function(){
 		asyncTest( "Styles within a false media query do not apply", function() { 
 			window.resizeTo(800,600);
 			setTimeout(function(){
-				ok( !widthApplied( 500 ), "testelem is not 500px wide when window is 1300px wide" );
+				ok( !widthApplied( 500 ), "testelem is not 500px wide when window is 800px wide" );
 				start();
 
 			}, 900);	
@@ -91,6 +120,7 @@ window.onload = function(){
 				start();
 			}, 900);	
 		});
+		
 		
 	}
 	

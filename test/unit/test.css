@@ -13,12 +13,16 @@
 
 #testelem {
 	width: 50px;
+	display: block;
 }
 
 /*styles for 480px and up */
 @media screen and (min-width: 480px) {
 	#testelem {
 		width: 150px;
+	}
+	#testelem[class=foo] {
+		height: 200px;
 	}
 }
 
