@@ -46,6 +46,10 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 	//define vars
 	var doc 			= win.document,
 		docElem 		= doc.documentElement,
+			refNode		= docElem.firstElementChild || docElem.firstChild,
+			// fakeBody required for <FF4 when executed in <head>
+			fakeUsed	= !doc.body,
+			fakeBody	= doc.body || doc.createElement( "body" ),
 		mediastyles		= [],
 		rules			= [],
 		appendedEls 	= [],
@@ -87,7 +91,6 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 				}
 			}
 			makeRequests();
-				
 		},
 		
 		//recurse through request queue, get css text
@@ -151,8 +154,8 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 					mediastyles.push( { 
 						media	: thisq.match( /(only\s+)?([a-zA-Z]+)(\sand)?/ ) && RegExp.$2,
 						rules	: rules.length - 1,
-						minw	: thisq.match( /\(min\-width:[\s]*([\s]*[0-9]+)(px|em)[\s]*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" ), 
-						maxw	: thisq.match( /\(max\-width:[\s]*([\s]*[0-9]+)(px|em)[\s]*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" )
+						minw	: thisq.match( /\(min\-width:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" ), 
+						maxw	: thisq.match( /\(max\-width:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" )
 					} );
 				}	
 			}
@@ -172,7 +175,34 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 				styleBlocks	= {},
 				lastLink	= links[ links.length-1 ],
 				now 		= (new Date()).getTime(),
-				eminpx		= parseFloat( docElem.currentStyle ? body.currentStyle.fontSize : document.defaultView.getComputedStyle( body, null ).getPropertyValue( "font-size" ) );
+				eminpx		= (function() {
+								var ret;
+								/* -- old method
+								if(docElem.currentStyle) { 
+									ret = docElem.currentStyle.fontSize;
+								} else {
+									ret = document.defaultView.getComputedStyle( docElem, null ).getPropertyValue( "font-size" ) 
+								}
+								*/
+								var div = doc.createElement('div');
+								div.id = "mq-test-1";
+								div.style.cssText = "position:absolute;top:-99em;width:1em";
+								fakeBody.appendChild( div );
+								
+								if( fakeUsed ){
+									docElem.insertBefore( fakeBody, refNode );
+								}
+								
+								ret = div.offsetWidth;
+								
+								if( fakeUsed ){
+									docElem.removeChild( fakeBody );
+								}
+									
+								fakeBody.removeChild( div );
+								
+								return parseFloat(ret);
+							})();
 
 			//throttle resize calls	
 			if( fromResize && lastCall && now - lastCall < resizeThrottle ){
@@ -188,23 +218,17 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 				var thisstyle = mediastyles[ i ],
 					min = thisstyle.minw,
 					max = thisstyle.maxw;
-
-				if( min ){
-					min = min.replace( "px", "" );
-					if( min.indexOf( "em" ) ){
-						min = parseFloat( min.replace( "em", "" ) ) * eminpx;
-					}
-				}
-				if( max ){
-					max = max.replace( "px", "" );
-					if( max.indexOf( "em" ) ){
-						max = parseFloat( max.replace( "em", "" ) ) * eminpx;
-					}
-				}	
 				
-				if( !min && !max || 
+				if( !!min ){
+					min = parseFloat( min ) * ( /em/i.test( min ) ? eminpx : 1 );
+				}
+				if( !!max ){
+					max = parseFloat( max ) * ( /em/i.test( max ) ? eminpx : 1 );
+				}
+				
+				if(!min && !max || 
 					( !min || min && currWidth >= min ) && 
-					( !max || max && currWidth <= max ) ){						
+					( !max || max && currWidth <= max )){						
 						if( !styleBlocks[ thisstyle.media ] ){
 							styleBlocks[ thisstyle.media ] = [];
 						}
