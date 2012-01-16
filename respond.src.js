@@ -176,8 +176,9 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 				lastLink	= links[ links.length-1 ],
 				now 		= (new Date()).getTime(),
 				eminpx		= (function() {
-								var ret;
-								var div = doc.createElement('div');
+								var ret,
+									div = doc.createElement('div');
+									
 								div.id = "mq-test-1";
 								div.style.cssText = "position:absolute;top:-99em;width:1em";
 								fakeBody.appendChild( div );
