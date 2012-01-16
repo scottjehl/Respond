@@ -140,7 +140,6 @@
 				docElemProp	= docElem[ name ],
 				currWidth 	= doc.compatMode === "CSS1Compat" && docElemProp || doc.body[ name ] || docElemProp,
 				styleBlocks	= {},
-				dFrag		= doc.createDocumentFragment(),
 				lastLink	= links[ links.length-1 ],
 				now 		= (new Date()).getTime();
 			
@@ -181,18 +180,20 @@
 				ss.type = "text/css";	
 				ss.media	= i;
 				
+				//originally, ss was appended to a documentFragment and sheets were appended in bulk.
+				//this caused crashes in IE in a number of circumstances, such as when the HTML element had a bg image set
+				head.insertBefore( ss, lastLink.nextSibling );
+				
 				if ( ss.styleSheet ){ 
 		        	ss.styleSheet.cssText = css;
 		        } 
 		        else {
 					ss.appendChild( doc.createTextNode( css ) );
 		        }
-		        dFrag.appendChild( ss );
+		        
+				//push to appendedEls to track for later removal
 				appendedEls.push( ss );
 			}
-			
-			//append to DOM at once
-			head.insertBefore( dFrag, lastLink.nextSibling );
 		},
 		//tweaked Ajax functions from Quirksmode
 		ajax = function( url, callback ) {
