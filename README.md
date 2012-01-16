@@ -72,8 +72,6 @@ Some notes to keep in mind:
 
 - Currently, media attributes on link elements are supported, but only if the linked stylesheet contains no media queries. If it does contain queries, the media attribute will be ignored and the internal queries will be parsed normally. In other words, @media statements in the CSS take priority.
 
-- Currently, em units in your media query conditions are not supported. Tracked in #18
-
 - WARNING: Do not include @font-face rules inside a media query. This will crash IE7 and IE8. Simply place @font-face rules in the wide open, as a sibling to other media queries. Isolated test here to demostrate (note: test crashes IE 7&8): http://jsfiddle.net/scottjehl/Ejyj5/1/
 
 
