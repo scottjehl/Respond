@@ -46,10 +46,10 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 	//define vars
 	var doc 			= win.document,
 		docElem 		= doc.documentElement,
-			refNode		= docElem.firstElementChild || docElem.firstChild,
-			// fakeBody required for <FF4 when executed in <head>
-			fakeUsed	= !doc.body,
-			fakeBody	= doc.body || doc.createElement( "body" ),
+		refNode		= docElem.firstElementChild || docElem.firstChild,
+		// fakeBody required for <FF4 when executed in <head>
+		fakeUsed	= !doc.body,
+		fakeBody	= doc.body || doc.createElement( "body" ),
 		mediastyles		= [],
 		rules			= [],
 		appendedEls 	= [],
@@ -177,13 +177,6 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 				now 		= (new Date()).getTime(),
 				eminpx		= (function() {
 								var ret;
-								/* -- old method
-								if(docElem.currentStyle) { 
-									ret = docElem.currentStyle.fontSize;
-								} else {
-									ret = document.defaultView.getComputedStyle( docElem, null ).getPropertyValue( "font-size" ) 
-								}
-								*/
 								var div = doc.createElement('div');
 								div.id = "mq-test-1";
 								div.style.cssText = "position:absolute;top:-99em;width:1em";
