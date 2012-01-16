@@ -46,10 +46,8 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 	//define vars
 	var doc 			= win.document,
 		docElem 		= doc.documentElement,
-		refNode		= docElem.firstElementChild || docElem.firstChild,
-		// fakeBody required for <FF4 when executed in <head>
-		fakeUsed	= !doc.body,
-		fakeBody	= doc.body || doc.createElement( "body" ),
+		refNode			= docElem.firstChild,
+		fakeBody		= doc.body || doc.createElement( "body" ),
 		mediastyles		= [],
 		rules			= [],
 		appendedEls 	= [],
@@ -176,26 +174,32 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 				lastLink	= links[ links.length-1 ],
 				now 		= (new Date()).getTime(),
 				eminpx		= (function() {
-								var ret,
-									div = doc.createElement('div');
+					var ret,
+						div = doc.createElement('div'),
+						body = doc.body,
+						fakeUsed = false;
 									
-								div.style.cssText = "position:absolute;top:-99em;width:1em";
-								fakeBody.appendChild( div );
+					div.style.cssText = "position:absolute;font-size:1em;width:1em";
+					
+					if( !body ){
+						body = fakeUsed = fakeBody;
+					}
+					
+					body.appendChild( div );
 								
-								if( fakeUsed ){
-									docElem.insertBefore( fakeBody, refNode );
-								}
+					docElem.insertBefore( body, docElem.firstChild );
 								
-								ret = div.offsetWidth;
+					ret = div.offsetWidth;
 								
-								if( fakeUsed ){
-									docElem.removeChild( fakeBody );
-								}
-									
-								fakeBody.removeChild( div );
+					if( fakeUsed ){
+						docElem.removeChild( body );
+					}
+					else {
+						body.removeChild( div );
+					}
 								
-								return parseFloat(ret);
-							})();
+					return parseFloat(ret);
+				})();
 
 			//throttle resize calls	
 			if( fromResize && lastCall && now - lastCall < resizeThrottle ){
