@@ -33,6 +33,12 @@
 	}
 }
 
+/* testing em unit support - 33em should be 528px and 35em should be 560px in IE with default font settings */
+@media screen and (min-width: 33em) and (max-width: 35em) {
+	#testelem {
+		width: 12px;
+	}
+}
 
 
 

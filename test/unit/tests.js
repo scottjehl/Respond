@@ -83,6 +83,16 @@ window.onload = function(){
 				start();
 			}, 900);	
 		});
+
+
+		
+		asyncTest( 'min and max-width media queries that use EM units apply properly', function() { 
+			window.resizeTo(560,600);
+			setTimeout(function(){
+				ok( widthApplied( 12 ), 'testelem is 150px wide when window is 500px wide'  );
+				start();
+			}, 900);	
+		});
 		
 		
 		
