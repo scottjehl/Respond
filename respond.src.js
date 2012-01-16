@@ -1,5 +1,36 @@
+/*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas. Dual MIT/BSD license */
+/*! NOTE: If you're already including a window.matchMedia polyfill via Modernizr or otherwise, you don't need this part */
+window.matchMedia = window.matchMedia || (function(doc, undefined){
+  
+  var bool,
+      docElem  = doc.documentElement,
+      refNode  = docElem.firstElementChild || docElem.firstChild,
+      // fakeBody required for <FF4 when executed in <head>
+      fakeBody = doc.createElement('body'),
+      div      = doc.createElement('div');
+  
+  div.id = 'mq-test-1';
+  div.style.cssText = "position:absolute;top:-100em";
+  fakeBody.appendChild(div);
+  
+  return function(q){
+    
+    div.innerHTML = '&shy;<style media="'+q+'"> #mq-test-1 { width: 42px; }</style>';
+    
+    docElem.insertBefore(fakeBody, refNode);
+    bool = div.offsetWidth == 42;  
+    docElem.removeChild(fakeBody);
+    
+    return { matches: bool, media: q };
+  };
+  
+})(document);
+
+
+
+
 /*! Respond.js v1.0.1pre: min/max-width media query polyfill. (c) Scott Jehl. MIT/GPLv2 Lic. j.mp/respondjs  */
-(function( win, mqSupported ){
+(function( win ){
 	//exposed namespace
 	win.respond		= {};
 	
@@ -7,10 +38,10 @@
 	respond.update	= function(){};
 	
 	//expose media query support flag for external use
-	respond.mediaQueriesSupported	= mqSupported;
+	respond.mediaQueriesSupported	= win.matchMedia && win.matchMedia( "only all" ).matches;
 	
 	//if media queries are supported, exit here
-	if( mqSupported ){ return; }
+	if( respond.mediaQueriesSupported ){ return; }
 	
 	//define vars
 	var doc 			= win.document,
@@ -243,39 +274,4 @@
 	else if( win.attachEvent ){
 		win.attachEvent( "onresize", callMedia );
 	}
-})(
-	this,
-	(function( win ){
-		
-		//for speed, flag browsers with window.matchMedia support and IE 9 as supported
-		if( win.matchMedia ){ return true; }
-
-		var bool,
-			doc			= document,
-			docElem		= doc.documentElement,
-			refNode		= docElem.firstElementChild || docElem.firstChild,
-			// fakeBody required for <FF4 when executed in <head>
-			fakeUsed	= !doc.body,
-			fakeBody	= doc.body || doc.createElement( "body" ),
-			div			= doc.createElement( "div" ),
-			q			= "only all";
-			
-		div.id = "mq-test-1";
-		div.style.cssText = "position:absolute;top:-99em";
-		fakeBody.appendChild( div );
-		
-		div.innerHTML = '_<style media="'+q+'"> #mq-test-1 { width: 9px; }</style>';
-		if( fakeUsed ){
-			docElem.insertBefore( fakeBody, refNode );
-		}	
-		div.removeChild( div.firstChild );
-		bool = div.offsetWidth == 9;  
-		if( fakeUsed ){
-			docElem.removeChild( fakeBody );
-		}	
-		else{
-			fakeBody.removeChild( div );
-		}
-		return bool;
-	})( this )
-);
+})(this);
