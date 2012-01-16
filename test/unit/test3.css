@@ -1,0 +1,5 @@
+/* this stylesheet was referenced via a link that had a media attr defined
+it should only apply on screen > 87.5em (1400px) */
+#testelem {
+	width: 25px;
+}

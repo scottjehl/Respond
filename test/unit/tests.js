@@ -131,6 +131,13 @@ window.onload = function(){
 			}, 900);	
 		});
 		
+		asyncTest( "stylesheets with an EM-based media query in a media attribute apply when they should", function() { 
+			window.resizeTo(1500,600);
+			setTimeout(function(){
+				ok( widthApplied( 25 ), "testelem is 25px wide when window is > 1400px wide" );
+				start();
+			}, 900);	
+		});
 		
 	}
 	
