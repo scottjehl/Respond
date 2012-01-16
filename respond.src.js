@@ -179,7 +179,6 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 								var ret,
 									div = doc.createElement('div');
 									
-								div.id = "mq-test-1";
 								div.style.cssText = "position:absolute;top:-99em;width:1em";
 								fakeBody.appendChild( div );
 								
