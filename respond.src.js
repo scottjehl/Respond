@@ -46,8 +46,6 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 	//define vars
 	var doc 			= win.document,
 		docElem 		= doc.documentElement,
-		refNode			= docElem.firstChild,
-		fakeBody		= doc.body || doc.createElement( "body" ),
 		mediastyles		= [],
 		rules			= [],
 		appendedEls 	= [],
@@ -175,7 +173,7 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 			div.style.cssText = "position:absolute;font-size:1em;width:1em";
 					
 			if( !body ){
-				body = fakeUsed = fakeBody;
+				body = fakeUsed = doc.createElement( "body" );
 			}
 					
 			body.appendChild( div );
