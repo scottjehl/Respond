@@ -220,13 +220,14 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 			for( var i in mediastyles ){
 				var thisstyle = mediastyles[ i ],
 					min = thisstyle.minw,
-					max = thisstyle.maxw;
+					max = thisstyle.maxw,
+					em = "em";
 				
 				if( !!min ){
-					min = parseFloat( min ) * ( /em/i.test( min ) ? ( eminpx || getEmValue() ) : 1 );
+					min = parseFloat( min ) * ( min.indexOf( em ) > -1 ? ( eminpx || getEmValue() ) : 1 );
 				}
 				if( !!max ){
-					max = parseFloat( max ) * ( /em/i.test( max ) ? ( eminpx || getEmValue() ) : 1 );
+					max = parseFloat( max ) * ( max.indexOf( em ) > -1 ? ( eminpx || getEmValue() ) : 1 );
 				}
 				
 				if(!min && !max || 
