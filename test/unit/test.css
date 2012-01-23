@@ -64,3 +64,17 @@
 		width: 500px;
 	}
 }
+
+/*styles for height 400px and under*/
+@media screen and (max-height: 360px) {
+	#testelem {
+		background-color: #FF0000;
+	}
+}
+
+/*styles for height 600px and above*/
+@media screen and (min-height: 560px) {
+	#testelem {
+		background-color: #00FF00;
+	}
+}

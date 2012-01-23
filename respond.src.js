@@ -151,7 +151,9 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 						media	: thisq.match( /(only\s+)?([a-zA-Z]+)(\sand)?/ ) && RegExp.$2,
 						rules	: rules.length - 1,
 						minw	: thisq.match( /\(min\-width:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" ), 
-						maxw	: thisq.match( /\(max\-width:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" )
+						maxw	: thisq.match( /\(max\-width:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" ),
+						minh	: thisq.match( /\(min\-height:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" ), 
+						maxh	: thisq.match( /\(max\-height:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" )
 					} );
 				}	
 			}
@@ -199,10 +201,13 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 		eminpx,
 		
 		//enable/disable styles
-		applyMedia			= function( fromResize ){
-			var name		= "clientWidth",
-				docElemProp	= docElem[ name ],
-				currWidth 	= doc.compatMode === "CSS1Compat" && docElemProp || doc.body[ name ] || docElemProp,
+		applyMedia = function( fromResize ){
+			var wname		= "clientWidth",
+				docElemProp	= docElem[ wname ],
+				currWidth	= doc.compatMode === "CSS1Compat" && docElemProp || doc.body[ wname ] || docElemProp,
+				hname		= "clientHeight",
+				docElemProp	= docElem[ hname ],
+				currHeight	= doc.compatMode === "CSS1Compat" && docElemProp || doc.body[ hname ] || docElemProp,
 				styleBlocks	= {},
 				lastLink	= links[ links.length-1 ],
 				now 		= (new Date()).getTime();
@@ -216,23 +221,34 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 			else {
 				lastCall	= now;
 			}
-										
+			
 			for( var i in mediastyles ){
 				var thisstyle = mediastyles[ i ],
-					min = thisstyle.minw,
-					max = thisstyle.maxw,
+					minw = thisstyle.minw,
+					maxw = thisstyle.maxw,
+					minh = thisstyle.minh,
+					maxh = thisstyle.maxh,
 					em = "em";
 				
-				if( !!min ){
-					min = parseFloat( min ) * ( min.indexOf( em ) > -1 ? ( eminpx || getEmValue() ) : 1 );
+				if( !!minw ){
+					minw = parseFloat( minw ) * ( minw.indexOf( em ) > -1 ? ( eminpx || getEmValue() ) : 1 );
 				}
-				if( !!max ){
-					max = parseFloat( max ) * ( max.indexOf( em ) > -1 ? ( eminpx || getEmValue() ) : 1 );
+				if( !!maxw ){
+					maxw = parseFloat( maxw ) * ( maxw.indexOf( em ) > -1 ? ( eminpx || getEmValue() ) : 1 );
+				}
+				if( !!minh ){
+					minh = parseFloat( minh ) * ( minh.indexOf( em ) > -1 ? ( eminpx || getEmValue() ) : 1 );
+				}
+				if( !!maxh ){
+					maxh = parseFloat( maxh ) * ( maxh.indexOf( em ) > -1 ? ( eminpx || getEmValue() ) : 1 );
 				}
 				
-				if(!min && !max || 
-					( !min || min && currWidth >= min ) && 
-					( !max || max && currWidth <= max )){						
+				if((!minw && !maxw || 
+					( !minw || minw && currWidth >= minw ) && 
+					( !maxw || maxw && currWidth <= maxw )) &&
+					(!minh && !maxh || 
+					( !minh || minh && currHeight >= minh ) && 
+					( !maxh || maxh && currHeight <= maxh ))){
 						if( !styleBlocks[ thisstyle.media ] ){
 							styleBlocks[ thisstyle.media ] = [];
 						}
@@ -260,12 +276,12 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 				head.insertBefore( ss, lastLink.nextSibling );
 				
 				if ( ss.styleSheet ){ 
-		        	ss.styleSheet.cssText = css;
-		        } 
-		        else {
+					ss.styleSheet.cssText = css;
+				} 
+				else {
 					ss.appendChild( doc.createTextNode( css ) );
-		        }
-		        
+				}
+				
 				//push to appendedEls to track for later removal
 				appendedEls.push( ss );
 			}
@@ -275,7 +291,7 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 			var req = xmlHttp();
 			if (!req){
 				return;
-			}	
+			}
 			req.open( "GET", url, true );
 			req.onreadystatechange = function () {
 				if ( req.readyState != 4 || req.status != 200 && req.status != 304 ){
