@@ -95,6 +95,7 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 				var thisRequest = requestQueue.shift();
 				
 				ajax( thisRequest.href, function( styles ){
+					styles = styles.replace( /\/\*([\s\S]*?)\*\//g, "" );
 					translate( styles, thisRequest.href, thisRequest.media );
 					parsedSheets[ thisRequest.href ] = true;
 					makeRequests();
