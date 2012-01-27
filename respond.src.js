@@ -256,7 +256,7 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 				ss.media	= i;
 				
 				//originally, ss was appended to a documentFragment and sheets were appended in bulk.
-				//this caused crashes in IE in a number of circumstances, such as when the HTML element had a bg image set
+				//this caused crashes in IE in a number of circumstances, such as when the HTML element had a bg image set, so appending beforehand seems best. Thanks to @dvelyk for the initial research on this one!
 				head.insertBefore( ss, lastLink.nextSibling );
 				
 				if ( ss.styleSheet ){ 
