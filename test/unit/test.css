@@ -16,8 +16,8 @@
 	display: block;
 }
 
-/*styles for 480px and up */
-@media screen and (min-width: 480px) {
+/*styles for 480px and up - media type purposely left out here to test that in the process */
+@media (min-width: 480px) {
 	#testelem {
 		width: 150px;
 	}
