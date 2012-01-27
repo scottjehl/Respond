@@ -78,3 +78,27 @@ a {
 		background: navy;
 	}
 }
+
+/* Here come the min-height media queries */
+
+/* styles for height 300 and up */
+@media screen and (min-height: 300px){
+	p {
+		background: Pink;
+	}
+}
+
+/* styles for height 600 and up */
+@media screen and (min-height: 600px){
+	p {
+		background: Plum;
+	}
+}
+
+/* styles for height 900 and up */
+@media screen and (min-height: 900px){
+	p {
+		background: PowderBlue;
+	}
+}
+

@@ -27,6 +27,24 @@ window.onload = function(){
 		function heightApplied( val ){
 			return testElem.offsetHeight === val;
 		}
+		function redBackground(){
+			if (window.getComputedStyle) {
+				var style = window.getComputedStyle(testElem, null); 
+				return "rgb(255, 0, 0)" === style.getPropertyCSSValue("background-color").cssText;
+			} else {
+				var color = testElem.currentStyle.backgroundColor;
+				return '#ff0000' === color;
+			}
+		}
+		function greenBackground(){
+			if (window.getComputedStyle) {
+				var style = window.getComputedStyle(testElem, null); 
+				return "rgb(0, 255, 0)" === style.getPropertyCSSValue("background-color").cssText;
+			} else {
+				var color = testElem.currentStyle.backgroundColor;
+				return '#00ff00' === color;
+			}
+		}
 		
 		// A short snippet for detecting versions of IE in JavaScript - author: @padolsey
 		var ie = (function(){
@@ -60,6 +78,22 @@ window.onload = function(){
 			window.resizeTo(520,600);
 			setTimeout(function(){
 				ok( widthApplied( 150 ), 'testelem is 150px wide when window is 500px wide'  );
+				start();
+			}, 900);	
+		});
+		
+		asyncTest( 'styles within max-height media queries apply properly', function() { 
+			window.resizeTo(520,200);
+			setTimeout(function(){
+				ok( redBackground() , 'testelem has red backgroundcolor'  );
+				start();
+			}, 900);	
+		});
+		
+		asyncTest( 'styles within min-height media queries apply properly', function() { 
+			window.resizeTo(520,700);
+			setTimeout(function(){
+				ok( greenBackground() , 'testelem has red backgroundcolor'  );
 				start();
 			}, 900);	
 		});
