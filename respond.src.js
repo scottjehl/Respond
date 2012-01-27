@@ -150,6 +150,7 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 					mediastyles.push( { 
 						media	: thisq.split( "(" )[ 0 ].match( /(only\s+)?([a-zA-Z]+)\s?/ ) && RegExp.$2 || "all",
 						rules	: rules.length - 1,
+						hasquery: thisq.indexOf("(") > -1,
 						minw	: thisq.match( /\(min\-width:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" ), 
 						maxw	: thisq.match( /\(max\-width:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" )
 					} );
@@ -221,6 +222,8 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 				var thisstyle = mediastyles[ i ],
 					min = thisstyle.minw,
 					max = thisstyle.maxw,
+					minnull = min === null,
+					maxnull = max === null,
 					em = "em";
 				
 				if( !!min ){
@@ -230,9 +233,8 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 					max = parseFloat( max ) * ( max.indexOf( em ) > -1 ? ( eminpx || getEmValue() ) : 1 );
 				}
 				
-				if(!min && !max || 
-					( !min || min && currWidth >= min ) && 
-					( !max || max && currWidth <= max )){						
+				// if there's no media query at all (the () part), or min or max is not null, and if either is present, they're true
+				if( !thisstyle.hasquery || ( !minnull || !maxnull ) && ( minnull || currWidth >= min ) && ( maxnull || currWidth <= max ) ){
 						if( !styleBlocks[ thisstyle.media ] ){
 							styleBlocks[ thisstyle.media ] = [];
 						}

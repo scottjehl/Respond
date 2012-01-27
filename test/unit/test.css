@@ -16,6 +16,13 @@
 	display: block;
 }
 
+/* a style like this should never apply in IE. If it does, tests will fail */
+@media screen and (view-mode: minimized) {
+	#testelem {
+		width: 10px !important;
+	}
+}
+
 /*styles for 480px and up - media type purposely left out here to test that in the process */
 @media (min-width: 480px) {
 	#testelem {
