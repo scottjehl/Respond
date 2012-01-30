@@ -29,7 +29,7 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 
 
 
-/*! Respond.js v1.1.0rc2: min/max-width media query polyfill. (c) Scott Jehl. MIT/GPLv2 Lic. j.mp/respondjs  */
+/*! Respond.js v1.1.0: min/max-width media query polyfill. (c) Scott Jehl. MIT/GPLv2 Lic. j.mp/respondjs  */
 (function( win ){
 	//exposed namespace
 	win.respond		= {};
