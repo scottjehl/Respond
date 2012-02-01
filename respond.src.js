@@ -52,6 +52,7 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 		parsedSheets 	= {},
 		resizeThrottle	= 30,
 		head 			= doc.getElementsByTagName( "head" )[0] || docElem,
+		base			= doc.getElementsByTagName( "base" )[0],
 		links			= head.getElementsByTagName( "link" ),
 		requestQueue	= [],
 		
@@ -76,7 +77,7 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 						translate( sheet.styleSheet.rawCssText, href, media );
 						parsedSheets[ href ] = true;
 					} else {
-						if( !/^([a-zA-Z:]*\/\/)/.test( href )
+						if( (!base && !/^([a-zA-Z:]*\/\/)/.test( href ))
 							|| href.replace( RegExp.$1, "" ).split( "/" )[0] === win.location.host ){
 							requestQueue.push( {
 								href: href,
