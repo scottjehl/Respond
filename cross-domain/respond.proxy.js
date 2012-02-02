@@ -3,6 +3,7 @@
 	var docElem			= doc.documentElement,
 		proxyURL		= doc.getElementById("respond-proxy").href,
 		redirectURL		= (doc.getElementById("respond-redirect") || location).href,
+		baseElem		= doc.getElementsByTagName("base")[0],
 		urls			= [],
 		refNode;
 
@@ -25,7 +26,7 @@
 			docElem.insertBefore(iframe, docElem.firstElementChild || docElem.firstChild );
 		}
 
-		iframe.src = proxyURL + "?url=" + redirectURL + "&css=" + url;
+		iframe.src = checkBaseURL(proxyURL) + "?url=" + redirectURL + "&css=" + checkBaseURL(url);
 		
 		function checkFrameName() {
 			var cssText;
@@ -60,6 +61,15 @@
 		
 		win.setTimeout(checkFrameName, 500);
 	}
+
+	function checkBaseURL(href) {
+		if (baseElem && href.indexOf(baseElem.href) === -1) {
+			bref = (/\/$/).test(baseElem.href) ? baseElem.href : (baseElem.href + "/");
+			href = bref + href;
+		}
+
+		return href;
+	}
 	
 	function checkRedirectURL() {
 		// IE6 & IE7 don't build out absolute urls in <link /> attributes.
@@ -67,7 +77,6 @@
 		// This trickery resolves that issue.
 		if (~ !redirectURL.indexOf(location.host)) {
 
-			// Inject an <a> attribute, with the redirectURL
 			var fakeLink = doc.createElement("div");
 
 			fakeLink.innerHTML = '<a href="' + redirectURL + '"></a>';
@@ -89,10 +98,11 @@
 			
 			var thislink	= links[i],
 				href		= links[i].href,
-				ext			= /^([a-zA-Z]+?:(\/\/)?(www\.)?)/;
+				extreg		= (/^([a-zA-Z]+?:(\/\/)?(www\.)?)/).test( href ),
+				ext			= (baseElem && !extreg) || extreg;
 
 			//make sure it's an external stylesheet
-			if( thislink.rel.indexOf( "stylesheet" ) >= 0 && ext.test( href ) ){
+			if( thislink.rel.indexOf( "stylesheet" ) >= 0 && ext ){
 				(function( link ){			
 					fakejax( href, function( css ){
 						link.styleSheet.rawCssText = css;
