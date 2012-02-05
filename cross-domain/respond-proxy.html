@@ -9,7 +9,7 @@
 	<script>
 		(function () {
 			var domain, css, query, getQueryString, ajax, xmlHttp;
-			
+
 			/*
 				http://stackoverflow.com/questions/4963673/get-url-array-variables-in-javascript-jquery/4963817#4963817
 			*/
@@ -27,7 +27,6 @@
 					if (p[0].search(/\[\]/) >= 0) { // then it"s an array
 						p[0] = p[0].replace("[]", "");
 
-
 						if (typeof ret[p[0]] != "object") {
 							ret[p[0]] = [];
 						}
@@ -43,7 +42,7 @@
 				var req = xmlHttp();
 				if (!req){
 					return;
-				}	
+				}
 				req.open( "GET", url, true );
 				req.onreadystatechange = function () {
 					if ( req.readyState != 4 || req.status != 200 && req.status != 304 ){
@@ -56,7 +55,7 @@
 				}
 				req.send();
 			};
-			
+
 			//define ajax obj 
 			xmlHttp = (function() {
 				var xmlhttpmethod = false,
@@ -80,11 +79,11 @@
 					return xmlhttpmethod;
 				};
 			})();
-			
+
 			query = getQueryString();
 			css = query["css"];
 			domain = query["url"];
-			
+
 			if (css && domain) {
 				ajax(css, function (response) {
 					window.name = response;
