@@ -17,4 +17,28 @@
 	<p id="attribute-test">Media-attributes are working too! This should be visible above 37.5em.</p>
 
 </body>
+<footer></footer>
+
+<script>
+
+    var mql =  window.matchMedia('only screen and (min-width: 320px)'),
+        mql2 =  window.matchMedia('only screen and (min-width: 768px)'),
+        mql3 = window.matchMedia('only screen and (min-width: 1024px)');
+
+    mql.addListener(listen);
+    mql2.addListener(listen);
+    mql3.addListener(listen);
+
+    function listen(arg) {
+
+        var build = '';
+
+        if (mql.matches) build+='<p>' + mql.media + '</p>';
+        if (mql2.matches) build+='<p>' + mql2.media + '</p>';
+        if (mql3.matches) build+='<p>' + mql3.media + '</p>';
+
+        document.getElementsByTagName('footer')[0].innerHTML = build;
+    }
+
+</script>
 </html>
