@@ -92,7 +92,7 @@ Sure, a couple:
 - respond.getEmValue() : returns the pixel value of one em (helpful for use with response.js to convert EMs to pixel values for breakpoints, see below)
 <pre>
   // breakpoints in EMs
-  var emBreakpoints = [0, 30, 60];
+  var emBreakpoints = [0, 30, 60],
       eminpx = respond.getEmValue(),
       breakpoints = [],
       i = 0,
