@@ -98,7 +98,7 @@ Sure, a couple:
 			i = 0,
 			len = emBreakpoints.length;
 
-	for (i,len; i < len; i++) {
+	for (i,len; i &lt; len; i++) {
 		// pixel breakpoint = em breakpoint * base pixel font size
 		breakpoints[i] = Math.round(emBreakpoints[i] * eminpx);
 	}
