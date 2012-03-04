@@ -89,7 +89,27 @@ Sure, a couple:
 
 - respond.update() : rerun the parser (helpful if you added a stylesheet to the page and it needs to be translated)
 - respond.mediaQueriesSupported: set to true if the browser natively supports media queries. 
+- respond.getEmValue() : returns the pixel value of one em (helpful for use with [response.js](https://github.com/ryanve/response.js) to convert EMs to pixel values for breakpoints, see below)
+<pre>
+	// breakpoints in EMs with Response.js
+	var emBreakpoints = [0, 30, 60],
+			eminpx = respond.getEmValue(),
+			breakpoints = [],
+			i = 0,
+			len = emBreakpoints.length;
 
+	for (i,len; i &lt; len; i++) {
+		// pixel breakpoint = em breakpoint * base pixel font size
+		breakpoints[i] = Math.round(emBreakpoints[i] * eminpx);
+	}
+
+	// create breakpoints
+	Response.create({
+		prop: 'width',
+		prefix: 'r',
+		breakpoints: breakpoints
+	});
+</pre>
 
 
 

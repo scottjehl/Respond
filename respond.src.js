@@ -39,14 +39,52 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 	
 	//expose media query support flag for external use
 	respond.mediaQueriesSupported	= win.matchMedia && win.matchMedia( "only all" ).matches;
+
+	var doc 			= win.document,
+		docElem 		= doc.documentElement,
+		//cached container for 1em value, populated the first time it's needed 
+		eminpx,
+
+		// returns the value of 1em in pixels
+		getEmValue		= function() {
+			var ret,
+				div = doc.createElement('div'),
+				body = doc.body,
+				fakeUsed = false;
+									
+			div.style.cssText = "position:absolute;font-size:1em;width:1em";
+					
+			if( !body ){
+				body = fakeUsed = doc.createElement( "body" );
+			}
+					
+			body.appendChild( div );
+								
+			docElem.insertBefore( body, docElem.firstChild );
+								
+			ret = div.offsetWidth;
+								
+			if( fakeUsed ){
+				docElem.removeChild( body );
+			}
+			else {
+				body.removeChild( div );
+			}
+			
+			//also update eminpx before returning
+			ret = eminpx = parseFloat(ret);
+								
+			return ret;
+		};
+
+	// expose getEmValue
+	respond.getEmValue = getEmValue;
 	
 	//if media queries are supported, exit here
 	if( respond.mediaQueriesSupported ){ return; }
 	
 	//define vars
-	var doc 			= win.document,
-		docElem 		= doc.documentElement,
-		mediastyles		= [],
+	var mediastyles		= [],
 		rules			= [],
 		appendedEls 	= [],
 		parsedSheets 	= {},
@@ -165,40 +203,7 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 		
 		resizeDefer,
 		
-		// returns the value of 1em in pixels
-		getEmValue		= function() {
-			var ret,
-				div = doc.createElement('div'),
-				body = doc.body,
-				fakeUsed = false;
-									
-			div.style.cssText = "position:absolute;font-size:1em;width:1em";
-					
-			if( !body ){
-				body = fakeUsed = doc.createElement( "body" );
-			}
-					
-			body.appendChild( div );
-								
-			docElem.insertBefore( body, docElem.firstChild );
-								
-			ret = div.offsetWidth;
-								
-			if( fakeUsed ){
-				docElem.removeChild( body );
-			}
-			else {
-				body.removeChild( div );
-			}
-			
-			//also update eminpx before returning
-			ret = eminpx = parseFloat(ret);
-								
-			return ret;
-		},
 		
-		//cached container for 1em value, populated the first time it's needed 
-		eminpx,
 		
 		//enable/disable styles
 		applyMedia			= function( fromResize ){
