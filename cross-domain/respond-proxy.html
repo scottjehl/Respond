@@ -8,13 +8,41 @@
 <body>
 	<script>
 		(function () {
-			var domain, css, url, match, file, ajax, xmlHttp;
-			
+			var domain, css, query, getQueryString, ajax, xmlHttp;
+
+			/*
+				http://stackoverflow.com/questions/4963673/get-url-array-variables-in-javascript-jquery/4963817#4963817
+			*/
+			getQueryString = function() {
+				var ret = {}, parts, i, p;
+
+				parts = (document.location.toString().split("?")[1]).split("&");
+
+				for (i = 0; i < parts.length; i++) {
+
+					p = parts[i].split("=");
+					// so strings will be correctly parsed:
+					p[1] = decodeURIComponent(p[1].replace(/\+/g, " "));
+
+					if (p[0].search(/\[\]/) >= 0) { // then it"s an array
+						p[0] = p[0].replace("[]", "");
+
+						if (typeof ret[p[0]] != "object") {
+							ret[p[0]] = [];
+						}
+						ret[p[0]].push(p[1]);
+					} else {
+						ret[p[0]] = p[1];
+					}
+				}
+				return ret;
+			};
+
 			ajax = function( url, callback ) {
 				var req = xmlHttp();
 				if (!req){
 					return;
-				}	
+				}
 				req.open( "GET", url, true );
 				req.onreadystatechange = function () {
 					if ( req.readyState != 4 || req.status != 200 && req.status != 304 ){
@@ -27,7 +55,7 @@
 				}
 				req.send();
 			};
-			
+
 			//define ajax obj 
 			xmlHttp = (function() {
 				var xmlhttpmethod = false,
@@ -51,24 +79,12 @@
 					return xmlhttpmethod;
 				};
 			})();
-			
-			url = window.location.href;
-			
-			if (url) {
-				match = (/css\=(.*\.css)$/).exec(url.slice(url.indexOf('?') + 1));
-				
-				if (match && match[1]) {
-					css = match[1];
-				}
-				
-				match = (/url\=([^&]+)/).exec(url);
-				
-				if (match && match[1]) {
-					domain = match[1];
-				}
-			}
-			
-			if (css) {
+
+			query = getQueryString();
+			css = query["css"];
+			domain = query["url"];
+
+			if (css && domain) {
 				ajax(css, function (response) {
 					window.name = response;
 					window.location.href = domain;
