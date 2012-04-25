@@ -308,7 +308,7 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 		})();
 	
 	//translate CSS
-	if( document.attachEvent ){
+	if( document.attachEvent && document.readyState !== "complete" ){
 		// Avoid "Operation aborted" error in IE6 by waiting until the DOM is loaded.
 		var DOMLoaded = function() {
 			if( document.readyState === "complete" ) {
