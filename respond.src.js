@@ -42,7 +42,7 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 	respond.mediaQueriesSupported	= win.matchMedia && win.matchMedia( "only all" ).matches;
 	
 	//if media queries are supported, exit here
-	if( respond.mediaQueriesSupported ){ return; }
+	if( respond.mediaQueriesSupported && !isIE9iframe() ){ return; }
 	
 	//define vars
 	var doc 			= win.document,
@@ -322,5 +322,13 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 	}
 	else if( win.attachEvent ){
 		win.attachEvent( "onresize", callMedia );
+	}
+  //test for IE9 iframe	
+  function isIE9iframe() {
+	  var ua = navigator.userAgent,
+	  	ie_version = -1;
+	  var re  = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})");
+	  if (re.exec(ua) != null) ie_version = parseFloat( RegExp.$1 );
+	  return ( window != window.top && ie_version >= 9.0 );
 	}
 })(this);
