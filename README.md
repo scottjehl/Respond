@@ -74,7 +74,9 @@ Some notes to keep in mind:
 
 - Reportedly, if CSS files are encoded in UTF-8 with Byte-Order-Mark (BOM), they will not work with Respond.js in IE7 or IE8. Noted in issue #97
 
-- WARNING: Including @font-face rules inside a media query will cause IE7 and IE8 to hang during load. To work around this, place @font-face rules in the wide open, as a sibling to other media queries. 
+- WARNING: Including @font-face rules inside a media query will cause IE7 and IE8 to hang during load. To work around this, place @font-face rules in the wide open, as a sibling to other media queries.
+
+- If you are using relative (em-baesd) media queries, remember that Respond.js calculates the size of one em based on the root (`<html>`) element's font size, whereas browsers with built-in media query support base it on the user agent's stylesheets. Therefore, if you wish to use relative media queries _and_ set a base font size other than 100%, set it on your `#container` element rather than the `<html>` or `<body>` element.
 
 
 How's it work?
