@@ -222,6 +222,9 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 			}
 										
 			for( var i in mediastyles ){
+				if (!mediastyles.hasOwnProperty(i)) {
+					continue;
+				}
 				var thisstyle = mediastyles[ i ],
 					min = thisstyle.minw,
 					max = thisstyle.maxw,
