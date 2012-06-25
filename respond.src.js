@@ -67,7 +67,7 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 
 			for( ; i < sl; i++ ){
 				sheet	= sheets[ i ],
-				href	= sheet.href,
+				href	= qualifyURL(sheet.href),
 				media	= sheet.media,
 				isCSS	= sheet.rel && sheet.rel.toLowerCase() === "stylesheet";
 
@@ -89,6 +89,16 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 				}
 			}
 			makeRequests();
+		},
+		
+		// Fix for IE6-7 not returning absolute URL for href attribute
+		// See http://james.padolsey.com/javascript/getting-a-fully-qualified-url/
+		qualifyURL = function(url){
+		    var img = document.createElement('img');
+		    img.src = url; // set string url
+		    url = img.src; // get qualified url
+		    img.src = null; // no server request
+		    return url;
 		},
 		
 		//recurse through request queue, get css text
