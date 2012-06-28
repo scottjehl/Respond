@@ -54,6 +54,9 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 		resizeThrottle	= 30,
 		head 			= doc.getElementsByTagName( "head" )[0] || docElem,
 		base			= doc.getElementsByTagName( "base" )[0],
+		basehref  = base.getAttribute('href', true),
+		baseproto = basehref.match(/^([a-zA-Z:]+)\/\//) ? RegExp.$1 : '',
+		basehost  = basehref.match(/^[a-zA-Z:]*\/\/([^\/]+)/, '') ? RegExp.$1 : '',
 		links			= head.getElementsByTagName( "link" ),
 		requestQueue	= [],
 		
@@ -69,6 +72,8 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 				sheet	= sheets[ i ],
 				href	= sheet.href,
 				media	= sheet.media,
+				hrefproto = href.match(/^([a-zA-Z:]+)\/\//) ? RegExp.$1 : '',
+				hrefhost  = href.match(/^[a-zA-Z:]*\/\/([^\/]+)/, '') ? RegExp.$1 : '',
 				isCSS	= sheet.rel && sheet.rel.toLowerCase() === "stylesheet";
 
 				//only links plz and prevent re-parsing
@@ -78,8 +83,12 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 						translate( sheet.styleSheet.rawCssText, href, media );
 						parsedSheets[ href ] = true;
 					} else {
-						if( (!/^([a-zA-Z:]*\/\/)/.test( href ) && !base)
-							|| href.replace( RegExp.$1, "" ).split( "/" )[0] === win.location.host ){
+						if(
+							// if host is defined in link href, it must be of the same origin, otherwise base host must not be defined or from same origin
+							((hrefhost && hrefhost === win.location.host) || (!hrefhost && (!basehost || basehost === win.location.host))) &&
+							// if protocol is defined in link href, it must be of the same origin, otherwise base protocol must not be defined or from same origin
+							((hrefproto && hrefproto === win.location.protocol) || (!hrefproto && (!baseproto || baseproto === win.location.protocol)))
+						){
 							requestQueue.push( {
 								href: href,
 								media: media
