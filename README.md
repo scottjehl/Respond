@@ -1,7 +1,7 @@
 # Respond.js 
 ### A fast & lightweight polyfill for min/max-width CSS3 Media Queries (for IE 6-8, and more)
 
- - Copyright 2011: Scott Jehl, scottjehl.com
+ - Copyrights: 2012  Scott Jehl, scottjehl.com; Kondrat Shmoylov remhag@gmail.com
  - Dual licensed under the MIT or GPL Version 2 licenses. 
  
 The goal of this script is to provide a fast and lightweight (3kb minified / 1kb gzipped) script to enable [responsive web designs](http://www.alistapart.com/articles/responsive-web-design/) in browsers that don't support CSS3 Media Queries - in particular, Internet Explorer 8 and under. It's written in such a way that it will probably patch support for other non-supporting browsers as well (more information on that soon).
