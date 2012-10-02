@@ -54,7 +54,7 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 		head 			= doc.getElementsByTagName( "head" )[0] || docElem,
 		base			= doc.getElementsByTagName( "base" )[0],
 		links			= head.getElementsByTagName( "link" ),
-		$styles           = $('style[type="text/css"]'),
+        $styles           = $('style[type="text/css"]'),
 		requestQueue	= [],
 		tm = null,
 		getDecimalValueByName = function( propValue, propName ){
@@ -66,9 +66,12 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 		ripCSS			= function(){
 			var sheets 	= links,
 				sl 		= sheets.length,
-				i		= 0,l,elm,inlineStyleContent,
+				i		= 0,
+                l,
+                elm,
 				//vars for loop:
-				sheet, href, media, isCSS;
+				sheet, href, media, isCSS,
+                inlineStyleContent;
 
 			for( ; i < sl; i++ ){
 				sheet	= sheets[ i ],
@@ -78,7 +81,6 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 
 				//only links plz and prevent re-parsing
 				if( !!href && isCSS && !parsedSheets[ href ] ){
-
 					// selectivizr exposes css through the rawCssText expando
 					if (sheet.styleSheet && sheet.styleSheet.rawCssText) {
 
@@ -87,34 +89,26 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 
 					} else {
 
-						if( (!/^([a-zA-Z:]*\/\/)/.test( href ) && !base) || 
-							href.replace( RegExp.$1, "" ).split( "/" )[0] === win.location.host ){
-
+						if( (!/^([a-zA-Z:]*\/\/)/.test( href ) && !base) || href.replace( RegExp.$1, "" ).split( "/" )[0] === win.location.host ){
 							requestQueue.push( {
 								href: href,
 								media: media
 							} );
-
 						}
 
 					}
-
 				}
 			}
 
-			for(i = 0, l = $styles.length; i < l; i++ ){
+            for(i = 0, l = $styles.length; i < l; i++ ){
+                elm = $styles[i];
+                inlineStyleContent = elm.innerHTML || elm.innerText || elm.textContent;
+                if( inlineStyleContent ){
 
-				elm = $styles[i];
-				inlineStyleContent = elm.innerHTML || elm.innerText || elm.textContent;
+                    translate( inlineStyleContent );
 
-				if (inlineStyleContent) {
-
-					translate( inlineStyleContent );
-
-				}
-
-			}
-
+                }
+            }
 			makeRequests();
 		},
 		
