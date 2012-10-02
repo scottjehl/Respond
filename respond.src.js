@@ -29,7 +29,6 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 
 
 
-
 /*! Respond.js v1.1.0: min/max-width media query polyfill. (c) Scott Jehl. MIT/GPLv2 Lic. j.mp/respondjs  */
 (function( win ){
 	//exposed namespace
@@ -55,13 +54,19 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 		head 			= doc.getElementsByTagName( "head" )[0] || docElem,
 		base			= doc.getElementsByTagName( "base" )[0],
 		links			= head.getElementsByTagName( "link" ),
+		$styles           = $('style[type="text/css"]'),
 		requestQueue	= [],
+		tm = null,
+		getDecimalValueByName = function( propValue, propName ){
+			var re = new RegExp("\\(" + propName + ":[\\s]*([\\s]*[0-9\\.]+)(px|em)[\\s]*\\)");
+			return (propValue.match( re ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" ));
+		},
 		
 		//loop stylesheets, send text content to translate
 		ripCSS			= function(){
 			var sheets 	= links,
 				sl 		= sheets.length,
-				i		= 0,
+				i		= 0,l,elm,inlineStyleContent,
 				//vars for loop:
 				sheet, href, media, isCSS;
 
@@ -73,21 +78,43 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 
 				//only links plz and prevent re-parsing
 				if( !!href && isCSS && !parsedSheets[ href ] ){
+
 					// selectivizr exposes css through the rawCssText expando
 					if (sheet.styleSheet && sheet.styleSheet.rawCssText) {
+
 						translate( sheet.styleSheet.rawCssText, href, media );
 						parsedSheets[ href ] = true;
+
 					} else {
-						if( (!/^([a-zA-Z:]*\/\/)/.test( href ) && !base)
-							|| href.replace( RegExp.$1, "" ).split( "/" )[0] === win.location.host ){
+
+						if( (!/^([a-zA-Z:]*\/\/)/.test( href ) && !base) || 
+							href.replace( RegExp.$1, "" ).split( "/" )[0] === win.location.host ){
+
 							requestQueue.push( {
 								href: href,
 								media: media
 							} );
+
 						}
+
 					}
+
 				}
 			}
+
+			for(i = 0, l = $styles.length; i < l; i++ ){
+
+				elm = $styles[i];
+				inlineStyleContent = elm.innerHTML || elm.innerText || elm.textContent;
+
+				if (inlineStyleContent) {
+
+					translate( inlineStyleContent );
+
+				}
+
+			}
+
 			makeRequests();
 		},
 		
@@ -106,6 +133,9 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 		
 		//find media blocks in css text, convert to style blocks
 		translate			= function( styles, href, media ){
+            href = href || "";
+            media = media || "";
+
 			var qs			= styles.match(  /@media[^\{]+\{([^\{\}]*\{[^\}\{]*\})+/gi ),
 				ql			= qs && qs.length || 0,
 				//try to get CSS path
@@ -153,15 +183,21 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 						media	: thisq.split( "(" )[ 0 ].match( /(only\s+)?([a-zA-Z]+)\s?/ ) && RegExp.$2 || "all",
 						rules	: rules.length - 1,
 						hasquery: thisq.indexOf("(") > -1,
-						minw	: thisq.match( /\(min\-width:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" ), 
-						maxw	: thisq.match( /\(max\-width:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" )
+						minw	: getDecimalValueByName( thisq, 'min\-width' ),
+						maxw	: getDecimalValueByName( thisq, 'max\-width' ), 
+						minh	: getDecimalValueByName( thisq, 'min\-height' ),
+						maxh	: getDecimalValueByName( thisq, 'max\-height' ) 
 					} );
 				}	
 			}
 
-			applyMedia();
+			// It's fix for calling applyMedia once for all styles links
+			tm && window.clearTimeout( tm );
+			tm = window.setTimeout(function(){
+				applyMedia()
+			}, 50);
 		},
-        	
+
 		lastCall,
 		
 		resizeDefer,
@@ -198,18 +234,27 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 								
 			return ret;
 		},
+
+		getCSSRuleValue = function( rule ){
+			return parseFloat( rule ) * ( rule.indexOf( "em" ) > -1 ? ( eminpx || getEmValue() ) : 1 );
+		},
 		
 		//cached container for 1em value, populated the first time it's needed 
 		eminpx,
 		
 		//enable/disable styles
-		applyMedia			= function( fromResize ){
-			var name		= "clientWidth",
-				docElemProp	= docElem[ name ],
-				currWidth 	= doc.compatMode === "CSS1Compat" && docElemProp || doc.body[ name ] || docElemProp,
-				styleBlocks	= {},
-				lastLink	= links[ links.length-1 ],
-				now 		= (new Date()).getTime();
+		applyMedia				= function( fromResize ){
+			var nameW			= "offsetWidth",
+				nameH			= "offsetHeight",
+				docElemPropW	= docElem[ nameW ],
+				docElemPropH	= docElem[ nameH ],
+				currWidth		= doc.compatMode === "CSS1Compat" && docElemPropW || doc.body[ nameW ] || docElemPropW,
+				currHeight		= doc.compatMode === "CSS1Compat" && docElemPropH || doc.body[ nameH ] || docElemPropH,
+				styleBlocks		= {},
+				lastLink		= links[ links.length-1 ],
+				now				= (new Date()).getTime(),
+				i				= 0,
+				l				= 0;
 
 			//throttle resize calls	
 			if( fromResize && lastCall && now - lastCall < resizeThrottle ){
@@ -220,24 +265,37 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 			else {
 				lastCall	= now;
 			}
-										
-			for( var i in mediastyles ){
+
+			for( i = 0, l = mediastyles.length; i < l; i++ ){
+
 				var thisstyle = mediastyles[ i ],
-					min = thisstyle.minw,
-					max = thisstyle.maxw,
-					minnull = min === null,
-					maxnull = max === null,
-					em = "em";
-				
-				if( !!min ){
-					min = parseFloat( min ) * ( min.indexOf( em ) > -1 ? ( eminpx || getEmValue() ) : 1 );
+					minw = thisstyle.minw,
+					maxw = thisstyle.maxw,
+					minh = thisstyle.minh,
+					maxh = thisstyle.maxh,
+					minwnull = minw === null,
+					maxwnull = maxw === null,
+					minhnull = minh === null,
+					maxhnull = maxh === null;
+
+				if( !minwnull ){
+					minw = getCSSRuleValue( minw );
 				}
-				if( !!max ){
-					max = parseFloat( max ) * ( max.indexOf( em ) > -1 ? ( eminpx || getEmValue() ) : 1 );
+				if( !maxwnull ){
+					maxw = getCSSRuleValue( maxw );
 				}
-				
+				if( !minhnull ){
+					minh = getCSSRuleValue( minh );
+				}
+				if( !maxhnull ){
+					maxh = getCSSRuleValue( maxh );
+				}
+
 				// if there's no media query at all (the () part), or min or max is not null, and if either is present, they're true
-				if( !thisstyle.hasquery || ( !minnull || !maxnull ) && ( minnull || currWidth >= min ) && ( maxnull || currWidth <= max ) ){
+				if( !thisstyle.hasquery || 
+					( !minwnull || !maxwnull ) && ( minwnull || currWidth >= minw ) && ( maxwnull || currWidth <= maxw ) ||
+					( !minhnull || !maxhnull ) && ( minhnull || currHeight >= minh ) && ( maxhnull || currHeight <= maxh )
+				){
 						if( !styleBlocks[ thisstyle.media ] ){
 							styleBlocks[ thisstyle.media ] = [];
 						}
@@ -246,7 +304,7 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 			}
 			
 			//remove any existing respond style element(s)
-			for( var i in appendedEls ){
+			for( i = 0, l = appendedEls.length; i < l; i++ ){
 				if( appendedEls[ i ] && appendedEls[ i ].parentNode === head ){
 					head.removeChild( appendedEls[ i ] );
 				}
@@ -254,25 +312,27 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 			
 			//inject active styles, grouped by media type
 			for( var i in styleBlocks ){
-				var ss		= doc.createElement( "style" ),
-					css		= styleBlocks[ i ].join( "\n" );
-				
-				ss.type = "text/css";	
-				ss.media	= i;
-				
-				//originally, ss was appended to a documentFragment and sheets were appended in bulk.
-				//this caused crashes in IE in a number of circumstances, such as when the HTML element had a bg image set, so appending beforehand seems best. Thanks to @dvelyk for the initial research on this one!
-				head.insertBefore( ss, lastLink.nextSibling );
-				
-				if ( ss.styleSheet ){ 
-		        	ss.styleSheet.cssText = css;
-		        } 
-		        else {
-					ss.appendChild( doc.createTextNode( css ) );
-		        }
-		        
-				//push to appendedEls to track for later removal
-				appendedEls.push( ss );
+				if( styleBlocks.hasOwnProperty( i ) ){
+					var ss		= doc.createElement( "style" ),
+						css		= styleBlocks[ i ].join( "\n" );
+					
+					ss.type = "text/css";	
+					ss.media	= i;
+					
+					//originally, ss was appended to a documentFragment and sheets were appended in bulk.
+					//this caused crashes in IE in a number of circumstances, such as when the HTML element had a bg image set, so appending beforehand seems best. Thanks to @dvelyk for the initial research on this one!
+					head.insertBefore( ss, lastLink.nextSibling );
+					
+					if ( ss.styleSheet ){ 
+						ss.styleSheet.cssText = css;
+					} 
+					else {
+						ss.appendChild( doc.createTextNode( css ) );
+					}
+					
+					//push to appendedEls to track for later removal
+					appendedEls.push( ss );
+				}
 			}
 		},
 		//tweaked Ajax functions from Quirksmode
