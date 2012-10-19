@@ -99,7 +99,10 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 				ajax( thisRequest.href, function( styles ){
 					translate( styles, thisRequest.href, thisRequest.media );
 					parsedSheets[ thisRequest.href ] = true;
-					makeRequests();
+
+					// by wrapping recursive function call in setTimeout 
+					// we prevent "Stack overflow" error in IE7
+					setTimeout(function(){ makeRequests(); },0);
 				} );
 			}
 		},
