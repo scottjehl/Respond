@@ -1,3 +1,4 @@
+/*! Respond.js v1.1.0: min/max-width media query polyfill. (c) Scott Jehl. MIT/GPLv2 Lic. j.mp/respondjs  */
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas. Dual MIT/BSD license */
 /*! NOTE: If you're already including a window.matchMedia polyfill via Modernizr or otherwise, you don't need this part */
 window.matchMedia = window.matchMedia || (function(doc, undefined){
@@ -37,6 +38,9 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 	
 	//define update even in native-mq-supporting browsers, to avoid errors
 	respond.update	= function(){};
+
+	//set the update throttle
+	respond.throttle = 100;	
 	
 	//expose media query support flag for external use
 	respond.mediaQueriesSupported	= win.matchMedia && win.matchMedia( "only all" ).matches;
@@ -51,7 +55,6 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 		rules			= [],
 		appendedEls 	= [],
 		parsedSheets 	= {},
-		resizeThrottle	= 30,
 		head 			= doc.getElementsByTagName( "head" )[0] || docElem,
 		base			= doc.getElementsByTagName( "base" )[0],
 		links			= head.getElementsByTagName( "link" ),
@@ -213,16 +216,6 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 				styleBlocks	= {},
 				lastLink	= links[ links.length-1 ],
 				now 		= (new Date()).getTime();
-
-			//throttle resize calls	
-			if( fromResize && lastCall && now - lastCall < resizeThrottle ){
-				clearTimeout( resizeDefer );
-				resizeDefer = setTimeout( applyMedia, resizeThrottle );
-				return;
-			}
-			else {
-				lastCall	= now;
-			}
 										
 			for( var i in mediastyles ){
 				var thisstyle = mediastyles[ i ],
@@ -317,13 +310,42 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 	respond.update = ripCSS;
 	
 	//adjust on resize
-	function callMedia(){
+	function callMedia(respond){
 		applyMedia( true );
+		respond.winResizing = false;
 	}
+
+	respond.winSize = 0;
+	respond.resizeTimer = null;
+	
+	function onResize(respond){
+		//get the window size
+		var winsize = 0;
+		if (document.body && document.body.offsetWidth) 
+			winsize = document.body.offsetWidth * document.body.offsetHeight;
+		if (document.compatMode=='CSS1Compat' && document.documentElement && document.documentElement.offsetWidth ) 
+			winsize = document.documentElement.offsetWidth * document.documentElement.offsetHeight;
+		if (window.innerWidth && window.innerHeight) 
+			winsize = window.innerWidth * window.innerHeight;
+		
+		//if window size has changed call respond
+		if (!respond.winResizing && winsize != respond.winSize){
+			respond.winSize = winsize;
+			respond.winResizing = true;
+			
+			//set a timeout so that respond code will only update according to the throttle
+			respond.resizeTimer = setTimeout(function(){callMedia(respond)}, respond.throttle);
+		}
+	}
+	
+	//add window event listener
 	if( win.addEventListener ){
-		win.addEventListener( "resize", callMedia, false );
+		win.addEventListener( "resize", function(){onResize(respond)}, false );
 	}
 	else if( win.attachEvent ){
-		win.attachEvent( "onresize", callMedia );
+		win.attachEvent( "onresize", function(){onResize(respond)} );
 	}
+	
 })(this);
+
+
