@@ -64,7 +64,7 @@ Some notes to keep in mind:
 
 - This script relies on no other scripts or frameworks (aside from the included matchMedia polyfill), and is optimized for mobile delivery (~1kb total filesize min/gzip)
 
-- As you might guess, this implementation is quite dumb in regards to CSS parsing rules. This is a good thing, because that allows it to run really fast, but it's looseness may also cause unexpected behavior. For example: if you enclose a whole media query in a comment intending to disable its rules, you'll probably find that those rules will end up enabled in non-media-query-supporting browsers.
+- As you might guess, this implementation is quite dumb in regards to CSS parsing rules. This is a good thing, because that allows it to run really fast, but its looseness may also cause unexpected behavior. For example: if you enclose a whole media query in a comment intending to disable its rules, you'll probably find that those rules will end up enabled in non-media-query-supporting browsers.
 
 - Respond.js doesn't parse CSS refrenced via @import, nor does it work with media queries within style elements, as those styles can't be re-requested for parsing.
 
