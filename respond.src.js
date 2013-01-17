@@ -55,7 +55,7 @@ window.matchMedia = window.matchMedia || (function( doc, undefined ) {
 	
 	//if media queries are supported, exit here
 	if( respond.mediaQueriesSupported ){
-		return;
+		//return;
 	}
 	
 	//define vars
@@ -270,7 +270,7 @@ window.matchMedia = window.matchMedia || (function( doc, undefined ) {
 			for( var k in styleBlocks ){
 				if( styleBlocks.hasOwnProperty( k ) ){
 					var ss = doc.createElement( "style" ),
-						css = styleBlocks[ i ].join( "\n" );
+						css = styleBlocks[ k ].join( "\n" );
 					
 					ss.type = "text/css";	
 					ss.media = k;
