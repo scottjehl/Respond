@@ -55,7 +55,7 @@ window.matchMedia = window.matchMedia || (function( doc, undefined ) {
 	
 	//if media queries are supported, exit here
 	if( respond.mediaQueriesSupported ){
-		//return;
+		return;
 	}
 	
 	//define vars
