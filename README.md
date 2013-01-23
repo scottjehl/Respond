@@ -23,7 +23,7 @@ Usage Instructions
     }
 </pre>
 
-2. Reference the respond.min.js script (1kb min/gzipped) after all of your CSS (the earlier it runs, the greater chance IE users will not see a flash of um-media'd content)
+2. Reference the respond.min.js script (1kb min/gzipped) after all of your CSS (the earlier it runs, the greater chance IE users will not see a flash of un-media'd content)
 
 3. Crack open Internet Explorer and pump fists in delight
 
