@@ -118,7 +118,8 @@ window.matchMedia = window.matchMedia || (function( doc, undefined ) {
 		
 		//find media blocks in css text, convert to style blocks
 		translate = function( styles, href, media ){
-			var qs = styles.match(  /@media[^\{]+\{([^\{\}]*\{[^\}\{]*\})+/gi ),
+			var sanitizedStyles = styles.replace(/(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm, ''),
+				qs = sanitizedStyles.match(  /@media[^\{]+\{([^\{\}]*\{[^\}\{]*\})+/gi ),
 				ql = qs && qs.length || 0;
 
 			//try to get CSS path
@@ -146,7 +147,7 @@ window.matchMedia = window.matchMedia || (function( doc, undefined ) {
 				//media attr
 				if( useMedia ){
 					fullq = media;
-					rules.push( repUrls( styles ) );
+					rules.push( repUrls( sanitizedStyles ) );
 				}
 				//parse for styles
 				else{
