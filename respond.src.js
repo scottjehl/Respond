@@ -111,7 +111,7 @@ window.matchMedia = window.matchMedia || (function( doc, undefined ) {
 
 					// by wrapping recursive function call in setTimeout 
 					// we prevent "Stack overflow" error in IE7
-					setTimeout(function(){ makeRequests(); },0);
+					win.setTimeout(function(){ makeRequests(); },0);
 				} );
 			}
 		},
@@ -223,8 +223,8 @@ window.matchMedia = window.matchMedia || (function( doc, undefined ) {
 
 			//throttle resize calls	
 			if( fromResize && lastCall && now - lastCall < resizeThrottle ){
-				clearTimeout( resizeDefer );
-				resizeDefer = setTimeout( applyMedia, resizeThrottle );
+				win.clearTimeout( resizeDefer );
+				resizeDefer = win.setTimeout( applyMedia, resizeThrottle );
 				return;
 			}
 			else {
