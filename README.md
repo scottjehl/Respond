@@ -1,9 +1,9 @@
-# Respond.js 
+# Respond.js
 ### A fast & lightweight polyfill for min/max-width CSS3 Media Queries (for IE 6-8, and more)
 
  - Copyright 2011: Scott Jehl, scottjehl.com
- - Dual licensed under the MIT or GPL Version 2 licenses. 
- 
+ - Dual licensed under the MIT or GPL Version 2 licenses.
+
 The goal of this script is to provide a fast and lightweight (3kb minified / 1kb gzipped) script to enable [responsive web designs](http://www.alistapart.com/articles/responsive-web-design/) in browsers that don't support CSS3 Media Queries - in particular, Internet Explorer 8 and under. It's written in such a way that it will probably patch support for other non-supporting browsers as well (more information on that soon).
 
 If you're unfamiliar with the concepts surrounding Responsive Web Design, you can read up [here](http://www.alistapart.com/articles/responsive-web-design/) and also [here](http://filamentgroup.com/examples/responsive-images/)
@@ -42,13 +42,15 @@ See `cross-domain/example.html` for a demo:
 <pre>
 	&lt;!-- Respond.js proxy on external server --&gt;
 	&lt;link href=&quot;http://externalcdn.com/respond-proxy.html&quot; id=&quot;respond-proxy&quot; rel=&quot;respond-proxy&quot; /&gt;
-	
+
 	&lt;!-- Respond.js redirect location on local server --&gt;
 	&lt;link href=&quot;/path/to/respond.proxy.gif&quot; id=&quot;respond-redirect&quot; rel=&quot;respond-redirect&quot; /&gt;
-	
+
 	&lt;!-- Respond.js proxy script on local server --&gt;
 	&lt;script src="/path/to/respond.proxy.js"&gt;&lt;/script&gt;
 </pre>
+
+If you are having problems with the cross-domain setup, make sure respond-proxy.html does not have a query string appended to it.
 
 Note: HUGE thanks to @doctyper for the contributions in the cross-domain proxy!
 
@@ -74,7 +76,7 @@ Some notes to keep in mind:
 
 - Reportedly, if CSS files are encoded in UTF-8 with Byte-Order-Mark (BOM), they will not work with Respond.js in IE7 or IE8. Noted in issue #97
 
-- WARNING: Including @font-face rules inside a media query will cause IE7 and IE8 to hang during load. To work around this, place @font-face rules in the wide open, as a sibling to other media queries. 
+- WARNING: Including @font-face rules inside a media query will cause IE7 and IE8 to hang during load. To work around this, place @font-face rules in the wide open, as a sibling to other media queries.
 
 
 How's it work?
@@ -88,7 +90,7 @@ API Options?
 Sure, a couple:
 
 - respond.update() : rerun the parser (helpful if you added a stylesheet to the page and it needs to be translated)
-- respond.mediaQueriesSupported: set to true if the browser natively supports media queries. 
+- respond.mediaQueriesSupported: set to true if the browser natively supports media queries.
 
 
 
