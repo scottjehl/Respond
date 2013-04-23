@@ -324,7 +324,18 @@ window.matchMedia = window.matchMedia || (function( doc, undefined ) {
 		})();
 	
 	//translate CSS
-	ripCSS();
+	if( document.attachEvent && document.readyState !== "complete" ){
+		// Avoid "Operation aborted" error in IE6 by waiting until the DOM is loaded.
+		var DOMLoaded = function() {
+			if( document.readyState === "complete" ) {
+				document.detachEvent( "onreadystatechange", DOMLoaded );
+				ripCSS();
+			}
+		};
+		document.attachEvent( "onreadystatechange", DOMLoaded );
+	} else {
+		ripCSS();
+	}
 	
 	//expose update for re-running respond later on
 	respond.update = ripCSS;
