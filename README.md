@@ -27,6 +27,9 @@ Usage Instructions
 
 3. Crack open Internet Explorer and pump fists in delight
 
+If you wish to exclude a stylesheet from the magic, for example if you are using multiple stylesheets and one or more don't contain any media queries, then simply add a 'data-no-respond' attribute to the stylesheet's link element:
+
+```<link href="styles.css" rel="stylesheet" data-no-respond />```
 
 CDN/X-Domain Setup
 ======
