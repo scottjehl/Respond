@@ -16,7 +16,6 @@ Usage Instructions
 
 1. Craft your CSS with min/max-width media queries to adapt your layout from mobile (first) all the way up to desktop
 
-
 <pre>
     @media screen and (min-width: 480px){
         ...styles for 480px and up go here
@@ -27,6 +26,11 @@ Usage Instructions
 
 3. Crack open Internet Explorer and pump fists in delight
 
+If you wish to exclude a stylesheet from the magic, for example if you are using multiple stylesheets (tut tut) and one doesn't contain any media queries, then simply add a 'data-no-respond' attribute to the stylesheet's link element:
+
+<pre>
+	&lt;link href="styles.css" rel="stylesheet" data-no-respond /&gt;
+</pre>
 
 CDN/X-Domain Setup
 ======

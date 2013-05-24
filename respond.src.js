@@ -78,10 +78,12 @@ window.matchMedia = window.matchMedia || (function( doc, undefined ) {
 				var sheet = links[ i ],
 				href = sheet.href,
 				media = sheet.media,
-				isCSS = sheet.rel && sheet.rel.toLowerCase() === "stylesheet";
+				isCSS = sheet.rel && sheet.rel.toLowerCase() === "stylesheet",
+				// check this stylesheet hasn't been excluded
+				ignore = sheet.getAttribute('data-no-respond');
 
 				//only links plz and prevent re-parsing
-				if( !!href && isCSS && !parsedSheets[ href ] ){
+				if( !!href && isCSS && !parsedSheets[ href ] && ignore === null){
 					// selectivizr exposes css through the rawCssText expando
 					if (sheet.styleSheet && sheet.styleSheet.rawCssText) {
 						translate( sheet.styleSheet.rawCssText, href, media );

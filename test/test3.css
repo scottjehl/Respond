@@ -1,0 +1,7 @@
+/* this stylesheet was ignored by respond because there is no need for it to be processed */
+#ignored {
+	display: block;
+	color: #000;
+	background: yellow;
+	text-align: center;
+}
