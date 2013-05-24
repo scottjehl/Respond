@@ -29,7 +29,9 @@ Usage Instructions
 
 If you wish to exclude a stylesheet from the magic, for example if you are using multiple stylesheets and one or more don't contain any media queries, then simply add a 'data-no-respond' attribute to the stylesheet's link element:
 
-```<link href="styles.css" rel="stylesheet" data-no-respond />```
+<pre>
+	&lt;link href="styles.css" rel="stylesheet" data-no-respond /&gt;
+</pre>
 
 CDN/X-Domain Setup
 ======
