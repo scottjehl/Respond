@@ -51,7 +51,7 @@ window.matchMedia = window.matchMedia || (function( doc, undefined ) {
 	respond.update = function(){};
 	
 	//expose media query support flag for external use
-	respond.mediaQueriesSupported	= win.matchMedia && win.matchMedia( "only all" ).matches;
+	respond.mediaQueriesSupported	= win.matchMedia && win.matchMedia( "only all" ).matches && win.matchMedia('(min-monochrome: 0)').matches;
 	
 	//if media queries are supported, exit here
 	if( respond.mediaQueriesSupported ){
