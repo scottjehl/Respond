@@ -279,8 +279,17 @@ window.matchMedia = window.matchMedia || (function( doc, undefined ) {
 					//this caused crashes in IE in a number of circumstances, such as when the HTML element had a bg image set, so appending beforehand seems best. Thanks to @dvelyk for the initial research on this one!
 					head.insertBefore( ss, lastLink.nextSibling );
 					
-					if ( ss.styleSheet ){ 
-						ss.styleSheet.cssText = css;
+					if ( ss.styleSheet ){
+						var setFunc = function(){
+							try{
+								ss.styleSheet.cssText = css;
+							} catch( e ){ }
+						};
+						if( ss.styleSheet.disabled ){
+							setTimeout( setFunc, 10 );
+						} else{
+							setFunc();
+						}
 					}
 					else {
 						ss.appendChild( doc.createTextNode( css ) );
