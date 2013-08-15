@@ -76,6 +76,8 @@ Some notes to keep in mind:
 
 - WARNING: Including @font-face rules inside a media query will cause IE7 and IE8 to hang during load. To work around this, place @font-face rules in the wide open, as a sibling to other media queries. 
 
+- WARNING: Sass/SCSS source maps are not supported; the current (as of Aug 2013) `@media -sass-debug-info` will break respond.js. Noted in issue [#148](https://github.com/scottjehl/Respond/issues/148)
+
 
 How's it work?
 ======
