@@ -19,7 +19,7 @@ window.matchMedia = window.matchMedia || (function( doc, undefined ) {
 
   return function(q){
 
-    div.innerHTML = "&shy;<style media=\"" + q + "\"> #mq-test-1 { width: 42px; }</style>";
+    div.innerHTML = "&shy;<style media=\"" + q + "\">#mq-test-1{width:42px}</style>";
 
     docElem.insertBefore( fakeBody, refNode );
     bool = div.offsetWidth === 42;
