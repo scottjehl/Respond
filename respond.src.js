@@ -181,6 +181,8 @@ window.matchMedia = window.matchMedia || (function( doc, undefined ) {
 			var ret,
 				div = doc.createElement('div'),
 				body = doc.body,
+				originalHTMLFontSize = docElem.style.fontSize,
+				originalBodyFontSize = body && body.style.fontSize,
 				fakeUsed = false;
 									
 			div.style.cssText = "position:absolute;font-size:1em;width:1em";
@@ -190,9 +192,17 @@ window.matchMedia = window.matchMedia || (function( doc, undefined ) {
 				body.style.background = "none";
 			}
 					
+			// 1em in a media query is the value of the default font size of the browser
+			// reset docElem and body to ensure the correct value is returned
+			docElem.style.fontSize = "100%";
+			body.style.fontSize = "100%";
+
 			body.appendChild( div );
 								
-			docElem.insertBefore( body, docElem.firstChild );
+			// if body doesn't exist, insert it into the DOM
+			if ( fakeUsed ) {
+				docElem.insertBefore( body, docElem.firstChild );
+			}
 								
 			ret = div.offsetWidth;
 								
@@ -203,6 +213,10 @@ window.matchMedia = window.matchMedia || (function( doc, undefined ) {
 				body.removeChild( div );
 			}
 			
+			// restore the original values
+			docElem.style.fontSize = originalHTMLFontSize;
+			body.style.fontSize = originalBodyFontSize;
+
 			//also update eminpx before returning
 			ret = eminpx = parseFloat(ret);
 								
