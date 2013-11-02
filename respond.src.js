@@ -1,43 +1,3 @@
-/*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas. Dual MIT/BSD license */
-/*! NOTE: If you're already including a window.matchMedia polyfill via Modernizr or otherwise, you don't need this part */
-
-window.matchMedia = window.matchMedia || (function( doc, undefined ) {
-
-  "use strict";
-
-  var bool,
-      docElem = doc.documentElement,
-      refNode = docElem.firstElementChild || docElem.firstChild,
-      // fakeBody required for <FF4 when executed in <head>
-      fakeBody = doc.createElement( "body" ),
-      div = doc.createElement( "div" );
-
-  div.id = "mq-test-1";
-  div.style.cssText = "position:absolute;top:-100em";
-  fakeBody.style.background = "none";
-  fakeBody.appendChild(div);
-
-  return function(q){
-
-    div.innerHTML = "&shy;<style media=\"" + q + "\"> #mq-test-1 { width: 42px; }</style>";
-
-    docElem.insertBefore( fakeBody, refNode );
-    bool = div.offsetWidth === 42;
-    docElem.removeChild( fakeBody );
-
-    return {
-      matches: bool,
-      media: q
-    };
-
-  };
-
-}( document ));
-
-
-
-
-
 /*! Respond.js v1.3.0: min/max-width media query polyfill. (c) Scott Jehl. MIT/GPLv2 Lic. j.mp/respondjs  */
 (function( win ){
 
@@ -49,9 +9,46 @@ window.matchMedia = window.matchMedia || (function( doc, undefined ) {
 	
 	//define update even in native-mq-supporting browsers, to avoid errors
 	respond.update = function(){};
+
+	/*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas. Dual MIT/BSD license */
+	var internalMatchMedia = (function( doc, undefined ) {
+
+		"use strict";
+
+		var bool,
+		docElem = doc.documentElement,
+		refNode = docElem.firstElementChild || docElem.firstChild,
+			// fakeBody required for <FF4 when executed in <head>
+			fakeBody = doc.createElement( "body" ),
+			div = doc.createElement( "div" );
+
+			div.id = "mq-test-1";
+			div.style.cssText = "position:absolute;top:-100em";
+			fakeBody.style.background = "none";
+			fakeBody.appendChild(div);
+
+		return function(q){
+
+			div.innerHTML = "&shy;<style media=\"" + q + "\"> #mq-test-1 { width: 42px; }</style>";
+
+			docElem.insertBefore( fakeBody, refNode );
+			bool = div.offsetWidth === 42;
+			docElem.removeChild( fakeBody );
+
+			return {
+				matches: bool,
+				media: q
+			};
+
+		};
+
+	}( document ));
 	
 	//expose media query support flag for external use
-	respond.mediaQueriesSupported	= win.matchMedia && win.matchMedia( "only all" ).matches;
+	respond.mediaQueriesSupported = internalMatchMedia( "only all" ).matches;
+
+	//to not break pages that depend on the matchMedia polyfill included by Respond.js
+	window.matchMedia = window.matchMedia || internalMatchMedia;
 	
 	//if media queries are supported, exit here
 	if( respond.mediaQueriesSupported ){
@@ -171,7 +168,7 @@ window.matchMedia = window.matchMedia || (function( doc, undefined ) {
 
 			applyMedia();
 		},
-        
+		
 		lastCall,
 		
 		resizeDefer,
