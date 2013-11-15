@@ -76,6 +76,8 @@ Some notes to keep in mind:
 
 - WARNING: Including @font-face rules inside a media query will cause IE7 and IE8 to hang during load. To work around this, place @font-face rules in the wide open, as a sibling to other media queries. 
 
+- If you have more than 32 stylesheets referenced, IE will throw an error, `Invalid procedure call or argument`. Concatenate your CSS and the issue should go away.
+
 
 How's it work?
 ======
