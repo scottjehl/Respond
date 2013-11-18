@@ -38,7 +38,7 @@ window.matchMedia = window.matchMedia || (function( doc, undefined ) {
 
 
 
-/*! Respond.js v1.3.0: min/max-width media query polyfill. (c) Scott Jehl. MIT/GPLv2 Lic. j.mp/respondjs  */
+/*! Respond.js v1.3.1: min/max-width media query polyfill. (c) Scott Jehl. MIT/GPLv2 Lic. j.mp/respondjs  */
 (function( win ){
 
 	"use strict";
@@ -89,6 +89,9 @@ window.matchMedia = window.matchMedia || (function( doc, undefined ) {
 					} else {
 						if( (!/^([a-zA-Z:]*\/\/)/.test( href ) && !base) ||
 							href.replace( RegExp.$1, "" ).split( "/" )[0] === win.location.host ){
+							// IE7 doesn't handle urls that start with '//' for ajax request
+							// manually add in the protocol
+							if ( href.substring(0,2) == "//" ) href = location.protocol + href;
 							requestQueue.push( {
 								href: href,
 								media: media
