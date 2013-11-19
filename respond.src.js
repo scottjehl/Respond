@@ -76,7 +76,7 @@ window.matchMedia = window.matchMedia || (function( doc, undefined ) {
 
 			for( var i = 0; i < links.length; i++ ){
 				var sheet = links[ i ],
-				href = sheet.href,
+				href = (/^\/\//g).test(sheet.href) ? (window.location.protocol + sheet.href) : sheet.href,
 				media = sheet.media,
 				isCSS = sheet.rel && sheet.rel.toLowerCase() === "stylesheet";
 
