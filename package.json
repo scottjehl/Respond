@@ -19,9 +19,6 @@
 		{
 			"type": "MIT",
 			"url": "https://github.com/scottjehl/Respond/blob/master/LICENSE-MIT"
-		},
-		{
-			"type": "GPLv2"
 		}
 	],
 	"devDependencies": {
