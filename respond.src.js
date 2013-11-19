@@ -1,75 +1,84 @@
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas. Dual MIT/BSD license */
 /*! NOTE: If you're already including a window.matchMedia polyfill via Modernizr or otherwise, you don't need this part */
-window.matchMedia = window.matchMedia || (function(doc, undefined){
-  
+
+window.matchMedia = window.matchMedia || (function( doc, undefined ) {
+
+  "use strict";
+
   var bool,
-      docElem  = doc.documentElement,
-      refNode  = docElem.firstElementChild || docElem.firstChild,
+      docElem = doc.documentElement,
+      refNode = docElem.firstElementChild || docElem.firstChild,
       // fakeBody required for <FF4 when executed in <head>
-      fakeBody = doc.createElement('body'),
-      div      = doc.createElement('div');
-  
-  div.id = 'mq-test-1';
+      fakeBody = doc.createElement( "body" ),
+      div = doc.createElement( "div" );
+
+  div.id = "mq-test-1";
   div.style.cssText = "position:absolute;top:-100em";
   fakeBody.style.background = "none";
   fakeBody.appendChild(div);
-  
+
   return function(q){
-    
-    div.innerHTML = '&shy;<style media="'+q+'"> #mq-test-1 { width: 42px; }</style>';
-    
-    docElem.insertBefore(fakeBody, refNode);
-    bool = div.offsetWidth == 42;  
-    docElem.removeChild(fakeBody);
-    
-    return { matches: bool, media: q };
+
+    div.innerHTML = "&shy;<style media=\"" + q + "\"> #mq-test-1 { width: 42px; }</style>";
+
+    docElem.insertBefore( fakeBody, refNode );
+    bool = div.offsetWidth === 42;
+    docElem.removeChild( fakeBody );
+
+    return {
+      matches: bool,
+      media: q
+    };
+
   };
-  
-})(document);
+
+}( document ));
 
 
 
 
-/*! Respond.js v1.1.0: min/max-width media query polyfill. (c) Scott Jehl. MIT/GPLv2 Lic. j.mp/respondjs  */
+
+/*! Respond.js v1.3.1: min/max-width media query polyfill. (c) Scott Jehl. MIT/GPLv2 Lic. j.mp/respondjs  */
 (function( win ){
+
+	"use strict";
+
 	//exposed namespace
-	win.respond		= {};
+	var respond = {};
+	win.respond = respond;
 	
 	//define update even in native-mq-supporting browsers, to avoid errors
-	respond.update	= function(){};
+	respond.update = function(){};
 	
 	//expose media query support flag for external use
 	respond.mediaQueriesSupported	= win.matchMedia && win.matchMedia( "only all" ).matches;
 	
 	//if media queries are supported, exit here
-	if( respond.mediaQueriesSupported ){ return; }
+	if( respond.mediaQueriesSupported ){
+		return;
+	}
 	
 	//define vars
-	var doc 			= win.document,
-		docElem 		= doc.documentElement,
-		mediastyles		= [],
-		rules			= [],
-		appendedEls 	= [],
-		parsedSheets 	= {},
-		resizeThrottle	= 30,
-		head 			= doc.getElementsByTagName( "head" )[0] || docElem,
-		base			= doc.getElementsByTagName( "base" )[0],
-		links			= head.getElementsByTagName( "link" ),
-		requestQueue	= [],
+	var doc = win.document,
+		docElem = doc.documentElement,
+		mediastyles = [],
+		rules = [],
+		appendedEls = [],
+		parsedSheets = {},
+		resizeThrottle = 30,
+		head = doc.getElementsByTagName( "head" )[0] || docElem,
+		base = doc.getElementsByTagName( "base" )[0],
+		links = head.getElementsByTagName( "link" ),
+		requestQueue = [],
 		
 		//loop stylesheets, send text content to translate
-		ripCSS			= function(){
-			var sheets 	= links,
-				sl 		= sheets.length,
-				i		= 0,
-				//vars for loop:
-				sheet, href, media, isCSS;
+		ripCSS = function(){
 
-			for( ; i < sl; i++ ){
-				sheet	= sheets[ i ],
-				href	= sheet.href,
-				media	= sheet.media,
-				isCSS	= sheet.rel && sheet.rel.toLowerCase() === "stylesheet";
+			for( var i = 0; i < links.length; i++ ){
+				var sheet = links[ i ],
+				href = sheet.href,
+				media = sheet.media,
+				isCSS = sheet.rel && sheet.rel.toLowerCase() === "stylesheet";
 
 				//only links plz and prevent re-parsing
 				if( !!href && isCSS && !parsedSheets[ href ] ){
@@ -78,8 +87,11 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 						translate( sheet.styleSheet.rawCssText, href, media );
 						parsedSheets[ href ] = true;
 					} else {
-						if( (!/^([a-zA-Z:]*\/\/)/.test( href ) && !base)
-							|| href.replace( RegExp.$1, "" ).split( "/" )[0] === win.location.host ){
+						if( (!/^([a-zA-Z:]*\/\/)/.test( href ) && !base) ||
+							href.replace( RegExp.$1, "" ).split( "/" )[0] === win.location.host ){
+							// IE7 doesn't handle urls that start with '//' for ajax request
+							// manually add in the protocol
+							if ( href.substring(0,2) == "//" ) href = location.protocol + href;
 							requestQueue.push( {
 								href: href,
 								media: media
@@ -99,24 +111,26 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 				ajax( thisRequest.href, function( styles ){
 					translate( styles, thisRequest.href, thisRequest.media );
 					parsedSheets[ thisRequest.href ] = true;
-					makeRequests();
+
+					// by wrapping recursive function call in setTimeout 
+					// we prevent "Stack overflow" error in IE7
+					win.setTimeout(function(){ makeRequests(); },0);
 				} );
 			}
 		},
 		
 		//find media blocks in css text, convert to style blocks
-		translate			= function( styles, href, media ){
-			var qs			= styles.match(  /@media[^\{]+\{([^\{\}]*\{[^\}\{]*\})+/gi ),
-				ql			= qs && qs.length || 0,
-				//try to get CSS path
-				href		= href.substring( 0, href.lastIndexOf( "/" )),
-				repUrls		= function( css ){
+		translate = function( styles, href, media ){
+			var qs = styles.match(  /@media[^\{]+\{([^\{\}]*\{[^\}\{]*\})+/gi ),
+				ql = qs && qs.length || 0;
+
+			//try to get CSS path
+			href = href.substring( 0, href.lastIndexOf( "/" ) );
+
+			var repUrls	= function( css ){
 					return css.replace( /(url\()['"]?([^\/\)'"][^:\)'"]+)['"]?(\))/g, "$1" + href + "$2$3" );
 				},
-				useMedia	= !ql && media,
-				//vars used in loop
-				i			= 0,
-				j, fullq, thisq, eachq, eql;
+				useMedia = !ql && media;
 
 			//if path exists, tack on trailing slash
 			if( href.length ){ href += "/"; }	
@@ -128,11 +142,10 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 			if( useMedia ){
 				ql = 1;
 			}
-			
 
-			for( ; i < ql; i++ ){
-				j	= 0;
-				
+			for( var i = 0; i < ql; i++ ){
+				var fullq, thisq, eachq, eql;
+
 				//media attr
 				if( useMedia ){
 					fullq = media;
@@ -140,34 +153,34 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 				}
 				//parse for styles
 				else{
-					fullq	= qs[ i ].match( /@media *([^\{]+)\{([\S\s]+?)$/ ) && RegExp.$1;
+					fullq = qs[ i ].match( /@media *([^\{]+)\{([\S\s]+?)$/ ) && RegExp.$1;
 					rules.push( RegExp.$2 && repUrls( RegExp.$2 ) );
 				}
 				
-				eachq	= fullq.split( "," );
-				eql		= eachq.length;
+				eachq = fullq.split( "," );
+				eql	= eachq.length;
 					
-				for( ; j < eql; j++ ){
-					thisq	= eachq[ j ];
+				for( var j = 0; j < eql; j++ ){
+					thisq = eachq[ j ];
 					mediastyles.push( { 
-						media	: thisq.split( "(" )[ 0 ].match( /(only\s+)?([a-zA-Z]+)\s?/ ) && RegExp.$2 || "all",
-						rules	: rules.length - 1,
-						hasquery: thisq.indexOf("(") > -1,
-						minw	: thisq.match( /\(min\-width:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" ), 
-						maxw	: thisq.match( /\(max\-width:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" )
+						media : thisq.split( "(" )[ 0 ].match( /(only\s+)?([a-zA-Z]+)\s?/ ) && RegExp.$2 || "all",
+						rules : rules.length - 1,
+						hasquery : thisq.indexOf("(") > -1,
+						minw : thisq.match( /\(\s*min\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" ), 
+						maxw : thisq.match( /\(\s*max\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" )
 					} );
 				}	
 			}
 
 			applyMedia();
 		},
-        	
+        
 		lastCall,
 		
 		resizeDefer,
 		
 		// returns the value of 1em in pixels
-		getEmValue		= function() {
+		getEmValue = function() {
 			var ret,
 				div = doc.createElement('div'),
 				body = doc.body,
@@ -203,76 +216,82 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 		eminpx,
 		
 		//enable/disable styles
-		applyMedia			= function( fromResize ){
-			var name		= "clientWidth",
-				docElemProp	= docElem[ name ],
-				currWidth 	= doc.compatMode === "CSS1Compat" && docElemProp || doc.body[ name ] || docElemProp,
+		applyMedia = function( fromResize ){
+			var name = "clientWidth",
+				docElemProp = docElem[ name ],
+				currWidth = doc.compatMode === "CSS1Compat" && docElemProp || doc.body[ name ] || docElemProp,
 				styleBlocks	= {},
-				lastLink	= links[ links.length-1 ],
-				now 		= (new Date()).getTime();
+				lastLink = links[ links.length-1 ],
+				now = (new Date()).getTime();
 
 			//throttle resize calls	
 			if( fromResize && lastCall && now - lastCall < resizeThrottle ){
-				clearTimeout( resizeDefer );
-				resizeDefer = setTimeout( applyMedia, resizeThrottle );
+				win.clearTimeout( resizeDefer );
+				resizeDefer = win.setTimeout( applyMedia, resizeThrottle );
 				return;
 			}
 			else {
-				lastCall	= now;
+				lastCall = now;
 			}
 										
 			for( var i in mediastyles ){
-				var thisstyle = mediastyles[ i ],
-					min = thisstyle.minw,
-					max = thisstyle.maxw,
-					minnull = min === null,
-					maxnull = max === null,
-					em = "em";
-				
-				if( !!min ){
-					min = parseFloat( min ) * ( min.indexOf( em ) > -1 ? ( eminpx || getEmValue() ) : 1 );
-				}
-				if( !!max ){
-					max = parseFloat( max ) * ( max.indexOf( em ) > -1 ? ( eminpx || getEmValue() ) : 1 );
-				}
-				
-				// if there's no media query at all (the () part), or min or max is not null, and if either is present, they're true
-				if( !thisstyle.hasquery || ( !minnull || !maxnull ) && ( minnull || currWidth >= min ) && ( maxnull || currWidth <= max ) ){
+				if( mediastyles.hasOwnProperty( i ) ){
+					var thisstyle = mediastyles[ i ],
+						min = thisstyle.minw,
+						max = thisstyle.maxw,
+						minnull = min === null,
+						maxnull = max === null,
+						em = "em";
+					
+					if( !!min ){
+						min = parseFloat( min ) * ( min.indexOf( em ) > -1 ? ( eminpx || getEmValue() ) : 1 );
+					}
+					if( !!max ){
+						max = parseFloat( max ) * ( max.indexOf( em ) > -1 ? ( eminpx || getEmValue() ) : 1 );
+					}
+					
+					// if there's no media query at all (the () part), or min or max is not null, and if either is present, they're true
+					if( !thisstyle.hasquery || ( !minnull || !maxnull ) && ( minnull || currWidth >= min ) && ( maxnull || currWidth <= max ) ){
 						if( !styleBlocks[ thisstyle.media ] ){
 							styleBlocks[ thisstyle.media ] = [];
 						}
 						styleBlocks[ thisstyle.media ].push( rules[ thisstyle.rules ] );
+					}
 				}
 			}
 			
 			//remove any existing respond style element(s)
-			for( var i in appendedEls ){
-				if( appendedEls[ i ] && appendedEls[ i ].parentNode === head ){
-					head.removeChild( appendedEls[ i ] );
+			for( var j in appendedEls ){
+				if( appendedEls.hasOwnProperty( j ) ){
+					if( appendedEls[ j ] && appendedEls[ j ].parentNode === head ){
+						head.removeChild( appendedEls[ j ] );
+					}
 				}
 			}
 			
 			//inject active styles, grouped by media type
-			for( var i in styleBlocks ){
-				var ss		= doc.createElement( "style" ),
-					css		= styleBlocks[ i ].join( "\n" );
-				
-				ss.type = "text/css";	
-				ss.media	= i;
-				
-				//originally, ss was appended to a documentFragment and sheets were appended in bulk.
-				//this caused crashes in IE in a number of circumstances, such as when the HTML element had a bg image set, so appending beforehand seems best. Thanks to @dvelyk for the initial research on this one!
-				head.insertBefore( ss, lastLink.nextSibling );
-				
-				if ( ss.styleSheet ){ 
-		        	ss.styleSheet.cssText = css;
-		        } 
-		        else {
-					ss.appendChild( doc.createTextNode( css ) );
-		        }
-		        
-				//push to appendedEls to track for later removal
-				appendedEls.push( ss );
+			for( var k in styleBlocks ){
+				if( styleBlocks.hasOwnProperty( k ) ){
+					var ss = doc.createElement( "style" ),
+						css = styleBlocks[ k ].join( "\n" );
+					
+					ss.type = "text/css";	
+					ss.media = k;
+					
+					//originally, ss was appended to a documentFragment and sheets were appended in bulk.
+					//this caused crashes in IE in a number of circumstances, such as when the HTML element had a bg image set, so appending beforehand seems best. Thanks to @dvelyk for the initial research on this one!
+					head.insertBefore( ss, lastLink.nextSibling );
+					
+					if ( ss.styleSheet ){ 
+						ss.styleSheet.cssText = css;
+					}
+					else {
+						ss.appendChild( doc.createTextNode( css ) );
+					}
+
+					//push to appendedEls to track for later removal
+					appendedEls.push( ss );
+				}
 			}
 		},
 		//tweaked Ajax functions from Quirksmode
@@ -283,12 +302,12 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 			}	
 			req.open( "GET", url, true );
 			req.onreadystatechange = function () {
-				if ( req.readyState != 4 || req.status != 200 && req.status != 304 ){
+				if ( req.readyState !== 4 || req.status !== 200 && req.status !== 304 ){
 					return;
 				}
 				callback( req.responseText );
-			}
-			if ( req.readyState == 4 ){
+			};
+			if ( req.readyState === 4 ){
 				return;
 			}
 			req.send( null );
@@ -297,10 +316,10 @@ window.matchMedia = window.matchMedia || (function(doc, undefined){
 		xmlHttp = (function() {
 			var xmlhttpmethod = false;	
 			try {
-				xmlhttpmethod = new XMLHttpRequest();
+				xmlhttpmethod = new win.XMLHttpRequest();
 			}
 			catch( e ){
-				xmlhttpmethod = new ActiveXObject( "Microsoft.XMLHTTP" );
+				xmlhttpmethod = new win.ActiveXObject( "Microsoft.XMLHTTP" );
 			}
 			return function(){
 				return xmlhttpmethod;
