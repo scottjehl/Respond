@@ -1,0 +1,11 @@
+{
+  "name": "respond",
+  "version": "1.2.1",
+  "main": "respond.min.js",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "components",
+    "test"
+  ]
+}
