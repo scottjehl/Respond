@@ -77,7 +77,7 @@
   w.respond = respond;
   respond.update = function() {};
   respond.mediaQueriesSupported = w.matchMedia && w.matchMedia("only all").matches;
-  if (respond.mediaQueriesSupported && !isIE9iframe()) {
+  if (respond.mediaQueriesSupported) {
     return;
   }
   var doc = w.document, docElem = doc.documentElement, mediastyles = [], rules = [], appendedEls = [], parsedSheets = {}, resizeThrottle = 30, head = doc.getElementsByTagName("head")[0] || docElem, base = doc.getElementsByTagName("base")[0], links = head.getElementsByTagName("link"), requestQueue = [], lastCall, resizeDefer, eminpx, getEmValue = function() {
@@ -246,14 +246,6 @@
   respond.update = ripCSS;
   function callMedia() {
     applyMedia(true);
-  }
-  function isIE9iframe() {
-    var ua = w.navigator.userAgent, ie_version = -1;
-    var re = new RegExp("MSIE ([0-9]{1,}[\\.0-9]{0,})");
-    if (re.exec(ua) !== null) {
-      ie_version = parseFloat(RegExp.$1);
-    }
-    return w !== w.top && ie_version >= 9;
   }
   if (w.addEventListener) {
     w.addEventListener("resize", callMedia, false);

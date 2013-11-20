@@ -14,7 +14,7 @@
 	respond.mediaQueriesSupported = w.matchMedia && w.matchMedia( "only all" ).matches;
 
 	//if media queries are supported, exit here
-	if( respond.mediaQueriesSupported && !isIE9iframe()){
+	if( respond.mediaQueriesSupported ){
 		return;
 	}
 
@@ -307,15 +307,6 @@
 	//adjust on resize
 	function callMedia(){
 		applyMedia( true );
-	}
-
-	//test for IE9 iframe
-	function isIE9iframe() {
-		var ua = w.navigator.userAgent,
-			ie_version = -1;
-		var re  = new RegExp("MSIE ([0-9]{1,}[\\.0-9]{0,})");
-		if (re.exec(ua) !== null){ ie_version = parseFloat( RegExp.$1 ); }
-		return ( w !== w.top && ie_version >= 9.0 );
 	}
 
 	if( w.addEventListener ){

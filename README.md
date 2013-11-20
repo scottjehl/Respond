@@ -4,7 +4,7 @@
  - Copyright 2011: Scott Jehl, scottjehl.com
  - Dual licensed under the MIT license.
  
-The goal of this script is to provide a fast and lightweight (3kb minified / 1kb gzipped) script to enable [responsive web designs](http://www.alistapart.com/articles/responsive-web-design/) in browsers that don't support CSS3 Media Queries - in particular, Internet Explorer 8 and under (and IE9 when inside a frame). It's written in such a way that it will probably patch support for other non-supporting browsers as well (more information on that soon).
+The goal of this script is to provide a fast and lightweight (3kb minified / 1kb gzipped) script to enable [responsive web designs](http://www.alistapart.com/articles/responsive-web-design/) in browsers that don't support CSS3 Media Queries - in particular, Internet Explorer 8 and under. It's written in such a way that it will probably patch support for other non-supporting browsers as well (more information on that soon).
 
 If you're unfamiliar with the concepts surrounding Responsive Web Design, you can read up [here](http://www.alistapart.com/articles/responsive-web-design/) and also [here](http://filamentgroup.com/examples/responsive-images/)
 
@@ -83,6 +83,8 @@ respond with a 200 status.
 - If you have more than 32 stylesheets referenced, IE will throw an error, `Invalid procedure call or argument`. Concatenate your CSS and the issue should go away.
 
 - Sass/SCSS source maps are not supported; `@media -sass-debug-info` will break respond.js. Noted in issue [#148](https://github.com/scottjehl/Respond/issues/148)
+
+- Internet Explorer 9 supports css3 media queries, but not within frames when the CSS containing the media query is in an external file (this appears to be a bug in IE9 — see http://stackoverflow.com/questions/10316247/media-queries-fail-inside-ie9-iframe). See this commit for a fix if you're having this problem. https://github.com/NewSignature/Respond/commit/1c86c66075f0a2099451eb426702fc3540d2e603
 
 
 How's it work?
