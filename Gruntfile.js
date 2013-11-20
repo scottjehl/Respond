@@ -14,6 +14,7 @@ module.exports = function(grunt) {
 			}
 		},
 		jshint: {
+			files: ['respond.src.js'],
 			options: {
 				curly: true,
 				eqeqeq: true,

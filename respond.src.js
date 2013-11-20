@@ -1,38 +1,40 @@
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas. Dual MIT/BSD license */
 /*! NOTE: If you're already including a window.matchMedia polyfill via Modernizr or otherwise, you don't need this part */
 
-window.matchMedia = window.matchMedia || (function( doc, undefined ) {
+(function(win){
+	win.matchMedia = win.matchMedia || (function( doc, undefined ) {
 
-	"use strict";
+		"use strict";
 
-	var bool,
-		docElem = doc.documentElement,
-		refNode = docElem.firstElementChild || docElem.firstChild,
-		// fakeBody required for <FF4 when executed in <head>
-		fakeBody = doc.createElement( "body" ),
-		div = doc.createElement( "div" );
+		var bool,
+			docElem = doc.documentElement,
+			refNode = docElem.firstElementChild || docElem.firstChild,
+			// fakeBody required for <FF4 when executed in <head>
+			fakeBody = doc.createElement( "body" ),
+			div = doc.createElement( "div" );
 
-	div.id = "mq-test-1";
-	div.style.cssText = "position:absolute;top:-100em";
-	fakeBody.style.background = "none";
-	fakeBody.appendChild(div);
+		div.id = "mq-test-1";
+		div.style.cssText = "position:absolute;top:-100em";
+		fakeBody.style.background = "none";
+		fakeBody.appendChild(div);
 
-	return function(q){
+		return function(q){
 
-		div.innerHTML = "&shy;<style media=\"" + q + "\"> #mq-test-1 { width: 42px; }</style>";
+			div.innerHTML = "&shy;<style media=\"" + q + "\"> #mq-test-1 { width: 42px; }</style>";
 
-		docElem.insertBefore( fakeBody, refNode );
-		bool = div.offsetWidth === 42;
-		docElem.removeChild( fakeBody );
+			docElem.insertBefore( fakeBody, refNode );
+			bool = div.offsetWidth === 42;
+			docElem.removeChild( fakeBody );
 
-		return {
-			matches: bool,
-			media: q
+			return {
+				matches: bool,
+				media: q
+			};
+
 		};
 
-	};
-
-}( document ));
+	}( win.document ));
+}( this ));
 
 
 
@@ -71,113 +73,11 @@ window.matchMedia = window.matchMedia || (function( doc, undefined ) {
 		links = head.getElementsByTagName( "link" ),
 		requestQueue = [],
 
-		//loop stylesheets, send text content to translate
-		ripCSS = function(){
-
-			for( var i = 0; i < links.length; i++ ){
-				var sheet = links[ i ],
-				href = sheet.href,
-				media = sheet.media,
-				isCSS = sheet.rel && sheet.rel.toLowerCase() === "stylesheet";
-
-				//only links plz and prevent re-parsing
-				if( !!href && isCSS && !parsedSheets[ href ] ){
-					// selectivizr exposes css through the rawCssText expando
-					if (sheet.styleSheet && sheet.styleSheet.rawCssText) {
-						translate( sheet.styleSheet.rawCssText, href, media );
-						parsedSheets[ href ] = true;
-					} else {
-						if( (!/^([a-zA-Z:]*\/\/)/.test( href ) && !base) ||
-							href.replace( RegExp.$1, "" ).split( "/" )[0] === win.location.host ){
-							// IE7 doesn't handle urls that start with '//' for ajax request
-							// manually add in the protocol
-							if ( href.substring(0,2) == "//" ) href = location.protocol + href;
-							requestQueue.push( {
-								href: href,
-								media: media
-							} );
-						}
-					}
-				}
-			}
-			makeRequests();
-		},
-
-		//recurse through request queue, get css text
-		makeRequests = function(){
-			if( requestQueue.length ){
-				var thisRequest = requestQueue.shift();
-
-				ajax( thisRequest.href, function( styles ){
-					translate( styles, thisRequest.href, thisRequest.media );
-					parsedSheets[ thisRequest.href ] = true;
-
-					// by wrapping recursive function call in setTimeout
-					// we prevent "Stack overflow" error in IE7
-					win.setTimeout(function(){ makeRequests(); },0);
-				} );
-			}
-		},
-
-		//find media blocks in css text, convert to style blocks
-		translate = function( styles, href, media ){
-			var qs = styles.match(  /@media[^\{]+\{([^\{\}]*\{[^\}\{]*\})+/gi ),
-				ql = qs && qs.length || 0;
-
-			//try to get CSS path
-			href = href.substring( 0, href.lastIndexOf( "/" ) );
-
-			var repUrls = function( css ){
-					return css.replace( /(url\()['"]?([^\/\)'"][^:\)'"]+)['"]?(\))/g, "$1" + href + "$2$3" );
-				},
-				useMedia = !ql && media;
-
-			//if path exists, tack on trailing slash
-			if( href.length ){ href += "/"; }
-
-			//if no internal queries exist, but media attr does, use that
-			//note: this currently lacks support for situations where a media attr is specified on a link AND
-				//its associated stylesheet has internal CSS media queries.
-				//In those cases, the media attribute will currently be ignored.
-			if( useMedia ){
-				ql = 1;
-			}
-
-			for( var i = 0; i < ql; i++ ){
-				var fullq, thisq, eachq, eql;
-
-				//media attr
-				if( useMedia ){
-					fullq = media;
-					rules.push( repUrls( styles ) );
-				}
-				//parse for styles
-				else{
-					fullq = qs[ i ].match( /@media *([^\{]+)\{([\S\s]+?)$/ ) && RegExp.$1;
-					rules.push( RegExp.$2 && repUrls( RegExp.$2 ) );
-				}
-
-				eachq = fullq.split( "," );
-				eql = eachq.length;
-
-				for( var j = 0; j < eql; j++ ){
-					thisq = eachq[ j ];
-					mediastyles.push( {
-						media : thisq.split( "(" )[ 0 ].match( /(only\s+)?([a-zA-Z]+)\s?/ ) && RegExp.$2 || "all",
-						rules : rules.length - 1,
-						hasquery : thisq.indexOf("(") > -1,
-						minw : thisq.match( /\(\s*min\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" ),
-						maxw : thisq.match( /\(\s*max\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" )
-					} );
-				}
-			}
-
-			applyMedia();
-		},
-
 		lastCall,
-
 		resizeDefer,
+
+		//cached container for 1em value, populated the first time it's needed
+		eminpx,
 
 		// returns the value of 1em in pixels
 		getEmValue = function() {
@@ -211,9 +111,6 @@ window.matchMedia = window.matchMedia || (function( doc, undefined ) {
 
 			return ret;
 		},
-
-		//cached container for 1em value, populated the first time it's needed
-		eminpx,
 
 		//enable/disable styles
 		applyMedia = function( fromResize ){
@@ -294,6 +191,76 @@ window.matchMedia = window.matchMedia || (function( doc, undefined ) {
 				}
 			}
 		},
+		//find media blocks in css text, convert to style blocks
+		translate = function( styles, href, media ){
+			var qs = styles.match(  /@media[^\{]+\{([^\{\}]*\{[^\}\{]*\})+/gi ),
+				ql = qs && qs.length || 0;
+
+			//try to get CSS path
+			href = href.substring( 0, href.lastIndexOf( "/" ) );
+
+			var repUrls = function( css ){
+					return css.replace( /(url\()['"]?([^\/\)'"][^:\)'"]+)['"]?(\))/g, "$1" + href + "$2$3" );
+				},
+				useMedia = !ql && media;
+
+			//if path exists, tack on trailing slash
+			if( href.length ){ href += "/"; }
+
+			//if no internal queries exist, but media attr does, use that
+			//note: this currently lacks support for situations where a media attr is specified on a link AND
+				//its associated stylesheet has internal CSS media queries.
+				//In those cases, the media attribute will currently be ignored.
+			if( useMedia ){
+				ql = 1;
+			}
+
+			for( var i = 0; i < ql; i++ ){
+				var fullq, thisq, eachq, eql;
+
+				//media attr
+				if( useMedia ){
+					fullq = media;
+					rules.push( repUrls( styles ) );
+				}
+				//parse for styles
+				else{
+					fullq = qs[ i ].match( /@media *([^\{]+)\{([\S\s]+?)$/ ) && RegExp.$1;
+					rules.push( RegExp.$2 && repUrls( RegExp.$2 ) );
+				}
+
+				eachq = fullq.split( "," );
+				eql = eachq.length;
+
+				for( var j = 0; j < eql; j++ ){
+					thisq = eachq[ j ];
+					mediastyles.push( {
+						media : thisq.split( "(" )[ 0 ].match( /(only\s+)?([a-zA-Z]+)\s?/ ) && RegExp.$2 || "all",
+						rules : rules.length - 1,
+						hasquery : thisq.indexOf("(") > -1,
+						minw : thisq.match( /\(\s*min\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" ),
+						maxw : thisq.match( /\(\s*max\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" )
+					} );
+				}
+			}
+
+			applyMedia();
+		},
+
+		//define ajax obj
+		xmlHttp = (function() {
+			var xmlhttpmethod = false;
+			try {
+				xmlhttpmethod = new win.XMLHttpRequest();
+			}
+			catch( e ){
+				xmlhttpmethod = new win.ActiveXObject( "Microsoft.XMLHTTP" );
+			}
+			return function(){
+				return xmlhttpmethod;
+			};
+		})(),
+
 		//tweaked Ajax functions from Quirksmode
 		ajax = function( url, callback ) {
 			var req = xmlHttp();
@@ -312,19 +279,54 @@ window.matchMedia = window.matchMedia || (function( doc, undefined ) {
 			}
 			req.send( null );
 		},
-		//define ajax obj
-		xmlHttp = (function() {
-			var xmlhttpmethod = false;
-			try {
-				xmlhttpmethod = new win.XMLHttpRequest();
+
+		//recurse through request queue, get css text
+		makeRequests = function(){
+			if( requestQueue.length ){
+				var thisRequest = requestQueue.shift();
+
+				ajax( thisRequest.href, function( styles ){
+					translate( styles, thisRequest.href, thisRequest.media );
+					parsedSheets[ thisRequest.href ] = true;
+
+					// by wrapping recursive function call in setTimeout
+					// we prevent "Stack overflow" error in IE7
+					win.setTimeout(function(){ makeRequests(); },0);
+				} );
 			}
-			catch( e ){
-				xmlhttpmethod = new win.ActiveXObject( "Microsoft.XMLHTTP" );
+		},
+
+		//loop stylesheets, send text content to translate
+		ripCSS = function(){
+
+			for( var i = 0; i < links.length; i++ ){
+				var sheet = links[ i ],
+				href = sheet.href,
+				media = sheet.media,
+				isCSS = sheet.rel && sheet.rel.toLowerCase() === "stylesheet";
+
+				//only links plz and prevent re-parsing
+				if( !!href && isCSS && !parsedSheets[ href ] ){
+					// selectivizr exposes css through the rawCssText expando
+					if (sheet.styleSheet && sheet.styleSheet.rawCssText) {
+						translate( sheet.styleSheet.rawCssText, href, media );
+						parsedSheets[ href ] = true;
+					} else {
+						if( (!/^([a-zA-Z:]*\/\/)/.test( href ) && !base) ||
+							href.replace( RegExp.$1, "" ).split( "/" )[0] === win.location.host ){
+							// IE7 doesn't handle urls that start with '//' for ajax request
+							// manually add in the protocol
+							if ( href.substring(0,2) === "//" ) { href = win.location.protocol + href; }
+							requestQueue.push( {
+								href: href,
+								media: media
+							} );
+						}
+					}
+				}
 			}
-			return function(){
-				return xmlhttpmethod;
-			};
-		})();
+			makeRequests();
+		};
 
 	//translate CSS
 	ripCSS();
