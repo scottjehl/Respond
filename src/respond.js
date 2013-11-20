@@ -1,25 +1,25 @@
 /*! Respond.js v1.3.1: min/max-width media query polyfill. (c) Scott Jehl. MIT Lic. j.mp/respondjs  */
-(function( win ){
+(function( w ){
 
 	"use strict";
 
 	//exposed namespace
 	var respond = {};
-	win.respond = respond;
+	w.respond = respond;
 
 	//define update even in native-mq-supporting browsers, to avoid errors
 	respond.update = function(){};
 
 	//expose media query support flag for external use
-	respond.mediaQueriesSupported = win.matchMedia && win.matchMedia( "only all" ).matches;
+	respond.mediaQueriesSupported = w.matchMedia && w.matchMedia( "only all" ).matches;
 
 	//if media queries are supported, exit here
-	if( respond.mediaQueriesSupported ){
+	if( respond.mediaQueriesSupported && !isIE9iframe()){
 		return;
 	}
 
 	//define vars
-	var doc = win.document,
+	var doc = w.document,
 		docElem = doc.documentElement,
 		mediastyles = [],
 		rules = [],
@@ -93,8 +93,8 @@
 
 			//throttle resize calls
 			if( fromResize && lastCall && now - lastCall < resizeThrottle ){
-				win.clearTimeout( resizeDefer );
-				resizeDefer = win.setTimeout( applyMedia, resizeThrottle );
+				w.clearTimeout( resizeDefer );
+				resizeDefer = w.setTimeout( applyMedia, resizeThrottle );
 				return;
 			}
 			else {
@@ -221,10 +221,10 @@
 		xmlHttp = (function() {
 			var xmlhttpmethod = false;
 			try {
-				xmlhttpmethod = new win.XMLHttpRequest();
+				xmlhttpmethod = new w.XMLHttpRequest();
 			}
 			catch( e ){
-				xmlhttpmethod = new win.ActiveXObject( "Microsoft.XMLHTTP" );
+				xmlhttpmethod = new w.ActiveXObject( "Microsoft.XMLHTTP" );
 			}
 			return function(){
 				return xmlhttpmethod;
@@ -261,7 +261,7 @@
 
 					// by wrapping recursive function call in setTimeout
 					// we prevent "Stack overflow" error in IE7
-					win.setTimeout(function(){ makeRequests(); },0);
+					w.setTimeout(function(){ makeRequests(); },0);
 				} );
 			}
 		},
@@ -283,10 +283,10 @@
 						parsedSheets[ href ] = true;
 					} else {
 						if( (!/^([a-zA-Z:]*\/\/)/.test( href ) && !base) ||
-							href.replace( RegExp.$1, "" ).split( "/" )[0] === win.location.host ){
+							href.replace( RegExp.$1, "" ).split( "/" )[0] === w.location.host ){
 							// IE7 doesn't handle urls that start with '//' for ajax request
 							// manually add in the protocol
-							if ( href.substring(0,2) === "//" ) { href = win.location.protocol + href; }
+							if ( href.substring(0,2) === "//" ) { href = w.location.protocol + href; }
 							requestQueue.push( {
 								href: href,
 								media: media
@@ -308,10 +308,20 @@
 	function callMedia(){
 		applyMedia( true );
 	}
-	if( win.addEventListener ){
-		win.addEventListener( "resize", callMedia, false );
+
+	//test for IE9 iframe
+	function isIE9iframe() {
+		var ua = w.navigator.userAgent,
+			ie_version = -1;
+		var re  = new RegExp("MSIE ([0-9]{1,}[\\.0-9]{0,})");
+		if (re.exec(ua) !== null){ ie_version = parseFloat( RegExp.$1 ); }
+		return ( w !== w.top && ie_version >= 9.0 );
 	}
-	else if( win.attachEvent ){
-		win.attachEvent( "onresize", callMedia );
+
+	if( w.addEventListener ){
+		w.addEventListener( "resize", callMedia, false );
+	}
+	else if( w.attachEvent ){
+		w.attachEvent( "onresize", callMedia );
 	}
 })(this);

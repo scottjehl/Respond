@@ -71,16 +71,16 @@
 })(this);
 
 /*! Respond.js v1.3.1: min/max-width media query polyfill. (c) Scott Jehl. MIT Lic. j.mp/respondjs  */
-(function(win) {
+(function(w) {
   "use strict";
   var respond = {};
-  win.respond = respond;
+  w.respond = respond;
   respond.update = function() {};
-  respond.mediaQueriesSupported = win.matchMedia && win.matchMedia("only all").matches;
-  if (respond.mediaQueriesSupported) {
+  respond.mediaQueriesSupported = w.matchMedia && w.matchMedia("only all").matches;
+  if (respond.mediaQueriesSupported && !isIE9iframe()) {
     return;
   }
-  var doc = win.document, docElem = doc.documentElement, mediastyles = [], rules = [], appendedEls = [], parsedSheets = {}, resizeThrottle = 30, head = doc.getElementsByTagName("head")[0] || docElem, base = doc.getElementsByTagName("base")[0], links = head.getElementsByTagName("link"), requestQueue = [], lastCall, resizeDefer, eminpx, getEmValue = function() {
+  var doc = w.document, docElem = doc.documentElement, mediastyles = [], rules = [], appendedEls = [], parsedSheets = {}, resizeThrottle = 30, head = doc.getElementsByTagName("head")[0] || docElem, base = doc.getElementsByTagName("base")[0], links = head.getElementsByTagName("link"), requestQueue = [], lastCall, resizeDefer, eminpx, getEmValue = function() {
     var ret, div = doc.createElement("div"), body = doc.body, originalHTMLFontSize = docElem.style.fontSize, originalBodyFontSize = body && body.style.fontSize, fakeUsed = false;
     div.style.cssText = "position:absolute;font-size:1em;width:1em";
     if (!body) {
@@ -104,8 +104,8 @@
   }, applyMedia = function(fromResize) {
     var name = "clientWidth", docElemProp = docElem[name], currWidth = doc.compatMode === "CSS1Compat" && docElemProp || doc.body[name] || docElemProp, styleBlocks = {}, lastLink = links[links.length - 1], now = new Date().getTime();
     if (fromResize && lastCall && now - lastCall < resizeThrottle) {
-      win.clearTimeout(resizeDefer);
-      resizeDefer = win.setTimeout(applyMedia, resizeThrottle);
+      w.clearTimeout(resizeDefer);
+      resizeDefer = w.setTimeout(applyMedia, resizeThrottle);
       return;
     } else {
       lastCall = now;
@@ -186,9 +186,9 @@
   }, xmlHttp = function() {
     var xmlhttpmethod = false;
     try {
-      xmlhttpmethod = new win.XMLHttpRequest();
+      xmlhttpmethod = new w.XMLHttpRequest();
     } catch (e) {
-      xmlhttpmethod = new win.ActiveXObject("Microsoft.XMLHTTP");
+      xmlhttpmethod = new w.ActiveXObject("Microsoft.XMLHTTP");
     }
     return function() {
       return xmlhttpmethod;
@@ -215,7 +215,7 @@
       ajax(thisRequest.href, function(styles) {
         translate(styles, thisRequest.href, thisRequest.media);
         parsedSheets[thisRequest.href] = true;
-        win.setTimeout(function() {
+        w.setTimeout(function() {
           makeRequests();
         }, 0);
       });
@@ -228,9 +228,9 @@
           translate(sheet.styleSheet.rawCssText, href, media);
           parsedSheets[href] = true;
         } else {
-          if (!/^([a-zA-Z:]*\/\/)/.test(href) && !base || href.replace(RegExp.$1, "").split("/")[0] === win.location.host) {
+          if (!/^([a-zA-Z:]*\/\/)/.test(href) && !base || href.replace(RegExp.$1, "").split("/")[0] === w.location.host) {
             if (href.substring(0, 2) === "//") {
-              href = win.location.protocol + href;
+              href = w.location.protocol + href;
             }
             requestQueue.push({
               href: href,
@@ -247,9 +247,17 @@
   function callMedia() {
     applyMedia(true);
   }
-  if (win.addEventListener) {
-    win.addEventListener("resize", callMedia, false);
-  } else if (win.attachEvent) {
-    win.attachEvent("onresize", callMedia);
+  function isIE9iframe() {
+    var ua = w.navigator.userAgent, ie_version = -1;
+    var re = new RegExp("MSIE ([0-9]{1,}[\\.0-9]{0,})");
+    if (re.exec(ua) !== null) {
+      ie_version = parseFloat(RegExp.$1);
+    }
+    return w !== w.top && ie_version >= 9;
+  }
+  if (w.addEventListener) {
+    w.addEventListener("resize", callMedia, false);
+  } else if (w.attachEvent) {
+    w.attachEvent("onresize", callMedia);
   }
 })(this);
