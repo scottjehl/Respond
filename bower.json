@@ -1,8 +1,8 @@
 {
   "name": "respond",
-  "version": "1.2.0",
-  "main": "respond.src.js",
-  "description": "Fast and lightweight polyfill for min/max-width CSS3 Media Queries (for IE 6-8, and more)"
+  "version": "1.4.0",
+  "main": "dest/respond.src.js",
+  "description": "Fast and lightweight polyfill for min/max-width CSS3 Media Queries (for IE 6-8, and more)",
   "ignore": [
     "**/.*",
     "test"
