@@ -11,7 +11,7 @@ module.exports = function(grunt) {
 						' * <%= pkg.website %>' +
 						' */\n\n',
 		uglify: {
-			nonMin: {
+			nonMinMatchMedia: {
 				options: {
 					mangle: false,
 					compress: false,
@@ -25,12 +25,34 @@ module.exports = function(grunt) {
 					'dest/respond.src.js': ['src/matchmedia.polyfill.js', 'src/respond.js']
 				}
 			},
-			min: {
+			minMatchMedia: {
 				options: {
 					banner: '<%= banner %>'
 				},
 				files: {
 					'dest/respond.min.js': ['src/matchmedia.polyfill.js', 'src/respond.js']
+				}
+			},
+			nonMinMatchMediaListener: {
+				options: {
+					mangle: false,
+					compress: false,
+					preserveComments: 'some',
+					beautify: {
+						beautify: true,
+						indent_level: 2
+					}
+				},
+				files: {
+					'dest/respond.matchmedia.addListener.src.js': ['src/matchmedia.polyfill.js', 'src/matchmedia.addListener.js', 'src/respond.js']
+				}
+			},
+			minMatchMediaListener: {
+				options: {
+					banner: '<%= banner %>'
+				},
+				files: {
+					'dest/respond.matchmedia.addListener.min.js': ['src/matchmedia.polyfill.js', 'src/matchmedia.addListener.js', 'src/respond.js']
 				}
 			}
 		},
@@ -63,6 +85,6 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks( 'grunt-contrib-uglify' );
 
 	// Default task.
-	grunt.registerTask('default', ['jshint', 'uglify:nonMin','uglify:min']);
+	grunt.registerTask('default', ['jshint', 'uglify']);
 
 };
