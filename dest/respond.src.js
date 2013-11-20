@@ -1,8 +1,8 @@
 /*! matchMedia() polyfill - Test a CSS media type/query in JS. Authors & copyright (c) 2012: Scott Jehl, Paul Irish, Nicholas Zakas. Dual MIT/BSD license */
 /*! NOTE: If you're already including a window.matchMedia polyfill via Modernizr or otherwise, you don't need this part */
-(function(win) {
-  win.matchMedia = win.matchMedia || function(doc, undefined) {
-    "use strict";
+(function(w) {
+  "use strict";
+  w.matchMedia = w.matchMedia || function(doc, undefined) {
     var bool, docElem = doc.documentElement, refNode = docElem.firstElementChild || docElem.firstChild, fakeBody = doc.createElement("body"), div = doc.createElement("div");
     div.id = "mq-test-1";
     div.style.cssText = "position:absolute;top:-100em";
@@ -18,7 +18,7 @@
         media: q
       };
     };
-  }(win.document);
+  }(w.document);
 })(this);
 
 /*! Respond.js v1.3.1: min/max-width media query polyfill. (c) Scott Jehl. MIT Lic. j.mp/respondjs  */
@@ -32,12 +32,14 @@
     return;
   }
   var doc = win.document, docElem = doc.documentElement, mediastyles = [], rules = [], appendedEls = [], parsedSheets = {}, resizeThrottle = 30, head = doc.getElementsByTagName("head")[0] || docElem, base = doc.getElementsByTagName("base")[0], links = head.getElementsByTagName("link"), requestQueue = [], lastCall, resizeDefer, eminpx, getEmValue = function() {
-    var ret, div = doc.createElement("div"), body = doc.body, fakeUsed = false;
+    var ret, div = doc.createElement("div"), body = doc.body, originalHTMLFontSize = docElem.style.fontSize, originalBodyFontSize = body && body.style.fontSize, fakeUsed = false;
     div.style.cssText = "position:absolute;font-size:1em;width:1em";
     if (!body) {
       body = fakeUsed = doc.createElement("body");
       body.style.background = "none";
     }
+    docElem.style.fontSize = "100%";
+    body.style.fontSize = "100%";
     body.appendChild(div);
     docElem.insertBefore(body, docElem.firstChild);
     ret = div.offsetWidth;
@@ -46,6 +48,8 @@
     } else {
       body.removeChild(div);
     }
+    docElem.style.fontSize = originalHTMLFontSize;
+    body.style.fontSize = originalBodyFontSize;
     ret = eminpx = parseFloat(ret);
     return ret;
   }, applyMedia = function(fromResize) {
