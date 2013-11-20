@@ -5,6 +5,9 @@ module.exports = function(grunt) {
 	grunt.initConfig({
 		uglify: {
 			target: {
+				options: {
+					preserveComments: 'some'
+				},
 				files: {
 					'respond.min.js': ['respond.src.js']
 				}
