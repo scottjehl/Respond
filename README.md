@@ -70,6 +70,10 @@ Some notes to keep in mind:
 
 - Due to security restrictions, some browsers may not allow this script to work on file:// urls (because it uses xmlHttpRequest). Run it on a web server.
 
+- If the request for the CSS file that includes MQ-specific styling is
+  behind a redirect, Respond.js will fail silently. CSS files should
+respond with a 200 status.
+
 - Currently, media attributes on link elements are supported, but only if the linked stylesheet contains no media queries. If it does contain queries, the media attribute will be ignored and the internal queries will be parsed normally. In other words, @media statements in the CSS take priority.
 
 - Reportedly, if CSS files are encoded in UTF-8 with Byte-Order-Mark (BOM), they will not work with Respond.js in IE7 or IE8. Noted in issue #97
