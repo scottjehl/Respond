@@ -304,6 +304,9 @@
 	//expose update for re-running respond later on
 	respond.update = ripCSS;
 
+	//expose getEmValue
+	respond.getEmValue = getEmValue;
+
 	//adjust on resize
 	function callMedia(){
 		applyMedia( true );
