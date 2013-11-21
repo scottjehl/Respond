@@ -70,7 +70,7 @@
   };
 })(this);
 
-/*! Respond.js v1.3.1: min/max-width media query polyfill. (c) Scott Jehl. MIT Lic. j.mp/respondjs  */
+/*! Respond.js v1.4.0: min/max-width media query polyfill. (c) Scott Jehl. MIT Lic. j.mp/respondjs  */
 (function(w) {
   "use strict";
   var respond = {};
