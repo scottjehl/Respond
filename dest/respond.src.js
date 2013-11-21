@@ -27,7 +27,7 @@
   var respond = {};
   w.respond = respond;
   respond.update = function() {};
-  respond.mediaQueriesSupported = w.matchMedia && w.matchMedia("only all").matches;
+  respond.mediaQueriesSupported = w.matchMedia && w.matchMedia("only all") !== null && w.matchMedia("only all").matches;
   if (respond.mediaQueriesSupported) {
     return;
   }
