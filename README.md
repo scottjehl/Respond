@@ -89,6 +89,8 @@ respond with a 200 status.
 
 - Internet Explorer 9 supports css3 media queries, but not within frames when the CSS containing the media query is in an external file (this appears to be a bug in IE9 — see http://stackoverflow.com/questions/10316247/media-queries-fail-inside-ie9-iframe). See this commit for a fix if you're having this problem. https://github.com/NewSignature/Respond/commit/1c86c66075f0a2099451eb426702fc3540d2e603
 
+- Nested Media Queries are not supported
+
 
 How's it work?
 ======
