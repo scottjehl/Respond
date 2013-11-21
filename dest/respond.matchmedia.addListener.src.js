@@ -244,6 +244,7 @@
   };
   ripCSS();
   respond.update = ripCSS;
+  respond.getEmValue = getEmValue;
   function callMedia() {
     applyMedia(true);
   }
