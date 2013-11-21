@@ -11,7 +11,7 @@
 	respond.update = function(){};
 
 	//expose media query support flag for external use
-	respond.mediaQueriesSupported = w.matchMedia && w.matchMedia( "only all" ).matches;
+	respond.mediaQueriesSupported = w.matchMedia && w.matchMedia( "only all" ) !== null && w.matchMedia( "only all" ).matches;
 
 	//if media queries are supported, exit here
 	if( respond.mediaQueriesSupported ){
