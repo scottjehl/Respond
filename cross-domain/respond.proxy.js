@@ -102,7 +102,7 @@
 			
 			var thislink	= links[i],
 				href		= links[i].href,
-				extreg		= (/^([a-zA-Z]+?:(\/\/)?(www\.)?)/).test( href ),
+				extreg		= (/^([a-zA-Z:]*\/\/(www\.)?)/).test( href ),
 				ext			= (baseElem && !extreg) || extreg;
 
 			//make sure it's an external stylesheet
