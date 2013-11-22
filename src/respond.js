@@ -18,6 +18,16 @@
 		return;
 	}
 
+	// expose for testing
+	respond.regex = {
+		media: /@media[^\{]+\{([^\{\}]*\{[^\}\{]*\})+/gi,
+		urls: /(url\()['"]?([^\/\)'"][^:\)'"]+)['"]?(\))/g,
+		findStyles: /@media *([^\{]+)\{([\S\s]+?)$/,
+		only: /(only\s+)?([a-zA-Z]+)\s?/,
+		minw: /\(min\-width\s*:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/,
+		maxw: /\(max\-width\s*:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/
+	};
+
 	//define vars
 	var doc = w.document,
 		docElem = doc.documentElement,
@@ -163,14 +173,14 @@
 		},
 		//find media blocks in css text, convert to style blocks
 		translate = function( styles, href, media ){
-			var qs = styles.match(  /@media[^\{]+\{([^\{\}]*\{[^\}\{]*\})+/gi ),
+			var qs = styles.match( respond.regex.media ),
 				ql = qs && qs.length || 0;
 
 			//try to get CSS path
 			href = href.substring( 0, href.lastIndexOf( "/" ) );
 
 			var repUrls = function( css ){
-					return css.replace( /(url\()['"]?([^\/\)'"][^:\)'"]+)['"]?(\))/g, "$1" + href + "$2$3" );
+					return css.replace( respond.regex.urls, "$1" + href + "$2$3" );
 				},
 				useMedia = !ql && media;
 
@@ -195,7 +205,7 @@
 				}
 				//parse for styles
 				else{
-					fullq = qs[ i ].match( /@media *([^\{]+)\{([\S\s]+?)$/ ) && RegExp.$1;
+					fullq = qs[ i ].match( respond.regex.findStyles ) && RegExp.$1;
 					rules.push( RegExp.$2 && repUrls( RegExp.$2 ) );
 				}
 
@@ -205,11 +215,11 @@
 				for( var j = 0; j < eql; j++ ){
 					thisq = eachq[ j ];
 					mediastyles.push( {
-						media : thisq.split( "(" )[ 0 ].match( /(only\s+)?([a-zA-Z]+)\s?/ ) && RegExp.$2 || "all",
+						media : thisq.split( "(" )[ 0 ].match( respond.regex.only ) && RegExp.$2 || "all",
 						rules : rules.length - 1,
 						hasquery : thisq.indexOf("(") > -1,
-						minw : thisq.match( /\(min\-width\s*:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" ),
-						maxw : thisq.match( /\(max\-width\s*:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/ ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" )
+						minw : thisq.match( respond.regex.minw ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" ),
+						maxw : thisq.match( respond.regex.maxw ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" )
 					} );
 				}
 			}
@@ -300,6 +310,10 @@
 
 	//translate CSS
 	ripCSS();
+
+	//expose for testing
+	respond.ajax = ajax;
+	respond.queue = requestQueue;
 
 	//expose update for re-running respond later on
 	respond.update = ripCSS;
