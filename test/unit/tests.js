@@ -154,15 +154,18 @@ window.onload = function(){
 			}, 900);
 		});
 
-		asyncTest( 'Test keyframe animation inside of media query', function() { 
-			queueRequest( function() {
-				respond.ajax( getNormalizedUrl( 'test-with-keyframe.css' ),
-					function( data ) {
-						ok( data.replace( respond.regex.keyframes ).match( respond.regex.media ), 'A keyframe animation doesn\'t bust the media regex.' );
-						start();
-					});
+		// This test will only run on IE8 since the respond ajax stuff isn’t exposed yet
+		if( ie <= 8 ) {
+			asyncTest( 'Test keyframe animation inside of media query', function() { 
+				queueRequest( function() {
+					respond.ajax( getNormalizedUrl( 'test-with-keyframe.css' ),
+						function( data ) {
+							ok( data.replace( respond.regex.keyframes ).match( /@media[^\{]+\{([^\{\}]*\{[^\}\{]*\})+/gi ), 'A keyframe animation doesn\'t bust the media regex.' );
+							start();
+						});
+				});
 			});
-		});
+		}
 	}
 	
 };
