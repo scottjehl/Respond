@@ -4,6 +4,21 @@
 
 window.onload = function(){
 
+	function getNormalizedUrl( filename ) {
+		var url = window.location.href;
+		return url.substr( 0, url.lastIndexOf( '/' ) + 1 ) + ( filename || '' );
+	}
+
+	// ajax doesn’t finish if you queue them while respond is already ajaxing
+	function queueRequest( callback ) {
+		var clearQueue = window.setInterval( function() {
+			if( !respond.queue.length ) {
+				window.clearInterval( clearQueue );
+				callback();
+			}
+		}, 50 );
+	}
+
 	if( !window.opener ){
 
 		document.documentElement.className = "launcher";
@@ -138,7 +153,16 @@ window.onload = function(){
 				start();
 			}, 900);
 		});
-		
+
+		asyncTest( 'Test keyframe animation inside of media query', function() { 
+			queueRequest( function() {
+				respond.ajax( getNormalizedUrl( 'test-with-keyframe.css' ),
+					function( data ) {
+						ok( data.replace( respond.regex.keyframes ).match( respond.regex.media ), 'A keyframe animation doesn\'t bust the media regex.' );
+						start();
+					});
+			});
+		});
 	}
 	
 };
