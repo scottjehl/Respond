@@ -84,7 +84,9 @@
 
 			// restore the original values
 			docElem.style.fontSize = originalHTMLFontSize;
-			body.style.fontSize = originalBodyFontSize;
+			if( originalBodyFontSize ) {
+				body.style.fontSize = originalBodyFontSize;
+			}
 
 
 			//also update eminpx before returning
