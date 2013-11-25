@@ -113,7 +113,7 @@ window.onload = function(){
 		
 		
 		asyncTest( "styles within a min-width media query with an \"only\" keyword apply properly", function() { 
-			window.resizeTo(650,800);
+			window.resizeTo(660,800);
 			setTimeout(function(){
 				strictEqual( getWidth(), 250, "testelem is 250px wide when window is 650px wide" );
 				start();
@@ -123,7 +123,7 @@ window.onload = function(){
 		asyncTest( "styles within a media query with a one true query among other false queries apply properly", function() { 
 			window.resizeTo(800,800);
 			setTimeout(function(){
-				strictEqual( getWidth(), 350, "testelem is 350px wide when window is 750px wide" );
+				strictEqual( getWidth(), 350, "testelem is 350px wide when window is > 620px wide" );
 				start();
 			}, 900);
 		});
