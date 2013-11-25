@@ -10,13 +10,43 @@
 	//define update even in native-mq-supporting browsers, to avoid errors
 	respond.update = function(){};
 
-	//expose media query support flag for external use
-	respond.mediaQueriesSupported = w.matchMedia && w.matchMedia( "only all" ) !== null && w.matchMedia( "only all" ).matches;
+	//define ajax obj
+	var requestQueue = [],
+		xmlHttp = (function() {
+			var xmlhttpmethod = false;
+			try {
+				xmlhttpmethod = new w.XMLHttpRequest();
+			}
+			catch( e ){
+				xmlhttpmethod = new w.ActiveXObject( "Microsoft.XMLHTTP" );
+			}
+			return function(){
+				return xmlhttpmethod;
+			};
+		})(),
 
-	//if media queries are supported, exit here
-	if( respond.mediaQueriesSupported ){
-		return;
-	}
+		//tweaked Ajax functions from Quirksmode
+		ajax = function( url, callback ) {
+			var req = xmlHttp();
+			if (!req){
+				return;
+			}
+			req.open( "GET", url, true );
+			req.onreadystatechange = function () {
+				if ( req.readyState !== 4 || req.status !== 200 && req.status !== 304 ){
+					return;
+				}
+				callback( req.responseText );
+			};
+			if ( req.readyState === 4 ){
+				return;
+			}
+			req.send( null );
+		};
+
+	//expose for testing
+	respond.ajax = ajax;
+	respond.queue = requestQueue;
 
 	// expose for testing
 	respond.regex = {
@@ -29,6 +59,14 @@
 		maxw: /\(max\-width\s*:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/
 	};
 
+	//expose media query support flag for external use
+	respond.mediaQueriesSupported = w.matchMedia && w.matchMedia( "only all" ) !== null && w.matchMedia( "only all" ).matches;
+
+	//if media queries are supported, exit here
+	if( respond.mediaQueriesSupported ){
+		return;
+	}
+
 	//define vars
 	var doc = w.document,
 		docElem = doc.documentElement,
@@ -40,7 +78,6 @@
 		head = doc.getElementsByTagName( "head" )[0] || docElem,
 		base = doc.getElementsByTagName( "base" )[0],
 		links = head.getElementsByTagName( "link" ),
-		requestQueue = [],
 
 		lastCall,
 		resizeDefer,
@@ -230,39 +267,6 @@
 			applyMedia();
 		},
 
-		//define ajax obj
-		xmlHttp = (function() {
-			var xmlhttpmethod = false;
-			try {
-				xmlhttpmethod = new w.XMLHttpRequest();
-			}
-			catch( e ){
-				xmlhttpmethod = new w.ActiveXObject( "Microsoft.XMLHTTP" );
-			}
-			return function(){
-				return xmlhttpmethod;
-			};
-		})(),
-
-		//tweaked Ajax functions from Quirksmode
-		ajax = function( url, callback ) {
-			var req = xmlHttp();
-			if (!req){
-				return;
-			}
-			req.open( "GET", url, true );
-			req.onreadystatechange = function () {
-				if ( req.readyState !== 4 || req.status !== 200 && req.status !== 304 ){
-					return;
-				}
-				callback( req.responseText );
-			};
-			if ( req.readyState === 4 ){
-				return;
-			}
-			req.send( null );
-		},
-
 		//recurse through request queue, get css text
 		makeRequests = function(){
 			if( requestQueue.length ){
@@ -313,10 +317,6 @@
 
 	//translate CSS
 	ripCSS();
-
-	//expose for testing
-	respond.ajax = ajax;
-	respond.queue = requestQueue;
 
 	//expose update for re-running respond later on
 	respond.update = ripCSS;
