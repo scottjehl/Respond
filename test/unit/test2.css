@@ -1,5 +1,5 @@
 /* this stylesheet was referenced via a link that had a media attr defined
-it should only apply on window > 1200px */
+it should only apply on window > 950px */
 #testelem {
 	width: 16px;
 }
