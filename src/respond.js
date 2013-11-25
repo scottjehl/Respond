@@ -55,8 +55,8 @@
 		urls: /(url\()['"]?([^\/\)'"][^:\)'"]+)['"]?(\))/g,
 		findStyles: /@media *([^\{]+)\{([\S\s]+?)$/,
 		only: /(only\s+)?([a-zA-Z]+)\s?/,
-		minw: /\(min\-width\s*:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/,
-		maxw: /\(max\-width\s*:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/
+		minw: /\([\s]*min\-width\s*:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/,
+		maxw: /\([\s]*max\-width\s*:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/
 	};
 
 	//expose media query support flag for external use

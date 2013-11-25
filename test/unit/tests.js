@@ -166,6 +166,18 @@ window.onload = function(){
 					});
 			});
 		});
+
+		test( 'Test spaces around min-width/max-width', function() {
+			ok( '@media only screen and (min-width: 1px) { }'.match( respond.regex.maxw ) === null );
+			ok( '@media only screen and ( min-width: 1px ) { }'.match( respond.regex.maxw ) === null );
+			ok( '@media only screen and (min-width: 1px) { }'.match( respond.regex.minw ).length );
+			ok( '@media only screen and ( min-width: 1px ) { }'.match( respond.regex.minw ).length );
+
+			ok( '@media only screen and (max-width: 1280px) { }'.match( respond.regex.minw ) === null );
+			ok( '@media only screen and ( max-width: 1280px ) { }'.match( respond.regex.minw ) === null );
+			ok( '@media only screen and (max-width: 1280px) { }'.match( respond.regex.maxw ).length );
+			ok( '@media only screen and ( max-width: 1280px ) { }'.match( respond.regex.maxw ).length );
+		});
 	}
 	
 };
