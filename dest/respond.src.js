@@ -27,10 +27,35 @@
   var respond = {};
   w.respond = respond;
   respond.update = function() {};
-  respond.mediaQueriesSupported = w.matchMedia && w.matchMedia("only all") !== null && w.matchMedia("only all").matches;
-  if (respond.mediaQueriesSupported) {
-    return;
-  }
+  var requestQueue = [], xmlHttp = function() {
+    var xmlhttpmethod = false;
+    try {
+      xmlhttpmethod = new w.XMLHttpRequest();
+    } catch (e) {
+      xmlhttpmethod = new w.ActiveXObject("Microsoft.XMLHTTP");
+    }
+    return function() {
+      return xmlhttpmethod;
+    };
+  }(), ajax = function(url, callback) {
+    var req = xmlHttp();
+    if (!req) {
+      return;
+    }
+    req.open("GET", url, true);
+    req.onreadystatechange = function() {
+      if (req.readyState !== 4 || req.status !== 200 && req.status !== 304) {
+        return;
+      }
+      callback(req.responseText);
+    };
+    if (req.readyState === 4) {
+      return;
+    }
+    req.send(null);
+  };
+  respond.ajax = ajax;
+  respond.queue = requestQueue;
   respond.regex = {
     media: /@media[^\{]+\{([^\{\}]*\{[^\}\{]*\})+/gi,
     keyframes: /@.*keyframes[^\{]+\{(?:[^\{\}]*\{[^\}\{]*\})+[^\}]+\}/gi,
@@ -40,7 +65,11 @@
     minw: /\(min\-width\s*:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/,
     maxw: /\(max\-width\s*:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/
   };
-  var doc = w.document, docElem = doc.documentElement, mediastyles = [], rules = [], appendedEls = [], parsedSheets = {}, resizeThrottle = 30, head = doc.getElementsByTagName("head")[0] || docElem, base = doc.getElementsByTagName("base")[0], links = head.getElementsByTagName("link"), requestQueue = [], lastCall, resizeDefer, eminpx, getEmValue = function() {
+  respond.mediaQueriesSupported = w.matchMedia && w.matchMedia("only all") !== null && w.matchMedia("only all").matches;
+  if (respond.mediaQueriesSupported) {
+    return;
+  }
+  var doc = w.document, docElem = doc.documentElement, mediastyles = [], rules = [], appendedEls = [], parsedSheets = {}, resizeThrottle = 30, head = doc.getElementsByTagName("head")[0] || docElem, base = doc.getElementsByTagName("base")[0], links = head.getElementsByTagName("link"), lastCall, resizeDefer, eminpx, getEmValue = function() {
     var ret, div = doc.createElement("div"), body = doc.body, originalHTMLFontSize = docElem.style.fontSize, originalBodyFontSize = body && body.style.fontSize, fakeUsed = false;
     div.style.cssText = "position:absolute;font-size:1em;width:1em";
     if (!body) {
@@ -58,7 +87,9 @@
       body.removeChild(div);
     }
     docElem.style.fontSize = originalHTMLFontSize;
-    body.style.fontSize = originalBodyFontSize;
+    if (originalBodyFontSize) {
+      body.style.fontSize = originalBodyFontSize;
+    }
     ret = eminpx = parseFloat(ret);
     return ret;
   }, applyMedia = function(fromResize) {
@@ -143,32 +174,6 @@
       }
     }
     applyMedia();
-  }, xmlHttp = function() {
-    var xmlhttpmethod = false;
-    try {
-      xmlhttpmethod = new w.XMLHttpRequest();
-    } catch (e) {
-      xmlhttpmethod = new w.ActiveXObject("Microsoft.XMLHTTP");
-    }
-    return function() {
-      return xmlhttpmethod;
-    };
-  }(), ajax = function(url, callback) {
-    var req = xmlHttp();
-    if (!req) {
-      return;
-    }
-    req.open("GET", url, true);
-    req.onreadystatechange = function() {
-      if (req.readyState !== 4 || req.status !== 200 && req.status !== 304) {
-        return;
-      }
-      callback(req.responseText);
-    };
-    if (req.readyState === 4) {
-      return;
-    }
-    req.send(null);
   }, makeRequests = function() {
     if (requestQueue.length) {
       var thisRequest = requestQueue.shift();
@@ -203,8 +208,6 @@
     makeRequests();
   };
   ripCSS();
-  respond.ajax = ajax;
-  respond.queue = requestQueue;
   respond.update = ripCSS;
   respond.getEmValue = getEmValue;
   function callMedia() {
