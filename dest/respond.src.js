@@ -79,7 +79,9 @@
     docElem.style.fontSize = "100%";
     body.style.fontSize = "100%";
     body.appendChild(div);
-    docElem.insertBefore(body, docElem.firstChild);
+    if (fakeUsed) {
+      docElem.insertBefore(body, docElem.firstChild);
+    }
     ret = div.offsetWidth;
     if (fakeUsed) {
       docElem.removeChild(body);
