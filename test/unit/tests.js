@@ -161,10 +161,16 @@ window.onload = function(){
 			queueRequest( function() {
 				respond.ajax( getNormalizedUrl( 'test-with-keyframe.css' ),
 					function( data ) {
-						ok( data.replace( respond.regex.keyframes ).match( /@media[^\{]+\{([^\{\}]*\{[^\}\{]*\})+/gi ), 'A keyframe animation doesn\'t bust the media regex.' );
+						ok( data.replace( respond.regex.keyframes, '' ).match( respond.regex.media ), 'A keyframe animation doesn\'t bust the media regex.' );
 						start();
 					});
 			});
+		});
+
+		test( 'Issue #242 overly agressive keyframes regex', function() {
+			strictEqual( '@media(q1){ @keyframes abc{ from{ }to{ } } } @media(q2){}'.replace( respond.regex.keyframes, '' ), '@media(q1){  } @media(q2){}' );
+			strictEqual( '@media(q1){} @keyframes abc{ from{ }to{ } } @media(q2){}'.replace( respond.regex.keyframes, '' ), '@media(q1){}  @media(q2){}' );
+			strictEqual( '@media(q1){} @media(q2){ @keyframes abc{ from{ }to{ } } }'.replace( respond.regex.keyframes, '' ), '@media(q1){} @media(q2){  }' );
 		});
 
 		test( 'Test spaces around min-width/max-width', function() {
