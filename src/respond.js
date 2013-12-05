@@ -187,7 +187,7 @@
 					}
 
 					// if there's no media query at all (the () part), or min or max is not null, and if either is present, they're true
-					if( !thisstyle.hasquery || ( !minwnull || !maxwnull ) && ( minwnull || currWidth >= minw ) && ( maxwnull || currWidth <= maxw ) || ( !minhnull || !maxhnull ) && ( minhnull || currHeight >= minh ) && ( maxhnull || currHeight <= maxh ) ){
+					if( !thisstyle.hasquery || ( !minwnull || !maxwnull || !minhnull || !maxhnull ) && ( minwnull || currWidth >= minw ) && ( maxwnull || currWidth <= maxw ) && ( minhnull || currHeight >= minh ) && ( maxhnull || currHeight <= maxh ) ){
 						if( !styleBlocks[ thisstyle.media ] ){
 							styleBlocks[ thisstyle.media ] = [];
 						}
