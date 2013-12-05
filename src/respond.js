@@ -56,7 +56,9 @@
 		findStyles: /@media *([^\{]+)\{([\S\s]+?)$/,
 		only: /(only\s+)?([a-zA-Z]+)\s?/,
 		minw: /\([\s]*min\-width\s*:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/,
-		maxw: /\([\s]*max\-width\s*:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/
+		maxw: /\([\s]*max\-width\s*:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/,
+		minh: /\([\s]*min\-height\s*:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/,
+		maxh: /\([\s]*max\-height\s*:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/
 	};
 
 	//expose media query support flag for external use
@@ -135,9 +137,12 @@
 
 		//enable/disable styles
 		applyMedia = function( fromResize ){
-			var name = "clientWidth",
-				docElemProp = docElem[ name ],
-				currWidth = doc.compatMode === "CSS1Compat" && docElemProp || doc.body[ name ] || docElemProp,
+			var wname = "clientWidth",
+				docElemPropW = docElem[ wname ],
+				currWidth = doc.compatMode === "CSS1Compat" && docElemPropW || doc.body[ wname ] || docElemPropW,
+				hname = "clientHeight",
+				docElemPropH = docElem[ hname ],
+				currHeight = doc.compatMode === "CSS1Compat" && docElemPropH || doc.body[ hname ] || docElemPropH,
 				styleBlocks	= {},
 				lastLink = links[ links.length-1 ],
 				now = (new Date()).getTime();
@@ -155,21 +160,34 @@
 			for( var i in mediastyles ){
 				if( mediastyles.hasOwnProperty( i ) ){
 					var thisstyle = mediastyles[ i ],
-						min = thisstyle.minw,
-						max = thisstyle.maxw,
-						minnull = min === null,
-						maxnull = max === null,
+						minw = thisstyle.minw,
+						maxw = thisstyle.maxw,
+						minh = thisstyle.minh,
+						maxh = thisstyle.maxh,
+						minwnull = minw === null,
+						maxwnull = maxw === null,
+						minhnull = minh === null,
+						maxhnull = maxh === null,
 						em = "em";
 
-					if( !!min ){
-						min = parseFloat( min ) * ( min.indexOf( em ) > -1 ? ( eminpx || getEmValue() ) : 1 );
+					// widths
+					if( !!minw ){
+						minw = parseFloat( minw ) * ( minw.indexOf( em ) > -1 ? ( eminpx || getEmValue() ) : 1 );
 					}
-					if( !!max ){
-						max = parseFloat( max ) * ( max.indexOf( em ) > -1 ? ( eminpx || getEmValue() ) : 1 );
+					if( !!maxw ){
+						maxw = parseFloat( maxw ) * ( maxw.indexOf( em ) > -1 ? ( eminpx || getEmValue() ) : 1 );
+					}
+
+					// heights
+					if( !!minh ){
+						minh = parseFloat( minh ) * ( minh.indexOf( em ) > -1 ? ( eminpx || getEmValue() ) : 1 );
+					}
+					if( !!maxh ){
+						maxh = parseFloat( maxh ) * ( maxh.indexOf( em ) > -1 ? ( eminpx || getEmValue() ) : 1 );
 					}
 
 					// if there's no media query at all (the () part), or min or max is not null, and if either is present, they're true
-					if( !thisstyle.hasquery || ( !minnull || !maxnull ) && ( minnull || currWidth >= min ) && ( maxnull || currWidth <= max ) ){
+					if( !thisstyle.hasquery || ( !minwnull || !maxwnull ) && ( minwnull || currWidth >= minw ) && ( maxwnull || currWidth <= maxw ) || ( !minhnull || !maxhnull ) && ( minhnull || currHeight >= minh ) && ( maxhnull || currHeight <= maxh ) ){
 						if( !styleBlocks[ thisstyle.media ] ){
 							styleBlocks[ thisstyle.media ] = [];
 						}
@@ -260,7 +278,9 @@
 						rules : rules.length - 1,
 						hasquery : thisq.indexOf("(") > -1,
 						minw : thisq.match( respond.regex.minw ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" ),
-						maxw : thisq.match( respond.regex.maxw ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" )
+						maxw : thisq.match( respond.regex.maxw ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" ),
+						minh : thisq.match( respond.regex.minh ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" ),
+						maxh : thisq.match( respond.regex.maxh ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" )
 					} );
 				}
 			}

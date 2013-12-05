@@ -78,3 +78,17 @@ a {
 		background: navy;
 	}
 }
+
+/** MIN HEIGHT **/
+@media screen and (min-height: 500px){
+	body {
+		font-family: serif;
+	}
+}
+
+/** MAX HEIGHT **/
+@media screen and (max-height: 900px){
+	body {
+		font-style: italic;
+	}
+}
