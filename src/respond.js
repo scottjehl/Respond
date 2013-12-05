@@ -311,12 +311,10 @@
 				var sheet = links[ i ],
 				href = sheet.href,
 				media = sheet.media,
-				isCSS = sheet.rel && sheet.rel.toLowerCase() === "stylesheet",
-				// check this stylesheet hasn't been excluded
-				ignore = sheet.getAttribute('data-no-respond');
+				isCSS = sheet.rel && sheet.rel.toLowerCase() === "stylesheet";
 
 				//only links plz and prevent re-parsing
-				if( !!href && isCSS && !parsedSheets[ href ] && ignore === null ){
+				if( !!href && isCSS && !parsedSheets[ href ] ){
 					// selectivizr exposes css through the rawCssText expando
 					if (sheet.styleSheet && sheet.styleSheet.rawCssText) {
 						translate( sheet.styleSheet.rawCssText, href, media );
