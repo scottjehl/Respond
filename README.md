@@ -15,8 +15,7 @@ If you're unfamiliar with the concepts surrounding Responsive Web Design, you ca
 Usage Instructions
 ======
 
-1. Craft your CSS with min/max-width media queries to adapt your layout from mobile (first) all the way up to desktop
-
+1. Craft your CSS with min/max-width and min/max-height media queries to adapt your layout from mobile (first) all the way up to desktop
 
 <pre>
     @media screen and (min-width: 480px){
@@ -28,6 +27,11 @@ Usage Instructions
 
 3. Crack open Internet Explorer and pump fists in delight
 
+If you wish to exclude a stylesheet from the magic, for example if you are using multiple stylesheets (tut tut) and one doesn't contain any media queries, then simply add a 'data-no-respond' attribute to the stylesheet's link element:
+
+<pre>
+	&lt;link href="styles.css" rel="stylesheet" data-no-respond /&gt;
+</pre>
 
 CDN/X-Domain Setup
 ======
@@ -61,7 +65,7 @@ Support & Caveats
 
 Some notes to keep in mind:
 
-- This script's focus is purposely very narrow: only min-width and max-width media queries and all media types (screen, print, etc) are translated to non-supporting browsers. I wanted to keep things simple for filesize, maintenance, and performance, so I've intentionally limited support to queries that are essential to building a (mobile-first) responsive design. In the future, I may rework things a bit to include a hook for patching-in additional media query features - stay tuned!
+- This script's focus is purposely very narrow: only min-width, max-width, min-height and max-height media queries and all media types (screen, print, etc) are translated to non-supporting browsers. I wanted to keep things simple for filesize, maintenance, and performance, so I've intentionally limited support to queries that are essential to building a (mobile-first) responsive design. In the future, I may rework things a bit to include a hook for patching-in additional media query features - stay tuned!
 
 - Browsers that natively support CSS3 Media Queries are opted-out of running this script as quickly as possible. In testing for support, all other browsers are subjected to a quick  test to determine whether they support media queries or not before proceeding to run the script. This test is now included separately at the top, and uses the window.matchMedia polyfill found here: https://github.com/paulirish/matchMedia.js . If you are already including this polyfill via Modernizr or otherwise, feel free to remove that part.
 
@@ -96,7 +100,7 @@ How's it work?
 ======
 Basically, the script loops through the CSS referenced in the page and runs a regular expression or two on their contents to find media queries and their associated blocks of CSS. In Internet Explorer, the content of the stylesheet is impossible to retrieve in its pre-parsed state (which in IE 8-, means its media queries are removed from the text), so Respond.js re-requests the CSS files using Ajax and parses the text response from there. Be sure to configure your CSS files' caching properly so that this re-request doesn't actually go to the server, hitting your browser cache instead.
 
-From there, each media query block is appended to the head in order via style elements, and those style elements are enabled and disabled (read: appended and removed from the DOM) depending on how their min/max width compares with the browser width. The media attribute on the style elements will match that of the query in the CSS, so it could be "screen", "projector", or whatever you want. Any relative paths contained in the CSS will be prefixed by their stylesheet's href, so image paths will direct to their proper destination
+From there, each media query block is appended to the head in order via style elements, and those style elements are enabled and disabled (read: appended and removed from the DOM) depending on how their min/max width/height compares with the browser width/height. The media attribute on the style elements will match that of the query in the CSS, so it could be "screen", "projector", or whatever you want. Any relative paths contained in the CSS will be prefixed by their stylesheet's href, so image paths will direct to their proper destination
 
 API Options?
 ======

@@ -5,6 +5,7 @@
 	<title>Respond JS Test Page</title>
 	<link href="test.css" rel="stylesheet"/>
 	<link href="test2.css" media="screen and (min-width: 37.5em)" rel="stylesheet"/> <!-- 37.5em = 600px @ 16px -->
+	<link href="test3.css" rel="stylesheet" data-no-respond/>
 	<script src="../dest/respond.src.js"></script>
 </head>
 <body>
@@ -15,6 +16,8 @@
 	<p>For a realistic use case for media queries: read up on <a href="http://www.alistapart.com/articles/responsive-web-design/">Responsive Web Design</a></p>
 
 	<p id="attribute-test">Media-attributes are working too! This should be visible above 37.5em.</p>
+
+	<p id="ignored">If you wish to ignore a stylesheet simply add a 'data-no-respond' attribute to the &lt;link&gt; element.</p>
 
 </body>
 </html>
