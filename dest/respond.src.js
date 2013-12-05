@@ -120,7 +120,7 @@
         if (!!maxh) {
           maxh = parseFloat(maxh) * (maxh.indexOf(em) > -1 ? eminpx || getEmValue() : 1);
         }
-        if (!thisstyle.hasquery || (!minwnull || !maxwnull) && (minwnull || currWidth >= minw) && (maxwnull || currWidth <= maxw) || (!minhnull || !maxhnull) && (minhnull || currHeight >= minh) && (maxhnull || currHeight <= maxh)) {
+        if (!thisstyle.hasquery || (!minwnull || !maxwnull || !minhnull || !maxhnull) && (minwnull || currWidth >= minw) && (maxwnull || currWidth <= maxw) && (minhnull || currHeight >= minh) && (maxhnull || currHeight <= maxh)) {
           if (!styleBlocks[thisstyle.media]) {
             styleBlocks[thisstyle.media] = [];
           }
