@@ -1,0 +1,15 @@
+@media (min-width: 1px) {
+
+	@-webkit-keyframes NAME-YOUR-ANIMATION {
+		0%   { opacity: 0; }
+		100% { opacity: 1; }
+	}
+	@keyframes NAME-YOUR-ANIMATION {
+		0%   { opacity: 0; }
+		100% { opacity: 1; }
+	}
+
+	body {
+		color: red;
+	}
+}
