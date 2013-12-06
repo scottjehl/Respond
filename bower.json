@@ -1,6 +1,6 @@
 {
   "name": "respond",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "main": "dest/respond.src.js",
   "description": "Fast and lightweight polyfill for min/max-width CSS3 Media Queries (for IE 6-8, and more)",
   "ignore": [
