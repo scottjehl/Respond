@@ -187,6 +187,7 @@
 					}
 				}
 			}
+			appendedEls.length = 0;
 
 			//inject active styles, grouped by media type
 			for( var k in styleBlocks ){
