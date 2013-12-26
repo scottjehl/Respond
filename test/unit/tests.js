@@ -197,6 +197,27 @@ window.onload = function(){
 			ok( '@media only screen and (max-width: 1280px) { }'.match( respond.regex.maxw ).length );
 			ok( '@media only screen and ( max-width: 1280px ) { }'.match( respond.regex.maxw ).length );
 		});
+
+		test( 'Issue #181: non-min-width and non-max-width queries', function() {
+			var others = ['(min--moz-device-pixel-ratio: 1.5)',
+				'(-moz-min-device-pixel-ratio: 1.5)',
+				'(-o-min-device-pixel-ratio: 1.5)',
+				'(-webkit-min-device-pixel-ratio: 1.5)',
+				'(min-device-pixel-ratio: 1.5)',
+				'(min-resolution: 1.5dppx)'],
+				str,
+				mq;
+
+			for( var j = 0, k = others.length; j<k; j++ ) {
+				str = '@media only screen and (max-width: 1319px) and ' + others[ j ] + ' {}';
+				mq = str.match( respond.regex.minmaxwh );
+				equal( mq && mq[ 0 ], '(max-width: 1319px)' );
+				equal( str.replace( respond.regex.minmaxwh, '' ).match( respond.regex.other )[ 0 ], others[ j ] );
+
+				equal( ( '@media only screen and (max-width: 1319px) and (min-width: 1px) and ' + others[ j ] + ' {}' ).replace( respond.regex.minmaxwh, '' ).match( respond.regex.other )[ 0 ], others[ j ] );
+				equal( ( '@media only screen and (max-width: 1319px) and (min-height: 1px) and ' + others[ j ] + ' {}' ).replace( respond.regex.minmaxwh, '' ).match( respond.regex.other )[ 0 ], others[ j ] );
+			}
+		});
 	}
 	
 };
