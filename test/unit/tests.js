@@ -197,6 +197,11 @@ window.onload = function(){
 			ok( '@media only screen and (max-width: 1280px) { }'.match( respond.regex.maxw ).length );
 			ok( '@media only screen and ( max-width: 1280px ) { }'.match( respond.regex.maxw ).length );
 		});
+
+		test( 'Issue #161: spaces around inside min-width/max-width', function() {
+			ok( '@media only screen and (min-width : 1px) { }'.match( respond.regex.min ) !== null );
+			ok( '@media only screen and (max-width : 1px ) { }'.match( respond.regex.maxw ) !== null );
+		});
 	}
 	
 };
