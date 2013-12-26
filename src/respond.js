@@ -52,6 +52,7 @@
 	respond.regex = {
 		media: /@media[^\{]+\{([^\{\}]*\{[^\}\{]*\})+/gi,
 		keyframes: /@(?:\-(?:o|moz|webkit)\-)?keyframes[^\{]+\{(?:[^\{\}]*\{[^\}\{]*\})+[^\}]*\}/gi,
+		comments: /\/\*[^*]*\*+([^/][^*]*\*+)*\//gi,
 		urls: /(url\()['"]?([^\/\)'"][^:\)'"]+)['"]?(\))/g,
 		findStyles: /@media *([^\{]+)\{([\S\s]+?)$/,
 		only: /(only\s+)?([a-zA-Z]+)\s?/,
@@ -216,7 +217,9 @@
 		},
 		//find media blocks in css text, convert to style blocks
 		translate = function( styles, href, media ){
-			var qs = styles.replace( respond.regex.keyframes, '' ).match( respond.regex.media ),
+			var qs = styles.replace( respond.regex.comments, '' )
+					.replace( respond.regex.keyframes, '' )
+					.match( respond.regex.media ),
 				ql = qs && qs.length || 0;
 
 			//try to get CSS path
