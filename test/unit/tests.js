@@ -198,9 +198,60 @@ window.onload = function(){
 			ok( '@media only screen and ( max-width: 1280px ) { }'.match( respond.regex.maxw ).length );
 		});
 
+
 		test( 'Issue #161: spaces around inside min-width/max-width', function() {
 			ok( '@media only screen and (min-width : 1px) { }'.match( respond.regex.min ) !== null );
 			ok( '@media only screen and (max-width : 1px ) { }'.match( respond.regex.maxw ) !== null );
+		});
+
+		test( 'Issue #181: non-min-width and non-max-width queries', function() {
+			var others = ['(min--moz-device-pixel-ratio: 1.5)',
+				'(-moz-min-device-pixel-ratio: 1.5)',
+				'(-o-min-device-pixel-ratio: 1.5)',
+				'(-webkit-min-device-pixel-ratio: 1.5)',
+				'(min-device-pixel-ratio: 1.5)',
+				'(min-resolution: 1.5dppx)'],
+				str,
+				mq;
+
+			for( var j = 0, k = others.length; j<k; j++ ) {
+				str = 'only screen and (max-width: 1319px) and ' + others[ j ] + ' {}';
+				mq = str.match( respond.regex.minmaxwh );
+				equal( mq && mq[ 0 ], '(max-width: 1319px)' );
+				equal( respond.unsupportedmq( str )[ 0 ], others[ j ] );
+
+				equal( ( 'only screen and (max-width: 1319px) and (min-width: 1px) and ' + others[ j ] + ' {}' ).replace( respond.regex.minmaxwh, '' ).match( respond.regex.other )[ 0 ], others[ j ] );
+				equal( ( 'only screen and (max-width: 1319px) and (min-height: 1px) and ' + others[ j ] + ' {}' ).replace( respond.regex.minmaxwh, '' ).match( respond.regex.other )[ 0 ], others[ j ] );
+			}
+		});
+
+		// At this point the media queries are already divided by commas
+		test( 'Issue #181: unsupported MQ tests', function() { 
+			// should pass
+			strictEqual( respond.unsupportedmq( '(min-width: 1151px)' ), null );
+			strictEqual( respond.unsupportedmq( 'all and (max-width: 699px) and (min-width: 520px)' ), null );
+			strictEqual( respond.unsupportedmq( 'print' ), null );
+
+			// source: http://www.w3.org/TR/css3-mediaqueries/
+			// should fail: looks for anything in parens that is not min/max-height/width
+			ok( respond.unsupportedmq( 'all and (orientation:portrait)' ) );
+			ok( respond.unsupportedmq( 'screen and (device-aspect-ratio: 16/9)' ) );
+			ok( respond.unsupportedmq( 'all and (color)' ) );
+			ok( respond.unsupportedmq( 'all and (min-color: 1)' ) );
+			ok( respond.unsupportedmq( 'all and (monochrome)' ) );
+			ok( respond.unsupportedmq( 'print and (min-resolution: 300dpi)' ) );
+			ok( respond.unsupportedmq( 'tv and (scan: progressive)' ) );
+			ok( respond.unsupportedmq( 'handheld and (grid) and (device-max-height: 7em)' ) );
+		});
+
+		asyncTest( 'Issue #181: full MQ with DPR', function() { 
+			queueRequest( function() {
+				respond.ajax( getNormalizedUrl( 'test-with-dpr.css' ),
+					function( data ) {
+						ok( respond.unsupportedmq( data ) );
+						start();
+					});
+			});
 		});
 	}
 	

@@ -78,3 +78,16 @@ a {
 		background: navy;
 	}
 }
+
+@media only screen and (min-width: 1250px) and (min--moz-device-pixel-ratio: 1.5),
+	only screen and (min-width: 1250px) and (-moz-min-device-pixel-ratio: 1.5),
+	only screen and (min-width: 1250px) and (-o-min-device-pixel-ratio: 3/2),
+	only screen and (min-width: 1250px) and (-webkit-min-device-pixel-ratio: 1.5),
+	only screen and (min-width: 1250px) and (min-device-pixel-ratio: 1.5),
+	only screen and (min-width: 1250px) and (min-resolution: 1.5dppx),
+	screen and (min-width: 1250px) {
+
+	body {
+		background-color: pink;
+	}
+}

@@ -1,0 +1,10 @@
+@media 
+only screen and (max-width: 1004px) and (min--moz-device-pixel-ratio: 1.5),
+only screen and (max-width: 1004px) and (-moz-min-device-pixel-ratio: 1.5),
+only screen and (max-width: 1004px) and (-o-min-device-pixel-ratio: 3/2),
+only screen and (max-width: 1004px) and (-webkit-min-device-pixel-ratio: 1.5),
+only screen and (max-width: 1004px) and (min-device-pixel-ratio: 1.5),
+only screen and (max-width: 1004px) and (min-resolution: 1.5dppx) {
+	
+	
+}
