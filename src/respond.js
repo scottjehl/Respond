@@ -42,13 +42,15 @@
 				return;
 			}
 			req.send( null );
+		},
+		isUnsupportedMediaQuery = function( query ) {
+			return query.replace( respond.regex.minmaxwh, '' ).match( respond.regex.other );
 		};
 
 	//expose for testing
 	respond.ajax = ajax;
 	respond.queue = requestQueue;
-
-	// expose for testing
+	respond.unsupportedmq = isUnsupportedMediaQuery;
 	respond.regex = {
 		media: /@media[^\{]+\{([^\{\}]*\{[^\}\{]*\})+/gi,
 		keyframes: /@(?:\-(?:o|moz|webkit)\-)?keyframes[^\{]+\{(?:[^\{\}]*\{[^\}\{]*\})+[^\}]*\}/gi,
@@ -263,7 +265,7 @@
 				for( var j = 0; j < eql; j++ ){
 					thisq = eachq[ j ];
 
-					if( thisq.replace( respond.regex.minmaxwh, '' ).match( respond.regex.other ) ) {
+					if( isUnsupportedMediaQuery( thisq ) ) {
 						continue;
 					}
 
