@@ -102,17 +102,23 @@
       return;
     }
     req.send(null);
+  }, isUnsupportedMediaQuery = function(query) {
+    return query.replace(respond.regex.minmaxwh, "").match(respond.regex.other);
   };
   respond.ajax = ajax;
   respond.queue = requestQueue;
+  respond.unsupportedmq = isUnsupportedMediaQuery;
   respond.regex = {
     media: /@media[^\{]+\{([^\{\}]*\{[^\}\{]*\})+/gi,
     keyframes: /@(?:\-(?:o|moz|webkit)\-)?keyframes[^\{]+\{(?:[^\{\}]*\{[^\}\{]*\})+[^\}]*\}/gi,
+    comments: /\/\*[^*]*\*+([^/][^*]*\*+)*\//gi,
     urls: /(url\()['"]?([^\/\)'"][^:\)'"]+)['"]?(\))/g,
     findStyles: /@media *([^\{]+)\{([\S\s]+?)$/,
     only: /(only\s+)?([a-zA-Z]+)\s?/,
-    minw: /\([\s]*min\-width\s*:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/,
-    maxw: /\([\s]*max\-width\s*:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/
+    minw: /\(\s*min\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/,
+    maxw: /\(\s*max\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/,
+    minmaxwh: /\(\s*m(in|ax)\-(height|width)\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/gi,
+    other: /\([^\)]*\)/g
   };
   respond.mediaQueriesSupported = w.matchMedia && w.matchMedia("only all") !== null && w.matchMedia("only all").matches;
   if (respond.mediaQueriesSupported) {
@@ -192,7 +198,7 @@
       }
     }
   }, translate = function(styles, href, media) {
-    var qs = styles.replace(respond.regex.keyframes, "").match(respond.regex.media), ql = qs && qs.length || 0;
+    var qs = styles.replace(respond.regex.comments, "").replace(respond.regex.keyframes, "").match(respond.regex.media), ql = qs && qs.length || 0;
     href = href.substring(0, href.lastIndexOf("/"));
     var repUrls = function(css) {
       return css.replace(respond.regex.urls, "$1" + href + "$2$3");
@@ -216,6 +222,9 @@
       eql = eachq.length;
       for (var j = 0; j < eql; j++) {
         thisq = eachq[j];
+        if (isUnsupportedMediaQuery(thisq)) {
+          continue;
+        }
         mediastyles.push({
           media: thisq.split("(")[0].match(respond.regex.only) && RegExp.$2 || "all",
           rules: rules.length - 1,
