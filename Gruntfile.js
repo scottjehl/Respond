@@ -5,14 +5,15 @@ module.exports = function(grunt) {
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
 		banner:
-						'/*! Respond.js v<%= pkg.version %>: <%= pkg.description %>' +
+						'/*! Respond.js v<%= pkg.version %>: <%= pkg.description %>\n' +
 						' * Copyright <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>\n' +
-						' * Licensed under <%= _.pluck(pkg.licenses, "url").join(", ") %>\n' +
-						' * <%= pkg.website %>' +
+						' * Licensed under <%= _.pluck(pkg.licenses, "type").join(", ") %>\n' + 
+						' * <%= pkg.homepageShortened %>' +
 						' */\n\n',
 		uglify: {
 			nonMinMatchMedia: {
 				options: {
+					banner: '<%= banner %>',
 					mangle: false,
 					compress: false,
 					preserveComments: 'some',
@@ -35,6 +36,7 @@ module.exports = function(grunt) {
 			},
 			nonMinMatchMediaListener: {
 				options: {
+					banner: '<%= banner %>',
 					mangle: false,
 					compress: false,
 					preserveComments: 'some',

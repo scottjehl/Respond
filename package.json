@@ -3,6 +3,7 @@
 	"description": "min/max-width media query polyfill",
 	"version": "1.4.2",
 	"homepage": "https://github.com/scottjehl/Respond",
+	"homepageShortened": "http://j.mp/respondjs",
 	"author": {
 		"name": "Scott Jehl",
 		"email": "scott@filamentgroup.com",
