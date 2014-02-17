@@ -304,7 +304,7 @@
 			for( var i = 0; i < links.length; i++ ){
 				var sheet = links[ i ],
 				parsedHref = href = sheet.href,
-				respondHref = sheet.getAttribute('respond-href'),
+				respondHref = sheet.getAttribute('data-respond-href'),
 				media = sheet.media,
 				isCSS = sheet.rel && sheet.rel.toLowerCase() === "stylesheet";
 
