@@ -303,7 +303,8 @@
 
 			for( var i = 0; i < links.length; i++ ){
 				var sheet = links[ i ],
-				parsedHref = href = sheet.href,
+				href = sheet.href,
+				parsedHref = href,
 				respondHref = sheet.getAttribute('data-respond-href'),
 				media = sheet.media,
 				isCSS = sheet.rel && sheet.rel.toLowerCase() === "stylesheet";
@@ -315,14 +316,14 @@
 						translate( sheet.styleSheet.rawCssText, href, media );
 						parsedSheets[ parsedHref ] = true;
 					} else {
-				        if (respondHref) {
-				            requestQueue.push({
-				            	href: respondHref,
-				            	media: media,
-				            	parsedHref: parsedHref
-				            });
-				        } else if( (!/^([a-zA-Z:]*\/\/)/.test( href ) && !base) ||
-							       href.replace( RegExp.$1, "" ).split( "/" )[0] === w.location.host ){
+						if (respondHref) {
+							requestQueue.push({
+								href: respondHref,
+								media: media,
+								parsedHref: parsedHref
+							});
+						} else if( (!/^([a-zA-Z:]*\/\/)/.test( href ) && !base) ||
+								   href.replace( RegExp.$1, "" ).split( "/" )[0] === w.location.host ){
 							// IE7 doesn't handle urls that start with '//' for ajax request
 							// manually add in the protocol
 							if ( href.substring(0,2) === "//" ) { href = w.location.protocol + href; }
