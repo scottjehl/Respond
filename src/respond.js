@@ -314,7 +314,6 @@
 					href = el.firstChild.href;
 				}
 
-
 				//only links plz and prevent re-parsing
 				if( !!href && isCSS && !parsedSheets[ href ] ){
 					// selectivizr exposes css through the rawCssText expando
