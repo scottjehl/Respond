@@ -307,6 +307,14 @@
 				media = sheet.media,
 				isCSS = sheet.rel && sheet.rel.toLowerCase() === "stylesheet";
 
+				// fixes #137 for IE6/7: qualifies href without additional request
+				if(!href.match('//')) {
+					var el= doc.createElement('div');
+					el.innerHTML= '<a href="' + href.split('&').join('&amp;').split('<').join('&lt;').split('"').join('&quot;') + '">x</a>';
+					href = el.firstChild.href;
+				}
+
+
 				//only links plz and prevent re-parsing
 				if( !!href && isCSS && !parsedSheets[ href ] ){
 					// selectivizr exposes css through the rawCssText expando

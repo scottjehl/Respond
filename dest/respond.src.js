@@ -204,6 +204,11 @@
   }, ripCSS = function() {
     for (var i = 0; i < links.length; i++) {
       var sheet = links[i], href = sheet.href, media = sheet.media, isCSS = sheet.rel && sheet.rel.toLowerCase() === "stylesheet";
+      if (!href.match("//")) {
+        var el = doc.createElement("div");
+        el.innerHTML = '<a href="' + href.split("&").join("&amp;").split("<").join("&lt;").split('"').join("&quot;") + '">x</a>';
+        href = el.firstChild.href;
+      }
       if (!!href && isCSS && !parsedSheets[href]) {
         if (sheet.styleSheet && sheet.styleSheet.rawCssText) {
           translate(sheet.styleSheet.rawCssText, href, media);
