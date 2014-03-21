@@ -271,8 +271,7 @@ window.matchMedia = window.matchMedia || (function( doc, undefined ) {
 			for( var k in styleBlocks ){
 				keys.push( k );
 			}
-			keys.reverse();
-			for( var l = 0; l < keys.length; l++ ){
+			for( var l = keys.length; l-- > 0;){
 				if( styleBlocks.hasOwnProperty( k ) ){
 					var ss = doc.createElement( "style" ),
 						css = styleBlocks[ k ].join( "\n" );
