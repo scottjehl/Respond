@@ -253,6 +253,12 @@ window.onload = function(){
 					});
 			});
 		});
+
+	test( 'Issue #271: fixes media query values without trailing unit', function() {
+		ok( '@media only screen and (min-width : 0) { }'.match( respond.regex.min ) !== null );
+	  ok( '@media only screen and (max-width : 0 ) { }'.match( respond.regex.max ) !== null );
+	});
+
 	}
 	
 };
