@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="utf-8" />
+	<!-- Change this to match your local server hostname and path -->
+	<base href="http://localhost/Respond/cross-domain/"><!--[if lte IE 6]></base><![endif]-->
+		<meta charset="utf-8" />
 	<title>Respond JS Test Page</title>
 	<link href="https://rawgithub.com/scottjehl/Respond/master/test/test.css" rel="stylesheet"/>
 	<link href="https://rawgithub.com/scottjehl/Respond/master/test/test2.css" media="screen and (min-width: 600px)" rel="stylesheet"/>
@@ -13,7 +15,7 @@
 	<script src="respond.proxy.js"></script>
 </head> 
 <body>
-	<p>This is a visual test file for cross-domain proxy.</p>
+	<p>This is a visual test file for cross-domain proxy and custom base tag. NB: For this test to work properly, you need to set the href attribute of the base tag to the fully-qualified path to cross-domain on your system, terminated with a slash (earlier versions of IE don't play nicely otherwise).</p>
 
 	<p>The media queries in the included CSS file simply change the body's background color depending on the browser width. If you see any colors aside from black, then the media queries are working in your browser. You can resize your browser window to see it change on the fly.</p>
 

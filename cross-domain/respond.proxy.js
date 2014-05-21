@@ -66,13 +66,15 @@
 		win.setTimeout(checkFrameName, 500);
 	}
 
+    // http://stackoverflow.com/a/472729
 	function checkBaseURL(href) {
-		if (baseElem && href.indexOf(baseElem.href) === -1) {
-			bref = (/\/$/).test(baseElem.href) ? baseElem.href : (baseElem.href + "/");
-			href = bref + href;
-		}
+        var el = document.createElement('div'),
+        escapedURL = href.split('&').join('&amp;').
+            split('<').join('&lt;').
+            split('"').join('&quot;');
 
-		return href;
+        el.innerHTML = '<a href="' + escapedURL + '">x</a>';
+        return el.firstChild.href;
 	}
 	
 	function checkRedirectURL() {
@@ -102,7 +104,7 @@
 			
 			var thislink	= links[i],
 				href		= links[i].href,
-				extreg		= (/^([a-zA-Z]+?:(\/\/)?(www\.)?)/).test( href ),
+				extreg		= (/^([a-zA-Z:]*\/\/(www\.)?)/).test( href ),
 				ext			= (baseElem && !extreg) || extreg;
 
 			//make sure it's an external stylesheet

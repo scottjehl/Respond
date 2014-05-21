@@ -1,0 +1,29 @@
+/* this is a comment
+	 *
+	 */
+
+@media (min-width: 1px) {
+
+	/* see issue #22 */
+	/* @media {} */
+	/* @media {
+	} */
+
+	/* this is a comment
+	 *
+	 */
+
+	/* * / /*
+		Will this strip right?
+	 */
+	body {
+		color: red;
+		/* TODO This edge case is not currently supported */
+		content: "content /* this should not strip */";
+	}
+
+	/* this is a comment */
+
+	/* see issue #22 */
+	/* @media */
+}
