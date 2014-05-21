@@ -9,7 +9,7 @@ The goal of this script is to provide a fast and lightweight (3kb minified / 1kb
 
 If you're unfamiliar with the concepts surrounding Responsive Web Design, you can read up [here](http://www.alistapart.com/articles/responsive-web-design/) and also [here](http://filamentgroup.com/examples/responsive-images/)
 
-[Demo page](https://rawgithub.com/scottjehl/Respond/master/test/test.html) (the colors change to show media queries working)
+[Demo page](http://scottjehl.github.io/Respond/test/test.html) (the colors change to show media queries working)
 
 
 Usage Instructions
