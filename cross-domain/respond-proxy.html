@@ -43,7 +43,14 @@
 				if (!req){
 					return;
 				}
-				req.open( "GET", url, true );
+
+				try {
+					req.open( "GET", url, true );
+				}
+				catch(e){
+					return;
+				}
+				
 				req.onreadystatechange = function () {
 					if ( req.readyState != 4 || req.status != 200 && req.status != 304 ){
 						return;
@@ -85,6 +92,11 @@
 			domain = query["url"];
 
 			if (css && domain) {
+
+				if (/^javascript:/.test(domain)) {
+					return;
+				}
+				
 				ajax(css, function (response) {
 					window.name = response;
 					window.location.href = domain;
