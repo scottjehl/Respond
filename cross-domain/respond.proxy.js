@@ -30,7 +30,7 @@
 			docElem.insertBefore(iframe, docElem.firstElementChild || docElem.firstChild );
 		}
 
-		iframe.src = checkBaseURL(proxyURL) + "?url=" + encode(redirectURL) + "&css=" + encode(checkBaseURL(url));
+		iframe.src = checkBaseURL(proxyURL) + (proxyURL.indexOf('?') === -1 ? '?' : '&')  + "url=" + encode(redirectURL) + "&css=" + encode(checkBaseURL(url));
 		
 		function checkFrameName() {
 			var cssText;
