@@ -72,6 +72,14 @@ window.onload = function(){
 			}, 900);
 		});
 		
+		asyncTest( 'styles with @import url notations are handled properly', function() {
+			window.resizeTo(300, 900);
+			setTimeout(function(){
+				strictEqual( getWidth(), 100, "testelem is 10px tall when window is 150px wide" );
+				start();
+			}, 900);
+		});
+		
 		asyncTest( 'styles within min-width media queries apply properly', function() { 
 			window.resizeTo(520,800);
 			setTimeout(function(){
@@ -179,7 +187,7 @@ window.onload = function(){
 					});
 			});
 		});
-
+		
 		test( 'Issue #242 overly agressive keyframes regex', function() {
 			strictEqual( '@media(q1){ @keyframes abc{ from{ }to{ } } } @media(q2){}'.replace( respond.regex.keyframes, '' ), '@media(q1){  } @media(q2){}' );
 			strictEqual( '@media(q1){} @keyframes abc{ from{ }to{ } } @media(q2){}'.replace( respond.regex.keyframes, '' ), '@media(q1){}  @media(q2){}' );

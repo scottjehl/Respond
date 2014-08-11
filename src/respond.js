@@ -2,7 +2,7 @@
 (function( w ){
 
 	"use strict";
-
+	
 	//exposed namespace
 	var respond = {};
 	w.respond = respond;
@@ -27,6 +27,11 @@
 
 		//tweaked Ajax functions from Quirksmode
 		ajax = function( url, callback ) {
+			if( typeof( ajaxCache[ url ] ) !== "undefined" ){
+				callback( ajaxCache[ url ] );
+				return;
+			}
+		
 			var req = xmlHttp();
 			if (!req){
 				return;
@@ -36,6 +41,7 @@
 				if ( req.readyState !== 4 || req.status !== 200 && req.status !== 304 ){
 					return;
 				}
+				ajaxCache[ url ] = req.responseText;
 				callback( req.responseText );
 			};
 			if ( req.readyState === 4 ){
@@ -57,6 +63,7 @@
 		comments: /\/\*[^*]*\*+([^/][^*]*\*+)*\//gi,
 		urls: /(url\()['"]?([^\/\)'"][^:\)'"]+)['"]?(\))/g,
 		findStyles: /@media *([^\{]+)\{([\S\s]+?)$/,
+		findImports: /@import url\(["']?([0-9a-zA-Z_\/=\.\-\?]+)["']?\)/g,
 		only: /(only\s+)?([a-zA-Z]+)\s?/,
 		minw: /\(\s*min\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/,
 		maxw: /\(\s*max\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/,
@@ -75,10 +82,12 @@
 	//define vars
 	var doc = w.document,
 		docElem = doc.documentElement,
+		ajaxCache = {},
 		mediastyles = [],
 		rules = [],
 		appendedEls = [],
 		parsedSheets = {},
+		importTreatedSheets = {},
 		resizeThrottle = 30,
 		head = doc.getElementsByTagName( "head" )[0] || docElem,
 		base = doc.getElementsByTagName( "base" )[0],
@@ -219,15 +228,34 @@
 				}
 			}
 		},
+		//return an array of url pointing to imported css hrefs
+		findImportsUrl = function( styles, href ){
+			if ( importTreatedSheets[ href ] === true ){
+				return {};
+			}
+			//try to get CSS folder path
+			var folderPath = href.substring( 0, href.lastIndexOf( "/" ) );
+			var urlImports = [];
+			var match;
+			while( match = respond.regex.findImports.exec( styles ) ){
+				var importHref = match[ 1 ];
+				//if the url doesn't start with '/', it means it's a relative one, in the same folder as the parent
+				if( importHref.lastIndexOf( "/", 0 ) !== 0 ){
+					importHref = folderPath + "/" + importHref;
+				}
+				urlImports.push( importHref );
+			}
+			return urlImports;
+		},		
 		//find media blocks in css text, convert to style blocks
 		translate = function( styles, href, media ){
+			//try to get CSS path
+			href = href.substring( 0, href.lastIndexOf( "/" ) );
+			
 			var qs = styles.replace( respond.regex.comments, '' )
 					.replace( respond.regex.keyframes, '' )
 					.match( respond.regex.media ),
 				ql = qs && qs.length || 0;
-
-			//try to get CSS path
-			href = href.substring( 0, href.lastIndexOf( "/" ) );
 
 			var repUrls = function( css ){
 					return css.replace( respond.regex.urls, "$1" + href + "$2$3" );
@@ -281,16 +309,29 @@
 
 			applyMedia();
 		},
-
 		//recurse through request queue, get css text
 		makeRequests = function(){
 			if( requestQueue.length ){
 				var thisRequest = requestQueue.shift();
-
 				ajax( thisRequest.href, function( styles ){
-					translate( styles, thisRequest.href, thisRequest.media );
-					parsedSheets[ thisRequest.href ] = true;
-
+					//check if there are @import in the file
+					var importedFilesArray = findImportsUrl( styles, thisRequest.href );
+					if( importTreatedSheets[ thisRequest.href ] !== true && importedFilesArray && importedFilesArray.length>0 ){
+						importTreatedSheets[ thisRequest.href ] = true;
+						//we readd this queue in its place
+						requestQueue.unshift( thisRequest );
+						while( importedFilesArray.length ){
+							var oneImported = importedFilesArray.shift();
+							//add imports files to the queue, before the current queue
+							requestQueue.unshift( {
+								href: oneImported,
+								media: "all"
+							} );
+						}
+					}else{
+						translate( styles, thisRequest.href, thisRequest.media );
+						parsedSheets[ thisRequest.href ] = true;
+					}
 					// by wrapping recursive function call in setTimeout
 					// we prevent "Stack overflow" error in IE7
 					w.setTimeout(function(){ makeRequests(); },0);

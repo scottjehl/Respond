@@ -42,6 +42,10 @@
       return xmlhttpmethod;
     };
   }(), ajax = function(url, callback) {
+    if (typeof ajaxCache[url] !== "undefined") {
+      callback(ajaxCache[url]);
+      return;
+    }
     var req = xmlHttp();
     if (!req) {
       return;
@@ -51,6 +55,7 @@
       if (req.readyState !== 4 || req.status !== 200 && req.status !== 304) {
         return;
       }
+      ajaxCache[url] = req.responseText;
       callback(req.responseText);
     };
     if (req.readyState === 4) {
@@ -69,6 +74,7 @@
     comments: /\/\*[^*]*\*+([^/][^*]*\*+)*\//gi,
     urls: /(url\()['"]?([^\/\)'"][^:\)'"]+)['"]?(\))/g,
     findStyles: /@media *([^\{]+)\{([\S\s]+?)$/,
+    findImports: /@import url\(["']?([0-9a-zA-Z_\/=\.\-\?]+)["']?\)/g,
     only: /(only\s+)?([a-zA-Z]+)\s?/,
     minw: /\(\s*min\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/,
     maxw: /\(\s*max\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/,
@@ -79,7 +85,7 @@
   if (respond.mediaQueriesSupported) {
     return;
   }
-  var doc = w.document, docElem = doc.documentElement, mediastyles = [], rules = [], appendedEls = [], parsedSheets = {}, resizeThrottle = 30, head = doc.getElementsByTagName("head")[0] || docElem, base = doc.getElementsByTagName("base")[0], links = head.getElementsByTagName("link"), lastCall, resizeDefer, eminpx, getEmValue = function() {
+  var doc = w.document, docElem = doc.documentElement, ajaxCache = {}, mediastyles = [], rules = [], appendedEls = [], parsedSheets = {}, importTreatedSheets = {}, resizeThrottle = 30, head = doc.getElementsByTagName("head")[0] || docElem, base = doc.getElementsByTagName("base")[0], links = head.getElementsByTagName("link"), lastCall, resizeDefer, eminpx, getEmValue = function() {
     var ret, div = doc.createElement("div"), body = doc.body, originalHTMLFontSize = docElem.style.fontSize, originalBodyFontSize = body && body.style.fontSize, fakeUsed = false;
     div.style.cssText = "position:absolute;font-size:1em;width:1em";
     if (!body) {
@@ -152,9 +158,24 @@
         appendedEls.push(ss);
       }
     }
+  }, findImportsUrl = function(styles, href) {
+    if (importTreatedSheets[href] === true) {
+      return {};
+    }
+    var folderPath = href.substring(0, href.lastIndexOf("/"));
+    var urlImports = [];
+    var match;
+    while (match = respond.regex.findImports.exec(styles)) {
+      var importHref = match[1];
+      if (importHref.lastIndexOf("/", 0) !== 0) {
+        importHref = folderPath + "/" + importHref;
+      }
+      urlImports.push(importHref);
+    }
+    return urlImports;
   }, translate = function(styles, href, media) {
-    var qs = styles.replace(respond.regex.comments, "").replace(respond.regex.keyframes, "").match(respond.regex.media), ql = qs && qs.length || 0;
     href = href.substring(0, href.lastIndexOf("/"));
+    var qs = styles.replace(respond.regex.comments, "").replace(respond.regex.keyframes, "").match(respond.regex.media), ql = qs && qs.length || 0;
     var repUrls = function(css) {
       return css.replace(respond.regex.urls, "$1" + href + "$2$3");
     }, useMedia = !ql && media;
@@ -194,8 +215,21 @@
     if (requestQueue.length) {
       var thisRequest = requestQueue.shift();
       ajax(thisRequest.href, function(styles) {
-        translate(styles, thisRequest.href, thisRequest.media);
-        parsedSheets[thisRequest.href] = true;
+        var importedFilesArray = findImportsUrl(styles, thisRequest.href);
+        if (importTreatedSheets[thisRequest.href] !== true && importedFilesArray && importedFilesArray.length > 0) {
+          importTreatedSheets[thisRequest.href] = true;
+          requestQueue.unshift(thisRequest);
+          while (importedFilesArray.length) {
+            var oneImported = importedFilesArray.shift();
+            requestQueue.unshift({
+              href: oneImported,
+              media: "all"
+            });
+          }
+        } else {
+          translate(styles, thisRequest.href, thisRequest.media);
+          parsedSheets[thisRequest.href] = true;
+        }
         w.setTimeout(function() {
           makeRequests();
         }, 0);

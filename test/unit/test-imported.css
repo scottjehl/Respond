@@ -1,0 +1,6 @@
+/** test imported file **/
+@media screen and (min-width: 260px) and (max-width: 300px){
+	#testelem {
+		width: 100px;
+	}
+}

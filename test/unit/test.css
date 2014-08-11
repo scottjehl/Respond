@@ -1,4 +1,4 @@
-
+@import url(test-imported.css);
 
 .launcher #qunit-testrunner-toolbar,
 .launcher #qunit-userAgent,
