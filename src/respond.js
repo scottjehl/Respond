@@ -58,9 +58,9 @@
 		urls: /(url\()['"]?([^\/\)'"][^:\)'"]+)['"]?(\))/g,
 		findStyles: /@media *([^\{]+)\{([\S\s]+?)$/,
 		only: /(only\s+)?([a-zA-Z]+)\s?/,
-		minw: /\(\s*min\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/,
-		maxw: /\(\s*max\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/,
-		minmaxwh: /\(\s*m(in|ax)\-(height|width)\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/gi,
+		minw: /\(\s*min\-width\s*:\s*(\s*[0-9\.]+)(px|em|rem)\s*\)/,
+		maxw: /\(\s*max\-width\s*:\s*(\s*[0-9\.]+)(px|em|rem)\s*\)/,
+		minmaxwh: /\(\s*m(in|ax)\-(height|width)\s*:\s*(\s*[0-9\.]+)(px|em|rem)\s*\)/gi,
 		other: /\([^\)]*\)/g
 	};
 
