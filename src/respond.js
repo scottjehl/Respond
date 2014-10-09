@@ -80,9 +80,9 @@
 		appendedEls = [],
 		parsedSheets = {},
 		resizeThrottle = 30,
-		head = doc.getElementsByTagName( "head" )[0] || docElem,
 		base = doc.getElementsByTagName( "base" )[0],
-		links = head.getElementsByTagName( "link" ),
+		links = doc.getElementsByTagName( "link" ),
+		head = links[0].parentNode,
 
 		lastCall,
 		resizeDefer,
