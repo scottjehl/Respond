@@ -159,7 +159,7 @@ window.onload = function(){
 		asyncTest( 'Test keyframe animation inside of media query', function() { 
 			queueRequest( function() {
 				respond.ajax( getNormalizedUrl( 'test-with-keyframe.css' ),
-					function( data ) {
+					function( err, data ) {
 						ok( data.replace( respond.regex.keyframes, '' ).match( respond.regex.media ), 'A keyframe animation doesn\'t bust the media regex.' );
 						start();
 					});
@@ -169,7 +169,7 @@ window.onload = function(){
 		asyncTest( 'Test comments inside of a media query', function() { 
 			queueRequest( function() {
 				respond.ajax( getNormalizedUrl( 'test-with-comment.css' ),
-					function( data ) {
+					function( err, data ) {
 						var stripped = data.replace( respond.regex.comments, '' );
 						// TODO allow /* */ inside of CSS content strings.
 						ok( stripped.match( respond.regex.media ), 'Comments don\'t bust the media regex.' );
@@ -247,8 +247,19 @@ window.onload = function(){
 		asyncTest( 'Issue #181: full MQ with DPR', function() { 
 			queueRequest( function() {
 				respond.ajax( getNormalizedUrl( 'test-with-dpr.css' ),
-					function( data ) {
+					function( err, data ) {
 						ok( respond.unsupportedmq( data ) );
+						start();
+					});
+			});
+		});
+
+		asyncTest( 'Test ajax callback errors on 404', function() { 
+			queueRequest( function() {
+				respond.ajax( 'does-not-exist',
+					function( err, data ) {
+						ok( err );
+						ok( ! data );
 						start();
 					});
 			});
