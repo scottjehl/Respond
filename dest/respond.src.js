@@ -24,7 +24,7 @@
       };
     };
   }(w.document);
-})(this);
+})(global);
 
 (function(w) {
   "use strict";
@@ -234,4 +234,4 @@
   } else if (w.attachEvent) {
     w.attachEvent("onresize", callMedia);
   }
-})(this);
+})(global);
