@@ -33,4 +33,4 @@
 		};
 
 	}( w.document ));
-}( global ));
+}( typeof window !== "undefined" ? window : this ));
