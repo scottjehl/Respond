@@ -77,7 +77,7 @@
 		docElem = doc.documentElement,
 		mediastyles = [],
 		rules = [],
-		appendedEls = [],
+		styleState = {},
 		parsedSheets = {},
 		resizeThrottle = 30,
 		head = doc.getElementsByTagName( "head" )[0] || docElem,
@@ -184,21 +184,24 @@
 				}
 			}
 
-			//remove any existing respond style element(s)
-			for( var j in appendedEls ){
-				if( appendedEls.hasOwnProperty( j ) ){
-					if( appendedEls[ j ] && appendedEls[ j ].parentNode === head ){
-						head.removeChild( appendedEls[ j ] );
-					}
-				}
-			}
-			appendedEls.length = 0;
-
 			//inject active styles, grouped by media type
 			for( var k in styleBlocks ){
 				if( styleBlocks.hasOwnProperty( k ) ){
-					var ss = doc.createElement( "style" ),
-						css = styleBlocks[ k ].join( "\n" );
+					var ss, css = styleBlocks[ k ].join( "\n" );
+
+					if (styleState[k]) {
+						// if the CSS hasn't changed, don't do anything
+						if (styleState[k].css === css) {
+							continue;
+						}
+
+						// if the CSS has changed, remove it and recreate it
+						if (styleState[k].el.parentNode === head) {
+							head.removeChild(styleState[k].el);
+						}
+					}
+
+					ss = doc.createElement( "style" );
 
 					ss.type = "text/css";
 					ss.media = k;
@@ -214,8 +217,8 @@
 						ss.appendChild( doc.createTextNode( css ) );
 					}
 
-					//push to appendedEls to track for later removal
-					appendedEls.push( ss );
+					//Keep track of the element and css for later processing
+					styleState[k] = { css: css, el: ss };
 				}
 			}
 		},
