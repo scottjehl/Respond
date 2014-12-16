@@ -303,7 +303,7 @@
 
 			for( var i = 0; i < links.length; i++ ){
 				var sheet = links[ i ],
-				href = sheet.href,
+				href = sheet.href.split('?')[0],
 				media = sheet.media,
 				isCSS = sheet.rel && sheet.rel.toLowerCase() === "stylesheet";
 

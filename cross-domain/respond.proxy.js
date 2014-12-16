@@ -103,7 +103,7 @@
 		for( var i = 0, linkl = links.length; i < linkl; i++ ){
 			
 			var thislink	= links[i],
-				href		= links[i].href,
+				href		= links[i].href.split('?')[0],
 				extreg		= (/^([a-zA-Z:]*\/\/(www\.)?)/).test( href ),
 				ext			= (baseElem && !extreg) || extreg;
 

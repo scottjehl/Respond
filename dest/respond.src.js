@@ -203,7 +203,7 @@
     }
   }, ripCSS = function() {
     for (var i = 0; i < links.length; i++) {
-      var sheet = links[i], href = sheet.href, media = sheet.media, isCSS = sheet.rel && sheet.rel.toLowerCase() === "stylesheet";
+      var sheet = links[i], href = sheet.href.split('?')[0], media = sheet.media, isCSS = sheet.rel && sheet.rel.toLowerCase() === "stylesheet";
       if (!!href && isCSS && !parsedSheets[href]) {
         if (sheet.styleSheet && sheet.styleSheet.rawCssText) {
           translate(sheet.styleSheet.rawCssText, href, media);
