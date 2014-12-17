@@ -1,4 +1,4 @@
-/* Respond.js: min/max-width media query polyfill. (c) Scott Jehl. MIT Lic. j.mp/respondjs  */
+/*! Respond.js v1.4.0: min/max-width media query polyfill. (c) Scott Jehl. MIT Lic. j.mp/respondjs  */
 (function( w ){
 
 	"use strict";
@@ -42,26 +42,21 @@
 				return;
 			}
 			req.send( null );
-		},
-		isUnsupportedMediaQuery = function( query ) {
-			return query.replace( respond.regex.minmaxwh, '' ).match( respond.regex.other );
 		};
 
 	//expose for testing
 	respond.ajax = ajax;
 	respond.queue = requestQueue;
-	respond.unsupportedmq = isUnsupportedMediaQuery;
+
+	// expose for testing
 	respond.regex = {
 		media: /@media[^\{]+\{([^\{\}]*\{[^\}\{]*\})+/gi,
 		keyframes: /@(?:\-(?:o|moz|webkit)\-)?keyframes[^\{]+\{(?:[^\{\}]*\{[^\}\{]*\})+[^\}]*\}/gi,
-		comments: /\/\*[^*]*\*+([^/][^*]*\*+)*\//gi,
 		urls: /(url\()['"]?([^\/\)'"][^:\)'"]+)['"]?(\))/g,
 		findStyles: /@media *([^\{]+)\{([\S\s]+?)$/,
 		only: /(only\s+)?([a-zA-Z]+)\s?/,
-		minw: /\(\s*min\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/,
-		maxw: /\(\s*max\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/,
-		minmaxwh: /\(\s*m(in|ax)\-(height|width)\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/gi,
-		other: /\([^\)]*\)/g
+		minw: /\([\s]*min\-width\s*:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/,
+		maxw: /\([\s]*max\-width\s*:[\s]*([\s]*[0-9\.]+)(px|em)[\s]*\)/
 	};
 
 	//expose media query support flag for external use
@@ -221,13 +216,12 @@
 		},
 		//find media blocks in css text, convert to style blocks
 		translate = function( styles, href, media ){
-			var qs = styles.replace( respond.regex.comments, '' )
-					.replace( respond.regex.keyframes, '' )
-					.match( respond.regex.media ),
+			var qs = styles.replace( respond.regex.keyframes, '' ).match( respond.regex.media ),
 				ql = qs && qs.length || 0;
 
 			//try to get CSS path
 			href = href.substring( 0, href.lastIndexOf( "/" ) );
+			
 
 			var repUrls = function( css ){
 					return css.replace( respond.regex.urls, "$1" + href + "$2$3" );
@@ -264,11 +258,6 @@
 
 				for( var j = 0; j < eql; j++ ){
 					thisq = eachq[ j ];
-
-					if( isUnsupportedMediaQuery( thisq ) ) {
-						continue;
-					}
-
 					mediastyles.push( {
 						media : thisq.split( "(" )[ 0 ].match( respond.regex.only ) && RegExp.$2 || "all",
 						rules : rules.length - 1,
@@ -303,7 +292,7 @@
 
 			for( var i = 0; i < links.length; i++ ){
 				var sheet = links[ i ],
-				href = sheet.href.split('?')[0],
+				href = sheet.href,
 				media = sheet.media,
 				isCSS = sheet.rel && sheet.rel.toLowerCase() === "stylesheet";
 

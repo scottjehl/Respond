@@ -1,129 +1,112 @@
-/*! Respond.js: min/max-width media query polyfill. Remote proxy (c) Scott Jehl. MIT/GPLv2 Lic. j.mp/respondjs  */
+/*! Respond.js: min/max-width media query polyfill. Remote proxy (c) Scott Jehl. MIT/GPLv2 Lic. j.mp/respondjs */
 (function(win, doc, undefined){
-	var docElem			= doc.documentElement,
-		proxyURL		= doc.getElementById("respond-proxy").href,
-		redirectURL		= (doc.getElementById("respond-redirect") || location).href,
-		baseElem		= doc.getElementsByTagName("base")[0],
-		urls			= [],
-		refNode;
+var docElem = doc.documentElement,
+proxyURL = doc.getElementById("respond-proxy").href,
+redirectURL = (doc.getElementById("respond-redirect") || location).href,
+urls = [],
+refNode;
 
-	function encode(url){
-		return win.encodeURIComponent(url);
-	}
+function fakejax( url, callback ){
 
-	 function fakejax( url, callback ){
+var iframe,
+AXO;
 
-		var iframe,
-			AXO;
-		
-		// All hail Google http://j.mp/iKMI19
-		// Behold, an iframe proxy without annoying clicky noises.
-		if ( "ActiveXObject" in win ) {
-			AXO = new ActiveXObject( "htmlfile" );
-			AXO.open();
-			AXO.write( '<iframe id="x"></iframe>' );
-			AXO.close();
-			iframe = AXO.getElementById( "x" );
-		} else {
-			iframe = doc.createElement( "iframe" );
-			iframe.style.cssText = "position:absolute;top:-99em";
-			docElem.insertBefore(iframe, docElem.firstElementChild || docElem.firstChild );
-		}
+// All hail Google http://j.mp/iKMI19
+// Behold, an iframe proxy without annoying clicky noises.
+if ( "ActiveXObject" in win ) {
+AXO = new ActiveXObject( "htmlfile" );
+AXO.open();
+AXO.write( '<iframe id="x"></iframe>' );
+AXO.close();
+iframe = AXO.getElementById( "x" );
+} else {
+iframe = doc.createElement( "iframe" );
+iframe.style.cssText = "position:absolute;top:-99em";
+docElem.insertBefore(iframe, docElem.firstElementChild || docElem.firstChild );
+}
 
-		iframe.src = checkBaseURL(proxyURL) + "?url=" + encode(redirectURL) + "&css=" + encode(checkBaseURL(url));
-		
-		function checkFrameName() {
-			var cssText;
+iframe.src = proxyURL + "?url=" + redirectURL + "&css=" + url;
 
-			try {
-				cssText = iframe.contentWindow.name;
-			}
-			catch (e) { }
+function checkFrameName() {
+var cssText;
 
-			if (cssText) {
-				// We've got what we need. Stop the iframe from loading further content.
-				iframe.src = "about:blank";
-				iframe.parentNode.removeChild(iframe);
-				iframe = null;
+try {
+cssText = iframe.contentWindow.name;
+}
+catch (e) { }
 
-			
-				// Per http://j.mp/kn9EPh, not taking any chances. Flushing the ActiveXObject
-				if (AXO) {
-					AXO = null;
+if (cssText) {
+// We've got what we need. Stop the iframe from loading further content.
+iframe.src = "about:blank";
+iframe.parentNode.removeChild(iframe);
+iframe = null;
 
-					if (win.CollectGarbage) {
-						win.CollectGarbage();
-					}
-				}
 
-				callback(cssText);
-			}
-			else{
-				win.setTimeout(checkFrameName, 100);
-			}
-		}
-		
-		win.setTimeout(checkFrameName, 500);
-	}
+// Per http://j.mp/kn9EPh, not taking any chances. Flushing the ActiveXObject
+if (AXO) {
+AXO = null;
 
-    // http://stackoverflow.com/a/472729
-	function checkBaseURL(href) {
-        var el = document.createElement('div'),
-        escapedURL = href.split('&').join('&amp;').
-            split('<').join('&lt;').
-            split('"').join('&quot;');
+if (win.CollectGarbage) {
+win.CollectGarbage();
+}
+}
 
-        el.innerHTML = '<a href="' + escapedURL + '">x</a>';
-        return el.firstChild.href;
-	}
-	
-	function checkRedirectURL() {
-		// IE6 & IE7 don't build out absolute urls in <link /> attributes.
-		// So respond.proxy.gif remains relative instead of http://example.com/respond.proxy.gif.
-		// This trickery resolves that issue.
-		if (~ !redirectURL.indexOf(location.host)) {
+callback(cssText);
+}
+else{
+win.setTimeout(checkFrameName, 100);
+}
+}
 
-			var fakeLink = doc.createElement("div");
+win.setTimeout(checkFrameName, 500);
+}
 
-			fakeLink.innerHTML = '<a href="' + redirectURL + '"></a>';
-			docElem.insertBefore(fakeLink, docElem.firstElementChild || docElem.firstChild );
+function checkRedirectURL() {
+// IE6 & IE7 don't build out absolute urls in <link /> attributes.
+// So respond.proxy.gif remains relative instead of http://example.com/respond.proxy.gif.
+// This trickery resolves that issue.
+if (~ !redirectURL.indexOf(location.host)) {
 
-			// Grab the parsed URL from that dummy object
-			redirectURL = fakeLink.firstChild.href;
+// Inject an <a> attribute, with the redirectURL
+var fakeLink = doc.createElement("div");
 
-			// Clean up
-			fakeLink.parentNode.removeChild(fakeLink);
-			fakeLink = null;
-		}
-	}
-	
-	function buildUrls(){
-		var links = doc.getElementsByTagName( "link" );
-		
-		for( var i = 0, linkl = links.length; i < linkl; i++ ){
-			
-			var thislink	= links[i],
-				href		= links[i].href.split('?')[0],
-				extreg		= (/^([a-zA-Z:]*\/\/(www\.)?)/).test( href ),
-				ext			= (baseElem && !extreg) || extreg;
+fakeLink.innerHTML = '<a href="' + redirectURL + '"></a>';
+docElem.insertBefore(fakeLink, docElem.firstElementChild || docElem.firstChild );
 
-			//make sure it's an external stylesheet
-			if( thislink.rel.indexOf( "stylesheet" ) >= 0 && ext ){
-				(function( link ){			
-					fakejax( href, function( css ){
-						link.styleSheet.rawCssText = css;
-						respond.update();
-					} );
-				})( thislink );
-			}	
-		}
+// Grab the parsed URL from that dummy object
+redirectURL = fakeLink.firstChild.href;
 
-		
-	}
-	
-	if( !respond.mediaQueriesSupported ){
-		checkRedirectURL();
-		buildUrls();
-	}
+// Clean up
+fakeLink.parentNode.removeChild(fakeLink);
+fakeLink = null;
+}
+}
+
+function buildUrls(){
+var links = doc.getElementsByTagName( "link" );
+
+for( var i = 0, linkl = links.length; i < linkl; i++ ){
+var thislink = links[i],
+href = links[i].href.split('?')[0],
+ext = /^([a-zA-Z]+?:(\/\/)?(www\.)?)/;
+
+//make sure it's an external stylesheet
+if( thislink.rel.indexOf( "stylesheet" ) >= 0 && ext.test( href ) ){
+(function( link ){
+fakejax( href, function( css ){
+link.styleSheet.rawCssText = css;
+respond.update();
+} );
+})( thislink );
+}
+}
+
+
+}
+
+if( !respond.mediaQueriesSupported ){
+checkRedirectURL();
+buildUrls();
+}
 
 })( window, document );
