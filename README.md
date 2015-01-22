@@ -69,7 +69,7 @@ Some notes to keep in mind:
 
 - As you might guess, this implementation is quite dumb in regards to CSS parsing rules. This is a good thing, because that allows it to run really fast, but its looseness may also cause unexpected behavior. For example: if you enclose a whole media query in a comment intending to disable its rules, you'll probably find that those rules will end up enabled in non-media-query-supporting browsers.
 
-- Respond.js doesn't parse CSS referenced via @import, nor does it work with media queries within style elements, as those styles can't be re-requested for parsing.
+- Respond.js doesn't parse CSS referenced via @import, nor does it work with media queries within style elements (this also includes inline css within a `<style>` block), as those styles can't be re-requested for parsing.
 
 - Due to security restrictions, some browsers may not allow this script to work on file:// urls (because it uses xmlHttpRequest). Run it on a web server.
 
