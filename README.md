@@ -16,8 +16,6 @@ Usage Instructions
 ======
 
 1. Craft your CSS with min/max-width media queries to adapt your layout from mobile (first) all the way up to desktop
-
-
 <pre>
     @media screen and (min-width: 480px){
         ...styles for 480px and up go here
