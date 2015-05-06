@@ -293,7 +293,14 @@
 
 					// by wrapping recursive function call in setTimeout
 					// we prevent "Stack overflow" error in IE7
-					w.setTimeout(function(){ makeRequests(); },0);
+					
+					/*
+					* you should remove this or detect if ie7 before
+					* because is make ie8 very slow when you have a lot of data
+					* and removing this improve the performance for more than 80%
+					*/
+					
+					//w.setTimeout(function(){ makeRequests(); },0);
 				} );
 			}
 		},
