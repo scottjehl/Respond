@@ -313,6 +313,9 @@
 					if (sheet.styleSheet && sheet.styleSheet.rawCssText) {
 						translate( sheet.styleSheet.rawCssText, href, media );
 						parsedSheets[ href ] = true;
+					} else if (href.match(/^data:text\/css;base64,/i)) {
+						translate( w.Base64.decode(href.substring(21)), '.', media );
+						parsedSheets[ href ] = true;
 					} else {
 						if( (!/^([a-zA-Z:]*\/\/)/.test( href ) && !base) ||
 							href.replace( RegExp.$1, "" ).split( "/" )[0] === w.location.host ){
