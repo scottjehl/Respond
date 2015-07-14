@@ -305,7 +305,7 @@
 				var sheet = links[ i ],
 				href = sheet.href,
 				media = sheet.media,
-				isCSS = sheet.rel && sheet.rel.toLowerCase() === "stylesheet";
+				isCSS = sheet.rel && sheet.rel.toLowerCase().match(/stylesheet/gi);
 
 				//only links plz and prevent re-parsing
 				if( !!href && isCSS && !parsedSheets[ href ] ){
