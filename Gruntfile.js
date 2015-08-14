@@ -8,7 +8,7 @@ module.exports = function(grunt) {
 						'/*! Respond.js v<%= pkg.version %>: <%= pkg.description %>\n' +
 						' * Copyright <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>\n' +
 						' * Licensed under <%= _.pluck(pkg.licenses, "type").join(", ") %>\n' + 
-						' * <%= pkg.homepageShortened %>' +
+						' * <%= pkg.homepage %>' +
 						' */\n\n',
 		uglify: {
 			nonMinMatchMedia: {
