@@ -111,7 +111,6 @@ Sure, a couple:
 window.respond.onRespondComplete = function(){
                     //make body visible after css is parsed, in order to prevent flickering
                      document.body.style.visibility = 'visible';
-                     
                  };
  window.respond.update();
 </pre>
