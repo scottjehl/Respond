@@ -108,14 +108,12 @@ Sure, a couple:
 - respond.onRespondComplete : will be called after respond finishes it's job.
     Example:
 <pre>
-`
 window.respond.onRespondComplete = function(){
                     //make body visible after css is parsed, in order to prevent flickering
                      document.body.style.visibility = 'visible';
                      
                  };
  window.respond.update();
-`
 </pre>
 
 Alternatives to this script
