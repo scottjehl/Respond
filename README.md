@@ -105,7 +105,18 @@ Sure, a couple:
 - respond.update() : rerun the parser (helpful if you added a stylesheet to the page and it needs to be translated)
 - respond.mediaQueriesSupported: set to true if the browser natively supports media queries.
 - respond.getEmValue() : returns the pixel value of one em
-
+- respond.onRespondComplete : will be called after respond finishes it's job.
+    Example:
+<pre>
+`
+window.respond.onRespondComplete = function(){
+                    //make body visible after css is parsed, in order to prevent flickering
+                     document.body.style.visibility = 'visible';
+                     
+                 };
+ window.respond.update();
+`
+</pre>
 
 Alternatives to this script
 ======
