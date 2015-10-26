@@ -61,7 +61,8 @@
 		minw: /\(\s*min\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/,
 		maxw: /\(\s*max\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/,
 		minmaxwh: /\(\s*m(in|ax)\-(height|width)\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/gi,
-		other: /\([^\)]*\)/g
+		other: /\([^\)]*\)/g,
+		id: /[A-Za-z0-9]+/g
 	};
 
 	//expose media query support flag for external use
@@ -72,12 +73,22 @@
 		return;
 	}
 
+	Array.prototype.indexOf = Array.prototype.indexOf || function (obj, start) {
+		for (var i = (start || 0); i < this.length; i++) {
+			if (this[i] === obj) {
+				return i;
+			}
+		}
+		return -1;
+	};
+
 	//define vars
 	var doc = w.document,
 		docElem = doc.documentElement,
 		mediastyles = [],
 		rules = [],
-		appendedEls = [],
+		appendedStyles = [],
+		cachedStyles = {},
 		parsedSheets = {},
 		resizeThrottle = 30,
 		head = doc.getElementsByTagName( "head" )[0] || docElem,
@@ -139,12 +150,48 @@
 			return ret;
 		},
 
+		getStyleEl = function( thisstyle ){
+			if( thisstyle.el ){
+				return thisstyle.el;
+			}
+
+			var ss = doc.createElement( "style" );
+			ss.id = thisstyle.id;
+			ss.type = "text/css";
+			ss.media = thisstyle.media;
+			if( ss.styleSheet ){
+				ss.styleSheet.cssText = cachedStyles[ thisstyle.id ];
+			}
+			else {
+				ss.appendChild( doc.createTextNode( cachedStyles[ thisstyle.id ] ) );
+			}
+			thisstyle.el = ss;
+			return ss;
+		},
+
+		appendStyle = function( ss, lastLink ){
+			var length = appendedStyles.length,
+				position;
+			if( length ){
+				position = appendedStyles[ length - 1 ].nextSibling;
+			}
+			else {
+				position = lastLink.nextSibling;
+			}
+			head.insertBefore( ss, position );
+			appendedStyles.push( ss );
+		},
+
+		removeStyle = function( ss ){
+			head.removeChild( ss );
+			appendedStyles.splice(appendedStyles.indexOf( ss ), 1);
+		},
+
 		//enable/disable styles
 		applyMedia = function( fromResize ){
 			var name = "clientWidth",
 				docElemProp = docElem[ name ],
 				currWidth = doc.compatMode === "CSS1Compat" && docElemProp || doc.body[ name ] || docElemProp,
-				styleBlocks	= {},
 				lastLink = links[ links.length-1 ],
 				now = (new Date()).getTime();
 
@@ -161,61 +208,24 @@
 			for( var i in mediastyles ){
 				if( mediastyles.hasOwnProperty( i ) ){
 					var thisstyle = mediastyles[ i ],
-						min = thisstyle.minw,
-						max = thisstyle.maxw,
+						min = thisstyle.min,
+						max = thisstyle.max,
 						minnull = min === null,
 						maxnull = max === null,
-						em = "em";
-
-					if( !!min ){
-						min = parseFloat( min ) * ( min.indexOf( em ) > -1 ? ( eminpx || getEmValue() ) : 1 );
-					}
-					if( !!max ){
-						max = parseFloat( max ) * ( max.indexOf( em ) > -1 ? ( eminpx || getEmValue() ) : 1 );
-					}
+						ss = doc.getElementById( thisstyle.id );
 
 					// if there's no media query at all (the () part), or min or max is not null, and if either is present, they're true
 					if( !thisstyle.hasquery || ( !minnull || !maxnull ) && ( minnull || currWidth >= min ) && ( maxnull || currWidth <= max ) ){
-						if( !styleBlocks[ thisstyle.media ] ){
-							styleBlocks[ thisstyle.media ] = [];
+						if( !ss ){
+							ss = getStyleEl( thisstyle );
+							appendStyle( ss, lastLink );
 						}
-						styleBlocks[ thisstyle.media ].push( rules[ thisstyle.rules ] );
-					}
-				}
-			}
-
-			//remove any existing respond style element(s)
-			for( var j in appendedEls ){
-				if( appendedEls.hasOwnProperty( j ) ){
-					if( appendedEls[ j ] && appendedEls[ j ].parentNode === head ){
-						head.removeChild( appendedEls[ j ] );
-					}
-				}
-			}
-			appendedEls.length = 0;
-
-			//inject active styles, grouped by media type
-			for( var k in styleBlocks ){
-				if( styleBlocks.hasOwnProperty( k ) ){
-					var ss = doc.createElement( "style" ),
-						css = styleBlocks[ k ].join( "\n" );
-
-					ss.type = "text/css";
-					ss.media = k;
-
-					//originally, ss was appended to a documentFragment and sheets were appended in bulk.
-					//this caused crashes in IE in a number of circumstances, such as when the HTML element had a bg image set, so appending beforehand seems best. Thanks to @dvelyk for the initial research on this one!
-					head.insertBefore( ss, lastLink.nextSibling );
-
-					if ( ss.styleSheet ){
-						ss.styleSheet.cssText = css;
 					}
 					else {
-						ss.appendChild( doc.createTextNode( css ) );
+						if( ss ){
+							removeStyle( ss );
+						}
 					}
-
-					//push to appendedEls to track for later removal
-					appendedEls.push( ss );
 				}
 			}
 		},
@@ -246,7 +256,8 @@
 			}
 
 			for( var i = 0; i < ql; i++ ){
-				var fullq, thisq, eachq, eql;
+				var fullq, thisq, eachq, eql,
+					ms, minw, maxw, ss, em = "em";
 
 				//media attr
 				if( useMedia ){
@@ -264,22 +275,53 @@
 
 				for( var j = 0; j < eql; j++ ){
 					thisq = eachq[ j ];
+					minw = thisq.match( respond.regex.minw ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" );
+					maxw = thisq.match( respond.regex.maxw ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" );
+					ms = {
+						id : thisq.match( respond.regex.id ).join( "" ),
+						media : thisq.split( "(" )[ 0 ].match( respond.regex.only ) && RegExp.$2 || "all",
+						rules : rules.length - 1,
+						hasquery : thisq.indexOf("(") > -1,
+						min : null,
+						max : null
+					};
+
+					if( !!minw ){
+						ms.min = parseFloat( minw ) * ( minw.indexOf( em ) > -1 ? ( eminpx || getEmValue() ) : 1 );
+					}
+					if( !!maxw ){
+						ms.max = parseFloat( maxw ) * ( maxw.indexOf( em ) > -1 ? ( eminpx || getEmValue() ) : 1 );
+					}
 
 					if( isUnsupportedMediaQuery( thisq ) ) {
 						continue;
 					}
 
-					mediastyles.push( {
-						media : thisq.split( "(" )[ 0 ].match( respond.regex.only ) && RegExp.$2 || "all",
-						rules : rules.length - 1,
-						hasquery : thisq.indexOf("(") > -1,
-						minw : thisq.match( respond.regex.minw ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" ),
-						maxw : thisq.match( respond.regex.maxw ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" )
-					} );
+					mediastyles.push( ms );
+
+					cachedStyles[ ms.id ] = ( cachedStyles[ ms.id ] || "" ) + minifyStyles( rules[ ms.rules ] );
+
+					ss = doc.getElementById( ms.id );
+					if( ss ){
+						removeStyle( ss );
+					}
 				}
 			}
 
 			applyMedia();
+		},
+
+		minifyStyles = function( source ) {
+			var styles = source;
+			styles = styles.replace( /\/\*(?:(?!\*\/)[\s\S])*\*\/|[\r\n\t]+/g, '' );
+			// now all comments, newlines and tabs have been removed
+			styles = styles.replace( / {2,}/g, ' ' );
+			// now there are no more than single adjacent spaces left
+			// now unnecessary: styles = styles.replace( /(\s)+\./g, ' .' );
+			styles = styles.replace( / ([{:}]) /g, '$1' );
+			styles = styles.replace( /([;,]) /g, '$1' );
+			styles = styles.replace( / !/g, '!' );
+			return styles;
 		},
 
 		//recurse through request queue, get css text
