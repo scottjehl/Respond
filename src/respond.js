@@ -44,7 +44,7 @@
 			req.send( null );
 		},
 		isUnsupportedMediaQuery = function( query ) {
-			return query.replace( respond.regex.minmaxwh, '' ).match( respond.regex.other );
+			return query.replace( respond.regex.minmaxwh, "" ).match( respond.regex.other );
 		};
 
 	//expose for testing
@@ -93,7 +93,7 @@
 		// returns the value of 1em in pixels
 		getEmValue = function() {
 			var ret,
-				div = doc.createElement('div'),
+				div = doc.createElement( "div" ),
 				body = doc.body,
 				originalHTMLFontSize = docElem.style.fontSize,
 				originalBodyFontSize = body && body.style.fontSize,
@@ -221,8 +221,8 @@
 		},
 		//find media blocks in css text, convert to style blocks
 		translate = function( styles, href, media ){
-			var qs = styles.replace( respond.regex.comments, '' )
-					.replace( respond.regex.keyframes, '' )
+			var qs = styles.replace( respond.regex.comments, "" )
+					.replace( respond.regex.keyframes, "" )
 					.match( respond.regex.media ),
 				ql = qs && qs.length || 0;
 
@@ -306,6 +306,13 @@
 				href = sheet.href,
 				media = sheet.media,
 				isCSS = sheet.rel && sheet.rel.toLowerCase() === "stylesheet";
+
+				// fixes #137 for IE6/7: qualifies href without additional request
+				if(!href.match( "//" )) {
+					var el= doc.createElement( "div" );
+					el.innerHTML= "<a href=\"" + href.split( "&" ).join( "&amp;" ).split( "<" ).join( "&lt;" ).split( "\"" ).join( "&quot;" ) + "\">x</a>";
+					href = el.firstChild.href;
+				}
 
 				//only links plz and prevent re-parsing
 				if( !!href && isCSS && !parsedSheets[ href ] ){
