@@ -7,6 +7,9 @@
 	var respond = {};
 	w.respond = respond;
 
+	//configurable filter to allow only certain sheets to be included
+	w.respondJsSheetFilter = w.respondJsSheetFilter || function(req) { return true; };
+
 	//define update even in native-mq-supporting browsers, to avoid errors
 	respond.update = function(){};
 
@@ -288,8 +291,10 @@
 				var thisRequest = requestQueue.shift();
 
 				ajax( thisRequest.href, function( styles ){
-					translate( styles, thisRequest.href, thisRequest.media );
-					parsedSheets[ thisRequest.href ] = true;
+					if( w.respondJsSheetFilter( thisRequest ) ){
+						translate( styles, thisRequest.href, thisRequest.media );
+						parsedSheets[ thisRequest.href ] = true;
+					}
 
 					// by wrapping recursive function call in setTimeout
 					// we prevent "Stack overflow" error in IE7

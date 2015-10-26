@@ -79,6 +79,9 @@
   "use strict";
   var respond = {};
   w.respond = respond;
+  w.respondJsSheetFilter = w.respondJsSheetFilter || function(req) {
+    return true;
+  };
   respond.update = function() {};
   var requestQueue = [], xmlHttp = function() {
     var xmlhttpmethod = false;
@@ -243,8 +246,10 @@
     if (requestQueue.length) {
       var thisRequest = requestQueue.shift();
       ajax(thisRequest.href, function(styles) {
-        translate(styles, thisRequest.href, thisRequest.media);
-        parsedSheets[thisRequest.href] = true;
+        if (w.respondJsSheetFilter(thisRequest)) {
+          translate(styles, thisRequest.href, thisRequest.media);
+          parsedSheets[thisRequest.href] = true;
+        }
         w.setTimeout(function() {
           makeRequests();
         }, 0);
