@@ -27,6 +27,15 @@ Usage Instructions
 3. Crack open Internet Explorer and pump fists in delight
 
 
+Options
+======
+
+- Set `window.RESPOND_REPLACE_STYLES = true` before referencing this library to avoid altering the order of media queries in the CSS. NOTE: this is not as fast as the default, but still quick. See the notes below and #325.
+```html
+<script>window.RESPOND_REPLACE_STYLES = true;</script>
+<script src="respond.min.js"></script>
+```
+
 CDN/X-Domain Setup
 ======
 
@@ -45,6 +54,8 @@ Some notes to keep in mind:
 - This script relies on no other scripts or frameworks (aside from the included matchMedia polyfill), and is optimized for mobile delivery (~1kb total filesize min/gzip)
 
 - As you might guess, this implementation is quite dumb in regards to CSS parsing rules. This is a good thing, because that allows it to run really fast, but its looseness may also cause unexpected behavior. For example: if you enclose a whole media query in a comment intending to disable its rules, you'll probably find that those rules will end up enabled in non-media-query-supporting browsers.
+
+- Respond.js by default will change the order of media queries by moving them after the stylesheet they came from. This is the best performing method but does have a drawback: see #325. To fix that, but at a slight cost to performance, set `window.RESPOND_REPLACE_STYLES = true` before this script runs: each stylesheet is removed and replaced with a parsed `<style media="all">` where all media queries are kept in the same place they were before. Other media types (like `print`) are appended the usual way.
 
 - Respond.js doesn't parse CSS referenced via @import, nor does it work with media queries within style elements, as those styles can't be re-requested for parsing.
 

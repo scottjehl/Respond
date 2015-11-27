@@ -3,6 +3,9 @@
 
 	"use strict";
 
+	//when set to true, linked stylesheets will be replaced entirely with style elements for "all" media whilst other media are appended in individual styles, to ensure the cascade is not altered
+	w.RESPOND_REPLACE_STYLES = w.RESPOND_REPLACE_STYLES || false;
+
 	//exposed namespace
 	var respond = {};
 	w.respond = respond;
@@ -52,11 +55,11 @@
 	respond.queue = requestQueue;
 	respond.unsupportedmq = isUnsupportedMediaQuery;
 	respond.regex = {
-		media: /@media[^\{]+\{([^\{\}]*\{[^\}\{]*\})+/gi,
+		media: /@media[^\{]+\{(([^\{\}]*\{[^\}\{]*\})+)[^\}]*\}/gi,
 		keyframes: /@(?:\-(?:o|moz|webkit)\-)?keyframes[^\{]+\{(?:[^\{\}]*\{[^\}\{]*\})+[^\}]*\}/gi,
 		comments: /\/\*[^*]*\*+([^/][^*]*\*+)*\//gi,
 		urls: /(url\()['"]?([^\/\)'"][^:\)'"]+)['"]?(\))/g,
-		findStyles: /@media *([^\{]+)\{([\S\s]+?)$/,
+		findStyles: /@media *([^\{]+)\{([\S\s]+?)\}$/,
 		only: /(only\s+)?([a-zA-Z]+)\s?/,
 		minw: /\(\s*min\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/,
 		maxw: /\(\s*max\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/,
@@ -78,6 +81,7 @@
 		mediastyles = [],
 		rules = [],
 		appendedEls = [],
+		storedSheets = {},
 		parsedSheets = {},
 		resizeThrottle = 30,
 		head = doc.getElementsByTagName( "head" )[0] || docElem,
@@ -139,51 +143,55 @@
 			return ret;
 		},
 
-		//enable/disable styles
-		applyMedia = function( fromResize ){
+		isRuleActive = function( hasquery, min, max ){
 			var name = "clientWidth",
 				docElemProp = docElem[ name ],
 				currWidth = doc.compatMode === "CSS1Compat" && docElemProp || doc.body[ name ] || docElemProp,
-				styleBlocks	= {},
-				lastLink = links[ links.length-1 ],
+				minnull = min === null,
+				maxnull = max === null,
+				em = "em";
+
+			if( !!min ){
+				min = parseFloat( min ) * ( min.indexOf( em ) > -1 ? ( eminpx || getEmValue() ) : 1 );
+			}
+			if( !!max ){
+				max = parseFloat( max ) * ( max.indexOf( em ) > -1 ? ( eminpx || getEmValue() ) : 1 );
+			}
+
+			// if there's no media query at all (the () part), or min or max is not null, and if either is present, they're true
+			return !hasquery || ( !minnull || !maxnull ) && ( minnull || currWidth >= min ) && ( maxnull || currWidth <= max );
+		},
+
+		replaceStringBetween = function( source, replacement, start, end ){
+			//replace the content between a start and end index
+			return source.substring( 0, start ) + replacement + source.substring( end );
+		},
+
+		applyMedia = function( fromResize ){
+			var method,
 				now = (new Date()).getTime();
+
+			if( w.RESPOND_REPLACE_STYLES ){
+				method = applyMediaReplace;
+			}
+			else{
+				method = applyMediaAppend;
+			}
 
 			//throttle resize calls
 			if( fromResize && lastCall && now - lastCall < resizeThrottle ){
 				w.clearTimeout( resizeDefer );
-				resizeDefer = w.setTimeout( applyMedia, resizeThrottle );
+				resizeDefer = w.setTimeout( method, resizeThrottle );
 				return;
 			}
 			else {
 				lastCall = now;
 			}
 
-			for( var i in mediastyles ){
-				if( mediastyles.hasOwnProperty( i ) ){
-					var thisstyle = mediastyles[ i ],
-						min = thisstyle.minw,
-						max = thisstyle.maxw,
-						minnull = min === null,
-						maxnull = max === null,
-						em = "em";
+			method();
+		},
 
-					if( !!min ){
-						min = parseFloat( min ) * ( min.indexOf( em ) > -1 ? ( eminpx || getEmValue() ) : 1 );
-					}
-					if( !!max ){
-						max = parseFloat( max ) * ( max.indexOf( em ) > -1 ? ( eminpx || getEmValue() ) : 1 );
-					}
-
-					// if there's no media query at all (the () part), or min or max is not null, and if either is present, they're true
-					if( !thisstyle.hasquery || ( !minnull || !maxnull ) && ( minnull || currWidth >= min ) && ( maxnull || currWidth <= max ) ){
-						if( !styleBlocks[ thisstyle.media ] ){
-							styleBlocks[ thisstyle.media ] = [];
-						}
-						styleBlocks[ thisstyle.media ].push( rules[ thisstyle.rules ] );
-					}
-				}
-			}
-
+		removeAppendEls = function(){
 			//remove any existing respond style element(s)
 			for( var j in appendedEls ){
 				if( appendedEls.hasOwnProperty( j ) ){
@@ -193,49 +201,159 @@
 				}
 			}
 			appendedEls.length = 0;
+		},
+
+		applyMediaReplace = function(){
+			var lastLink = links[ links.length-1 ];
+
+			removeAppendEls();
+
+			//inject active styles, replacing current stylesheet
+			for( var l in storedSheets ){
+				if( storedSheets.hasOwnProperty( l ) ){
+					var stored = storedSheets[ l ],
+						styles = stored.styles,
+						sheet = stored.sheet,
+						css = styles,
+						styleBlocks = {},
+						styleBlocksAll = [],
+						alreadyReplaced = {},
+						thisstyle, min, max;
+
+					for( var m in stored.mediastyles ){
+						if( stored.mediastyles.hasOwnProperty( m ) ){
+							thisstyle = stored.mediastyles[ m ];
+							min = thisstyle.minw;
+							max = thisstyle.maxw;
+
+							if( thisstyle.media === "all" ){
+								styleBlocksAll.push(thisstyle);
+							}
+							else if( isRuleActive( thisstyle.hasquery, min, max ) ){
+								//group by media type
+								if( !styleBlocks[ thisstyle.media ] ){
+									styleBlocks[ thisstyle.media ] = [];
+								}
+								styleBlocks[ thisstyle.media ].push( rules[ thisstyle.rules ] );
+							}
+						}
+					}
+
+					//replace active rules with @media stripped and remove inactive rules, in reverse order so replace index won't change
+					for( var n = styleBlocksAll.length - 1; n >= 0; n-- ){
+						thisstyle = styleBlocksAll[ n ];
+						min = thisstyle.minw;
+						max = thisstyle.maxw;
+						var rule = rules[ thisstyle.rules ],
+							start = thisstyle.replaceIndexStart,
+							end = thisstyle.replaceIndexEnd,
+							replacement = '';
+
+						if( alreadyReplaced[ rule ] ){
+							//this rule has already been applied for "all" media, we don't need to add it again for the other media queries it is under
+							continue;
+						}
+
+						if( isRuleActive( thisstyle.hasquery, min, max ) ){
+							replacement = rule;
+						}
+
+						css = replaceStringBetween( css, replacement, start, end );
+						alreadyReplaced[ rule ] = true;
+					}
+
+					insertCss( css, "all", stored.insertBefore );
+
+					//remove original stylesheet
+					if( sheet.parentElement !== null ){
+						head.removeChild( sheet );
+					}
+
+					//inject active styles, grouped by media type
+					for( var o in styleBlocks ){
+						if( styleBlocks.hasOwnProperty( o ) ){
+							insertCss( styleBlocks[ o ].join( "\n" ), "all", stored.insertBefore );
+						}
+					}
+				}
+			}
+		},
+
+		//enable/disable styles
+		applyMediaAppend = function(){
+			var styleBlocks = {},
+				lastLink = links[ links.length-1 ];
+
+			for( var i in mediastyles ){
+				if( mediastyles.hasOwnProperty( i ) ){
+					var thisstyle = mediastyles[ i ],
+						min = thisstyle.minw,
+						max = thisstyle.maxw;
+
+					if( isRuleActive( thisstyle.hasquery, min, max ) ){
+						if( !styleBlocks[ thisstyle.media ] ){
+							styleBlocks[ thisstyle.media ] = [];
+						}
+						styleBlocks[ thisstyle.media ].push( rules[ thisstyle.rules ] );
+					}
+				}
+			}
+
+			removeAppendEls();
 
 			//inject active styles, grouped by media type
 			for( var k in styleBlocks ){
 				if( styleBlocks.hasOwnProperty( k ) ){
-					var ss = doc.createElement( "style" ),
-						css = styleBlocks[ k ].join( "\n" );
-
-					ss.type = "text/css";
-					ss.media = k;
-
-					//originally, ss was appended to a documentFragment and sheets were appended in bulk.
-					//this caused crashes in IE in a number of circumstances, such as when the HTML element had a bg image set, so appending beforehand seems best. Thanks to @dvelyk for the initial research on this one!
-					head.insertBefore( ss, lastLink.nextSibling );
-
-					if ( ss.styleSheet ){
-						ss.styleSheet.cssText = css;
-					}
-					else {
-						ss.appendChild( doc.createTextNode( css ) );
-					}
-
-					//push to appendedEls to track for later removal
-					appendedEls.push( ss );
+					insertCss( styleBlocks[ k ].join( "\n" ), k, lastLink.nextSibling );
 				}
 			}
 		},
-		//find media blocks in css text, convert to style blocks
-		translate = function( styles, href, media ){
-			var qs = styles.replace( respond.regex.comments, '' )
-					.replace( respond.regex.keyframes, '' )
-					.match( respond.regex.media ),
-				ql = qs && qs.length || 0;
 
+		insertCss = function( css, media, insertBefore ){
+			var ss = doc.createElement( "style" );
+
+			ss.type = "text/css";
+			ss.media = media;
+
+			//originally, ss was appended to a documentFragment and sheets were appended in bulk.
+			//this caused crashes in IE in a number of circumstances, such as when the HTML element had a bg image set, so appending beforehand seems best. Thanks to @dvelyk for the initial research on this one!
+			head.insertBefore( ss, insertBefore );
+
+			if ( ss.styleSheet ){
+				ss.styleSheet.cssText = css;
+			}
+			else {
+				ss.appendChild( doc.createTextNode( css ) );
+			}
+
+			//push to appendedEls to track for later removal
+			appendedEls.push( ss );
+		},
+
+		replaceUrls = function( styles, href ){
 			//try to get CSS path
 			href = href.substring( 0, href.lastIndexOf( "/" ) );
 
-			var repUrls = function( css ){
-					return css.replace( respond.regex.urls, "$1" + href + "$2$3" );
-				},
-				useMedia = !ql && media;
-
 			//if path exists, tack on trailing slash
 			if( href.length ){ href += "/"; }
+
+			return styles.replace( respond.regex.urls, "$1" + href + "$2$3" );
+		},
+
+		//find media blocks in css text, convert to style blocks
+		translate = function( styles, href, media ){
+			if( w.RESPOND_REPLACE_STYLES ){
+				//replace urls in the whole stylesheet
+				styles = replaceUrls( styles, href );
+				storedSheets[ href ].styles = styles;
+				storedSheets[ href ].mediastyles = [];
+			}
+
+			var qs = styles.replace( respond.regex.comments, '' )
+					.replace( respond.regex.keyframes, '' )
+					.match( respond.regex.media ),
+				ql = qs && qs.length || 0,
+				useMedia = !ql && media;
 
 			//if no internal queries exist, but media attr does, use that
 			//note: this currently lacks support for situations where a media attr is specified on a link AND
@@ -246,17 +364,26 @@
 			}
 
 			for( var i = 0; i < ql; i++ ){
-				var fullq, thisq, eachq, eql;
+				var fullq, thisq, eachq, eql, rule;
 
 				//media attr
 				if( useMedia ){
 					fullq = media;
-					rules.push( repUrls( styles ) );
+					rule = styles;
 				}
 				//parse for styles
 				else{
 					fullq = qs[ i ].match( respond.regex.findStyles ) && RegExp.$1;
-					rules.push( RegExp.$2 && repUrls( RegExp.$2 ) );
+					rule = RegExp.$2;
+				}
+
+				if( w.RESPOND_REPLACE_STYLES ){
+					//urls have already been replaced
+					rules.push( rule );
+				}
+				else {
+					//replace urls only in the rules that are appended
+					rules.push( rule && replaceUrls( rule, href ) );
 				}
 
 				eachq = fullq.split( "," );
@@ -269,13 +396,21 @@
 						continue;
 					}
 
-					mediastyles.push( {
+					var thisstyle = {
 						media : thisq.split( "(" )[ 0 ].match( respond.regex.only ) && RegExp.$2 || "all",
 						rules : rules.length - 1,
 						hasquery : thisq.indexOf("(") > -1,
 						minw : thisq.match( respond.regex.minw ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" ),
 						maxw : thisq.match( respond.regex.maxw ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" )
-					} );
+					};
+					if( w.RESPOND_REPLACE_STYLES ){
+						thisstyle.replaceIndexStart = storedSheets[ href ].styles.indexOf( qs[ i ] );
+						thisstyle.replaceIndexEnd = thisstyle.replaceIndexStart + qs[ i ].length;
+						storedSheets[ href ].mediastyles.push( thisstyle );
+					}
+					else {
+						mediastyles.push( thisstyle );
+					}
 				}
 			}
 
@@ -288,6 +423,13 @@
 				var thisRequest = requestQueue.shift();
 
 				ajax( thisRequest.href, function( styles ){
+					if( w.RESPOND_REPLACE_STYLES ){
+						storedSheets[ thisRequest.href ] = {
+							sheet: thisRequest.sheet,
+							insertBefore: thisRequest.sheet.nextSibling,
+							styles: styles
+						};
+					}
 					translate( styles, thisRequest.href, thisRequest.media );
 					parsedSheets[ thisRequest.href ] = true;
 
@@ -311,6 +453,13 @@
 				if( !!href && isCSS && !parsedSheets[ href ] ){
 					// selectivizr exposes css through the rawCssText expando
 					if (sheet.styleSheet && sheet.styleSheet.rawCssText) {
+						if( w.RESPOND_REPLACE_STYLES ){
+							storedSheets[ href ] = {
+								sheet: sheet,
+								insertBefore: sheet.nextSibling,
+								styles: sheet.styleSheet.rawCssText
+							};
+						}
 						translate( sheet.styleSheet.rawCssText, href, media );
 						parsedSheets[ href ] = true;
 					} else {
@@ -320,6 +469,7 @@
 							// manually add in the protocol
 							if ( href.substring(0,2) === "//" ) { href = w.location.protocol + href; }
 							requestQueue.push( {
+								sheet: sheet,
 								href: href,
 								media: media
 							} );
