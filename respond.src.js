@@ -218,6 +218,7 @@ window.matchMedia = window.matchMedia || (function( doc, undefined ) {
 				docElemProp = docElem[ name ],
 				currWidth = doc.compatMode === "CSS1Compat" && docElemProp || doc.body[ name ] || docElemProp,
 				styleBlocks	= {},
+				keys		= [],
 				lastLink = links[ links.length-1 ],
 				now = (new Date()).getTime();
 
@@ -251,6 +252,7 @@ window.matchMedia = window.matchMedia || (function( doc, undefined ) {
 					if( !thisstyle.hasquery || ( !minnull || !maxnull ) && ( minnull || currWidth >= min ) && ( maxnull || currWidth <= max ) ){
 						if( !styleBlocks[ thisstyle.media ] ){
 							styleBlocks[ thisstyle.media ] = [];
+							keys.push( thisstyle.media );
 						}
 						styleBlocks[ thisstyle.media ].push( rules[ thisstyle.rules ] );
 					}
@@ -267,11 +269,8 @@ window.matchMedia = window.matchMedia || (function( doc, undefined ) {
 			}
 			
 			//inject active styles, grouped by media type
-			var keys = [];
-			for( var k in styleBlocks ){
-				keys.push( k );
-			}
 			for( var l = keys.length; l-- > 0;){
+				var k = keys[ l ];
 				if( styleBlocks.hasOwnProperty( k ) ){
 					var ss = doc.createElement( "style" ),
 						css = styleBlocks[ k ].join( "\n" );
