@@ -272,7 +272,7 @@
 					//inject active styles, grouped by media type
 					for( var o in styleBlocks ){
 						if( styleBlocks.hasOwnProperty( o ) ){
-							insertCss( styleBlocks[ o ].join( "\n" ), "all", stored.insertBefore );
+							insertCss( styleBlocks[ o ].join( "\n" ), o, stored.insertBefore );
 						}
 					}
 				}
