@@ -1,5 +1,5 @@
 /*! Respond.js v1.4.2: min/max-width media query polyfill
- * Copyright 2014 Scott Jehl
+ * Copyright 2015 Scott Jehl
  * Licensed under MIT
  * http://j.mp/respondjs */
 
@@ -28,6 +28,7 @@
 
 (function(w) {
   "use strict";
+  w.RESPOND_REPLACE_STYLES = w.RESPOND_REPLACE_STYLES || false;
   var respond = {};
   w.respond = respond;
   respond.update = function() {};
@@ -64,11 +65,11 @@
   respond.queue = requestQueue;
   respond.unsupportedmq = isUnsupportedMediaQuery;
   respond.regex = {
-    media: /@media[^\{]+\{([^\{\}]*\{[^\}\{]*\})+/gi,
+    media: /@media[^\{]+\{(([^\{\}]*\{[^\}\{]*\})+)[^\}]*\}/gi,
     keyframes: /@(?:\-(?:o|moz|webkit)\-)?keyframes[^\{]+\{(?:[^\{\}]*\{[^\}\{]*\})+[^\}]*\}/gi,
     comments: /\/\*[^*]*\*+([^/][^*]*\*+)*\//gi,
     urls: /(url\()['"]?([^\/\)'"][^:\)'"]+)['"]?(\))/g,
-    findStyles: /@media *([^\{]+)\{([\S\s]+?)$/,
+    findStyles: /@media *([^\{]+)\{([\S\s]+?)\}$/,
     only: /(only\s+)?([a-zA-Z]+)\s?/,
     minw: /\(\s*min\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/,
     maxw: /\(\s*max\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/,
@@ -79,7 +80,7 @@
   if (respond.mediaQueriesSupported) {
     return;
   }
-  var doc = w.document, docElem = doc.documentElement, mediastyles = [], rules = [], appendedEls = [], parsedSheets = {}, resizeThrottle = 30, head = doc.getElementsByTagName("head")[0] || docElem, base = doc.getElementsByTagName("base")[0], links = head.getElementsByTagName("link"), lastCall, resizeDefer, eminpx, getEmValue = function() {
+  var doc = w.document, docElem = doc.documentElement, mediastyles = [], rules = [], appendedEls = [], storedSheets = {}, parsedSheets = {}, resizeThrottle = 30, head = doc.getElementsByTagName("head")[0] || docElem, base = doc.getElementsByTagName("base")[0], links = head.getElementsByTagName("link"), lastCall, resizeDefer, eminpx, getEmValue = function() {
     var ret, div = doc.createElement("div"), body = doc.body, originalHTMLFontSize = docElem.style.fontSize, originalBodyFontSize = body && body.style.fontSize, fakeUsed = false;
     div.style.cssText = "position:absolute;font-size:1em;width:1em";
     if (!body) {
@@ -104,32 +105,33 @@
     }
     ret = eminpx = parseFloat(ret);
     return ret;
+  }, isRuleActive = function(hasquery, min, max) {
+    var name = "clientWidth", docElemProp = docElem[name], currWidth = doc.compatMode === "CSS1Compat" && docElemProp || doc.body[name] || docElemProp, minnull = min === null, maxnull = max === null, em = "em";
+    if (!!min) {
+      min = parseFloat(min) * (min.indexOf(em) > -1 ? eminpx || getEmValue() : 1);
+    }
+    if (!!max) {
+      max = parseFloat(max) * (max.indexOf(em) > -1 ? eminpx || getEmValue() : 1);
+    }
+    return !hasquery || (!minnull || !maxnull) && (minnull || currWidth >= min) && (maxnull || currWidth <= max);
+  }, replaceStringBetween = function(source, replacement, start, end) {
+    return source.substring(0, start) + replacement + source.substring(end);
   }, applyMedia = function(fromResize) {
-    var name = "clientWidth", docElemProp = docElem[name], currWidth = doc.compatMode === "CSS1Compat" && docElemProp || doc.body[name] || docElemProp, styleBlocks = {}, lastLink = links[links.length - 1], now = new Date().getTime();
+    var method, now = new Date().getTime();
+    if (w.RESPOND_REPLACE_STYLES) {
+      method = applyMediaReplace;
+    } else {
+      method = applyMediaAppend;
+    }
     if (fromResize && lastCall && now - lastCall < resizeThrottle) {
       w.clearTimeout(resizeDefer);
-      resizeDefer = w.setTimeout(applyMedia, resizeThrottle);
+      resizeDefer = w.setTimeout(method, resizeThrottle);
       return;
     } else {
       lastCall = now;
     }
-    for (var i in mediastyles) {
-      if (mediastyles.hasOwnProperty(i)) {
-        var thisstyle = mediastyles[i], min = thisstyle.minw, max = thisstyle.maxw, minnull = min === null, maxnull = max === null, em = "em";
-        if (!!min) {
-          min = parseFloat(min) * (min.indexOf(em) > -1 ? eminpx || getEmValue() : 1);
-        }
-        if (!!max) {
-          max = parseFloat(max) * (max.indexOf(em) > -1 ? eminpx || getEmValue() : 1);
-        }
-        if (!thisstyle.hasquery || (!minnull || !maxnull) && (minnull || currWidth >= min) && (maxnull || currWidth <= max)) {
-          if (!styleBlocks[thisstyle.media]) {
-            styleBlocks[thisstyle.media] = [];
-          }
-          styleBlocks[thisstyle.media].push(rules[thisstyle.rules]);
-        }
-      }
-    }
+    method();
+  }, removeAppendEls = function() {
     for (var j in appendedEls) {
       if (appendedEls.hasOwnProperty(j)) {
         if (appendedEls[j] && appendedEls[j].parentNode === head) {
@@ -138,40 +140,112 @@
       }
     }
     appendedEls.length = 0;
-    for (var k in styleBlocks) {
-      if (styleBlocks.hasOwnProperty(k)) {
-        var ss = doc.createElement("style"), css = styleBlocks[k].join("\n");
-        ss.type = "text/css";
-        ss.media = k;
-        head.insertBefore(ss, lastLink.nextSibling);
-        if (ss.styleSheet) {
-          ss.styleSheet.cssText = css;
-        } else {
-          ss.appendChild(doc.createTextNode(css));
+  }, applyMediaReplace = function() {
+    var lastLink = links[links.length - 1];
+    removeAppendEls();
+    for (var l in storedSheets) {
+      if (storedSheets.hasOwnProperty(l)) {
+        var stored = storedSheets[l], styles = stored.styles, sheet = stored.sheet, css = styles, styleBlocks = {}, styleBlocksAll = [], alreadyReplaced = {}, thisstyle, min, max;
+        for (var m in stored.mediastyles) {
+          if (stored.mediastyles.hasOwnProperty(m)) {
+            thisstyle = stored.mediastyles[m];
+            min = thisstyle.minw;
+            max = thisstyle.maxw;
+            if (thisstyle.media === "all") {
+              styleBlocksAll.push(thisstyle);
+            } else if (isRuleActive(thisstyle.hasquery, min, max)) {
+              if (!styleBlocks[thisstyle.media]) {
+                styleBlocks[thisstyle.media] = [];
+              }
+              styleBlocks[thisstyle.media].push(rules[thisstyle.rules]);
+            }
+          }
         }
-        appendedEls.push(ss);
+        for (var n = styleBlocksAll.length - 1; n >= 0; n--) {
+          thisstyle = styleBlocksAll[n];
+          min = thisstyle.minw;
+          max = thisstyle.maxw;
+          var rule = rules[thisstyle.rules], start = thisstyle.replaceIndexStart, end = thisstyle.replaceIndexEnd, replacement = "";
+          if (alreadyReplaced[rule]) {
+            continue;
+          }
+          if (isRuleActive(thisstyle.hasquery, min, max)) {
+            replacement = rule;
+          }
+          css = replaceStringBetween(css, replacement, start, end);
+          alreadyReplaced[rule] = true;
+        }
+        insertCss(css, "all", stored.insertBefore);
+        if (sheet.parentElement !== null) {
+          head.removeChild(sheet);
+        }
+        for (var o in styleBlocks) {
+          if (styleBlocks.hasOwnProperty(o)) {
+            insertCss(styleBlocks[o].join("\n"), o, stored.insertBefore);
+          }
+        }
       }
     }
-  }, translate = function(styles, href, media) {
-    var qs = styles.replace(respond.regex.comments, "").replace(respond.regex.keyframes, "").match(respond.regex.media), ql = qs && qs.length || 0;
+  }, applyMediaAppend = function() {
+    var styleBlocks = {}, lastLink = links[links.length - 1];
+    for (var i in mediastyles) {
+      if (mediastyles.hasOwnProperty(i)) {
+        var thisstyle = mediastyles[i], min = thisstyle.minw, max = thisstyle.maxw;
+        if (isRuleActive(thisstyle.hasquery, min, max)) {
+          if (!styleBlocks[thisstyle.media]) {
+            styleBlocks[thisstyle.media] = [];
+          }
+          styleBlocks[thisstyle.media].push(rules[thisstyle.rules]);
+        }
+      }
+    }
+    removeAppendEls();
+    for (var k in styleBlocks) {
+      if (styleBlocks.hasOwnProperty(k)) {
+        insertCss(styleBlocks[k].join("\n"), k, lastLink.nextSibling);
+      }
+    }
+  }, insertCss = function(css, media, insertBefore) {
+    var ss = doc.createElement("style");
+    ss.type = "text/css";
+    ss.media = media;
+    head.insertBefore(ss, insertBefore);
+    if (ss.styleSheet) {
+      ss.styleSheet.cssText = css;
+    } else {
+      ss.appendChild(doc.createTextNode(css));
+    }
+    appendedEls.push(ss);
+  }, replaceUrls = function(styles, href) {
     href = href.substring(0, href.lastIndexOf("/"));
-    var repUrls = function(css) {
-      return css.replace(respond.regex.urls, "$1" + href + "$2$3");
-    }, useMedia = !ql && media;
     if (href.length) {
       href += "/";
     }
+    return styles.replace(respond.regex.urls, "$1" + href + "$2$3");
+  }, translate = function(styles, href, media) {
+    styles = styles.replace(respond.regex.comments, "").replace(respond.regex.keyframes, "");
+    if (w.RESPOND_REPLACE_STYLES) {
+      styles = replaceUrls(styles, href);
+      storedSheets[href].styles = styles;
+      storedSheets[href].mediastyles = [];
+    }
+    var qs = styles.match(respond.regex.media), ql = qs && qs.length || 0, useMedia = !ql && media;
     if (useMedia) {
       ql = 1;
     }
     for (var i = 0; i < ql; i++) {
-      var fullq, thisq, eachq, eql;
+      var fullq, thisq, eachq, eql, rule;
       if (useMedia) {
         fullq = media;
-        rules.push(repUrls(styles));
+        rule = styles;
       } else {
         fullq = qs[i].match(respond.regex.findStyles) && RegExp.$1;
-        rules.push(RegExp.$2 && repUrls(RegExp.$2));
+        rule = RegExp.$2;
+      }
+      if (w.RESPOND_REPLACE_STYLES) {
+        rules.push(rule);
+      } else {
+        rules.push(rule && replaceUrls(rule, href));
       }
       eachq = fullq.split(",");
       eql = eachq.length;
@@ -180,13 +254,20 @@
         if (isUnsupportedMediaQuery(thisq)) {
           continue;
         }
-        mediastyles.push({
+        var thisstyle = {
           media: thisq.split("(")[0].match(respond.regex.only) && RegExp.$2 || "all",
           rules: rules.length - 1,
           hasquery: thisq.indexOf("(") > -1,
           minw: thisq.match(respond.regex.minw) && parseFloat(RegExp.$1) + (RegExp.$2 || ""),
           maxw: thisq.match(respond.regex.maxw) && parseFloat(RegExp.$1) + (RegExp.$2 || "")
-        });
+        };
+        if (w.RESPOND_REPLACE_STYLES) {
+          thisstyle.replaceIndexStart = storedSheets[href].styles.indexOf(qs[i]);
+          thisstyle.replaceIndexEnd = thisstyle.replaceIndexStart + qs[i].length;
+          storedSheets[href].mediastyles.push(thisstyle);
+        } else {
+          mediastyles.push(thisstyle);
+        }
       }
     }
     applyMedia();
@@ -194,6 +275,13 @@
     if (requestQueue.length) {
       var thisRequest = requestQueue.shift();
       ajax(thisRequest.href, function(styles) {
+        if (w.RESPOND_REPLACE_STYLES) {
+          storedSheets[thisRequest.href] = {
+            sheet: thisRequest.sheet,
+            insertBefore: thisRequest.sheet.nextSibling,
+            styles: styles
+          };
+        }
         translate(styles, thisRequest.href, thisRequest.media);
         parsedSheets[thisRequest.href] = true;
         w.setTimeout(function() {
@@ -206,6 +294,13 @@
       var sheet = links[i], href = sheet.href, media = sheet.media, isCSS = sheet.rel && sheet.rel.toLowerCase() === "stylesheet";
       if (!!href && isCSS && !parsedSheets[href]) {
         if (sheet.styleSheet && sheet.styleSheet.rawCssText) {
+          if (w.RESPOND_REPLACE_STYLES) {
+            storedSheets[href] = {
+              sheet: sheet,
+              insertBefore: sheet.nextSibling,
+              styles: sheet.styleSheet.rawCssText
+            };
+          }
           translate(sheet.styleSheet.rawCssText, href, media);
           parsedSheets[href] = true;
         } else {
@@ -214,6 +309,7 @@
               href = w.location.protocol + href;
             }
             requestQueue.push({
+              sheet: sheet,
               href: href,
               media: media
             });
