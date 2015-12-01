@@ -230,7 +230,7 @@
         }
         for (var o in styleBlocks) {
           if (styleBlocks.hasOwnProperty(o)) {
-            insertCss(styleBlocks[o].join("\n"), "all", stored.insertBefore);
+            insertCss(styleBlocks[o].join("\n"), o, stored.insertBefore);
           }
         }
       }
@@ -272,12 +272,13 @@
     }
     return styles.replace(respond.regex.urls, "$1" + href + "$2$3");
   }, translate = function(styles, href, media) {
+    styles = styles.replace(respond.regex.comments, "").replace(respond.regex.keyframes, "");
     if (w.RESPOND_REPLACE_STYLES) {
       styles = replaceUrls(styles, href);
       storedSheets[href].styles = styles;
       storedSheets[href].mediastyles = [];
     }
-    var qs = styles.replace(respond.regex.comments, "").replace(respond.regex.keyframes, "").match(respond.regex.media), ql = qs && qs.length || 0, useMedia = !ql && media;
+    var qs = styles.match(respond.regex.media), ql = qs && qs.length || 0, useMedia = !ql && media;
     if (useMedia) {
       ql = 1;
     }
