@@ -342,6 +342,9 @@
 
 		//find media blocks in css text, convert to style blocks
 		translate = function( styles, href, media ){
+			styles = styles.replace( respond.regex.comments, '' )
+					.replace( respond.regex.keyframes, '' );
+
 			if( w.RESPOND_REPLACE_STYLES ){
 				//replace urls in the whole stylesheet
 				styles = replaceUrls( styles, href );
@@ -349,9 +352,7 @@
 				storedSheets[ href ].mediastyles = [];
 			}
 
-			var qs = styles.replace( respond.regex.comments, '' )
-					.replace( respond.regex.keyframes, '' )
-					.match( respond.regex.media ),
+			var qs = styles.match( respond.regex.media ),
 				ql = qs && qs.length || 0,
 				useMedia = !ql && media;
 
