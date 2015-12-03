@@ -350,4 +350,4 @@
 	else if( w.attachEvent ){
 		w.attachEvent( "onresize", callMedia );
 	}
-})(this);
+})(window);
