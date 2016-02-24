@@ -1,5 +1,5 @@
 /*! Respond.js v1.4.2: min/max-width media query polyfill
- * Copyright 2014 Scott Jehl
+ * Copyright 2016 Scott Jehl
  * Licensed under MIT
  * http://j.mp/respondjs */
 
@@ -8,7 +8,8 @@
 (function(w) {
   "use strict";
   w.matchMedia = w.matchMedia || function(doc, undefined) {
-    var bool, docElem = doc.documentElement, refNode = docElem.firstElementChild || docElem.firstChild, fakeBody = doc.createElement("body"), div = doc.createElement("div");
+    var bool, docElem = doc.documentElement, refNode = docElem.firstElementChild || docElem.firstChild, // fakeBody required for <FF4 when executed in <head>
+    fakeBody = doc.createElement("body"), div = doc.createElement("div");
     div.id = "mq-test-1";
     div.style.cssText = "position:absolute;top:-100em";
     fakeBody.style.background = "none";
@@ -26,11 +27,15 @@
   }(w.document);
 })(this);
 
+/* Respond.js: min/max-width media query polyfill. (c) Scott Jehl. MIT Lic. j.mp/respondjs  */
 (function(w) {
   "use strict";
+  //exposed namespace
   var respond = {};
   w.respond = respond;
+  //define update even in native-mq-supporting browsers, to avoid errors
   respond.update = function() {};
+  //define ajax obj
   var requestQueue = [], xmlHttp = function() {
     var xmlhttpmethod = false;
     try {
@@ -41,7 +46,23 @@
     return function() {
       return xmlhttpmethod;
     };
-  }(), ajax = function(url, callback) {
+  }(), xmlHttpExternal = function() {
+    var xmlhttpmethod = false;
+    try {
+      xmlhttpmethod = new w.XDomainRequest();
+    } catch (e) {}
+    return function() {
+      return xmlhttpmethod;
+    };
+  }(), //check if an URL is external
+  //http://stackoverflow.com/questions/6238351/fastest-way-to-detect-external-urls
+  isExternalUrl = function(url) {
+    var domain = function(url) {
+      return url.toLowerCase().replace(/([a-z])?:\/\//, "$1").split("/")[0];
+    };
+    return (url.indexOf(":") > -1 || url.indexOf("//") > -1) && domain(w.location.href) !== domain(url);
+  }, //tweaked Ajax functions from Quirksmode
+  ajaxInternal = function(url, callback) {
     var req = xmlHttp();
     if (!req) {
       return;
@@ -57,9 +78,28 @@
       return;
     }
     req.send(null);
+  }, //external ajax function
+  ajaxExternal = function(url, callback) {
+    var req = xmlHttpExternal();
+    if (!req) {
+      return;
+    }
+    req.open("GET", url);
+    req.onload = function() {
+      callback(req.responseText);
+    };
+    req.send();
+  }, //ajax wrapper
+  ajax = function(url, callback) {
+    if (isExternalUrl(url)) {
+      ajaxExternal(url, callback);
+    } else {
+      ajaxInternal(url, callback);
+    }
   }, isUnsupportedMediaQuery = function(query) {
     return query.replace(respond.regex.minmaxwh, "").match(respond.regex.other);
   };
+  //expose for testing
   respond.ajax = ajax;
   respond.queue = requestQueue;
   respond.unsupportedmq = isUnsupportedMediaQuery;
@@ -75,17 +115,24 @@
     minmaxwh: /\(\s*m(in|ax)\-(height|width)\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/gi,
     other: /\([^\)]*\)/g
   };
+  //expose media query support flag for external use
   respond.mediaQueriesSupported = w.matchMedia && w.matchMedia("only all") !== null && w.matchMedia("only all").matches;
+  //if media queries are supported, exit here
   if (respond.mediaQueriesSupported) {
     return;
   }
-  var doc = w.document, docElem = doc.documentElement, mediastyles = [], rules = [], appendedEls = [], parsedSheets = {}, resizeThrottle = 30, head = doc.getElementsByTagName("head")[0] || docElem, base = doc.getElementsByTagName("base")[0], links = head.getElementsByTagName("link"), lastCall, resizeDefer, eminpx, getEmValue = function() {
+  //define vars
+  var doc = w.document, docElem = doc.documentElement, mediastyles = [], rules = [], appendedEls = [], parsedSheets = {}, resizeThrottle = 30, head = doc.getElementsByTagName("head")[0] || docElem, base = doc.getElementsByTagName("base")[0], links = head.getElementsByTagName("link"), lastCall, resizeDefer, //cached container for 1em value, populated the first time it's needed
+  eminpx, // returns the value of 1em in pixels
+  getEmValue = function() {
     var ret, div = doc.createElement("div"), body = doc.body, originalHTMLFontSize = docElem.style.fontSize, originalBodyFontSize = body && body.style.fontSize, fakeUsed = false;
     div.style.cssText = "position:absolute;font-size:1em;width:1em";
     if (!body) {
       body = fakeUsed = doc.createElement("body");
       body.style.background = "none";
     }
+    // 1em in a media query is the value of the default font size of the browser
+    // reset docElem and body to ensure the correct value is returned
     docElem.style.fontSize = "100%";
     body.style.fontSize = "100%";
     body.appendChild(div);
@@ -98,14 +145,18 @@
     } else {
       body.removeChild(div);
     }
+    // restore the original values
     docElem.style.fontSize = originalHTMLFontSize;
     if (originalBodyFontSize) {
       body.style.fontSize = originalBodyFontSize;
     }
+    //also update eminpx before returning
     ret = eminpx = parseFloat(ret);
     return ret;
-  }, applyMedia = function(fromResize) {
+  }, //enable/disable styles
+  applyMedia = function(fromResize) {
     var name = "clientWidth", docElemProp = docElem[name], currWidth = doc.compatMode === "CSS1Compat" && docElemProp || doc.body[name] || docElemProp, styleBlocks = {}, lastLink = links[links.length - 1], now = new Date().getTime();
+    //throttle resize calls
     if (fromResize && lastCall && now - lastCall < resizeThrottle) {
       w.clearTimeout(resizeDefer);
       resizeDefer = w.setTimeout(applyMedia, resizeThrottle);
@@ -122,6 +173,7 @@
         if (!!max) {
           max = parseFloat(max) * (max.indexOf(em) > -1 ? eminpx || getEmValue() : 1);
         }
+        // if there's no media query at all (the () part), or min or max is not null, and if either is present, they're true
         if (!thisstyle.hasquery || (!minnull || !maxnull) && (minnull || currWidth >= min) && (maxnull || currWidth <= max)) {
           if (!styleBlocks[thisstyle.media]) {
             styleBlocks[thisstyle.media] = [];
@@ -130,6 +182,7 @@
         }
       }
     }
+    //remove any existing respond style element(s)
     for (var j in appendedEls) {
       if (appendedEls.hasOwnProperty(j)) {
         if (appendedEls[j] && appendedEls[j].parentNode === head) {
@@ -138,34 +191,46 @@
       }
     }
     appendedEls.length = 0;
+    //inject active styles, grouped by media type
     for (var k in styleBlocks) {
       if (styleBlocks.hasOwnProperty(k)) {
         var ss = doc.createElement("style"), css = styleBlocks[k].join("\n");
         ss.type = "text/css";
         ss.media = k;
+        //originally, ss was appended to a documentFragment and sheets were appended in bulk.
+        //this caused crashes in IE in a number of circumstances, such as when the HTML element had a bg image set, so appending beforehand seems best. Thanks to @dvelyk for the initial research on this one!
         head.insertBefore(ss, lastLink.nextSibling);
         if (ss.styleSheet) {
           ss.styleSheet.cssText = css;
         } else {
           ss.appendChild(doc.createTextNode(css));
         }
+        //push to appendedEls to track for later removal
         appendedEls.push(ss);
       }
     }
-  }, translate = function(styles, href, media) {
+  }, //find media blocks in css text, convert to style blocks
+  translate = function(styles, href, media) {
     var qs = styles.replace(respond.regex.comments, "").replace(respond.regex.keyframes, "").match(respond.regex.media), ql = qs && qs.length || 0;
+    //try to get CSS path
     href = href.substring(0, href.lastIndexOf("/"));
     var repUrls = function(css) {
       return css.replace(respond.regex.urls, "$1" + href + "$2$3");
     }, useMedia = !ql && media;
+    //if path exists, tack on trailing slash
     if (href.length) {
       href += "/";
     }
+    //if no internal queries exist, but media attr does, use that
+    //note: this currently lacks support for situations where a media attr is specified on a link AND
+    //its associated stylesheet has internal CSS media queries.
+    //In those cases, the media attribute will currently be ignored.
     if (useMedia) {
       ql = 1;
     }
     for (var i = 0; i < ql; i++) {
       var fullq, thisq, eachq, eql;
+      //media attr
       if (useMedia) {
         fullq = media;
         rules.push(repUrls(styles));
@@ -190,42 +255,52 @@
       }
     }
     applyMedia();
-  }, makeRequests = function() {
+  }, //recurse through request queue, get css text
+  makeRequests = function() {
     if (requestQueue.length) {
       var thisRequest = requestQueue.shift();
       ajax(thisRequest.href, function(styles) {
         translate(styles, thisRequest.href, thisRequest.media);
         parsedSheets[thisRequest.href] = true;
+        // by wrapping recursive function call in setTimeout
+        // we prevent "Stack overflow" error in IE7
         w.setTimeout(function() {
           makeRequests();
         }, 0);
       });
     }
-  }, ripCSS = function() {
+  }, //loop stylesheets, send text content to translate
+  ripCSS = function() {
     for (var i = 0; i < links.length; i++) {
       var sheet = links[i], href = sheet.href, media = sheet.media, isCSS = sheet.rel && sheet.rel.toLowerCase() === "stylesheet";
+      //only links plz and prevent re-parsing
       if (!!href && isCSS && !parsedSheets[href]) {
+        // selectivizr exposes css through the rawCssText expando
         if (sheet.styleSheet && sheet.styleSheet.rawCssText) {
           translate(sheet.styleSheet.rawCssText, href, media);
           parsedSheets[href] = true;
         } else {
-          if (!/^([a-zA-Z:]*\/\/)/.test(href) && !base || href.replace(RegExp.$1, "").split("/")[0] === w.location.host) {
-            if (href.substring(0, 2) === "//") {
-              href = w.location.protocol + href;
-            }
-            requestQueue.push({
-              href: href,
-              media: media
-            });
+          // IE7 doesn't handle urls that start with '//' for ajax request
+          // manually add in the protocol
+          if (href.substring(0, 2) === "//") {
+            href = w.location.protocol + href;
           }
+          requestQueue.push({
+            href: href,
+            media: media
+          });
         }
       }
     }
     makeRequests();
   };
+  //translate CSS
   ripCSS();
+  //expose update for re-running respond later on
   respond.update = ripCSS;
+  //expose getEmValue
   respond.getEmValue = getEmValue;
+  //adjust on resize
   function callMedia() {
     applyMedia(true);
   }
