@@ -16,11 +16,11 @@ Usage Instructions
 ======
 
 1. Craft your CSS with min/max-width media queries to adapt your layout from mobile (first) all the way up to desktop
-<pre>
+```css
     @media screen and (min-width: 480px){
-        ...styles for 480px and up go here
+        /** ...styles for 480px and up go here **/
     }
-</pre>
+```
 
 2. Reference the respond.min.js script (1kb min/gzipped) after all of your CSS (the earlier it runs, the greater chance IE users will not see a flash of un-media'd content)
 
