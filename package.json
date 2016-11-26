@@ -4,6 +4,7 @@
 	"version": "1.4.2",
 	"homepage": "https://github.com/scottjehl/Respond",
 	"homepageShortened": "http://j.mp/respondjs",
+	"main": "dest/respond.min.js",
 	"author": {
 		"name": "Scott Jehl",
 		"email": "scott@filamentgroup.com",
