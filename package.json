@@ -1,9 +1,8 @@
 {
 	"name": "Respond.js",
-	"description": "min/max-width media query polyfill",
-	"version": "1.4.2",
-	"homepage": "https://github.com/scottjehl/Respond",
-	"homepageShortened": "http://j.mp/respondjs",
+	"description": "min/max-width media query polyfill. Beta release by silverorange.",
+	"version": "1.4.3-so.3",
+	"homepage": "https://github.com/silverorange/Respond",
 	"author": {
 		"name": "Scott Jehl",
 		"email": "scott@filamentgroup.com",
@@ -11,7 +10,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/scottjehl/Respond.git"
+		"url": "https://github.com/silverorange/Respond.git"
 	},
 	"bugs": {
 		"url": "https://github.com/scottjehl/Respond/issues"
@@ -19,7 +18,7 @@
 	"licenses": [
 		{
 			"type": "MIT",
-			"url": "https://github.com/scottjehl/Respond/blob/master/LICENSE-MIT"
+			"url": "https://github.com/silverorange/Respond/blob/master/LICENSE-MIT"
 		}
 	],
 	"devDependencies": {
