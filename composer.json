@@ -1,7 +1,6 @@
 {
-    "name": "scottjehl/respond",
+    "name": "foxou33/respond",
     "description": "min/max-width media query polyfill",
-    "type": "component",
     "homepage": "http://scottjehl.com",
     "license": "MIT",
     "authors": [
@@ -9,15 +8,5 @@
             "name": "Scott Jehl",
             "email": "scottjehl@gmail.com"
         }
-    ],
-    "extra": {
-        "component": {
-            "scripts": [
-                "dest/respond.src.js"
-            ],
-            "files": [
-                "dest/respond.min.js"
-            ]
-        }
-    }
+    ]
 }
