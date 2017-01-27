@@ -16,7 +16,7 @@
 		var iframe,
 			AXO;
 		
-		// All hail Google http://j.mp/iKMI19
+		// All hail Google https://j.mp/iKMI19
 		// Behold, an iframe proxy without annoying clicky noises.
 		if ( "ActiveXObject" in win ) {
 			AXO = new ActiveXObject( "htmlfile" );
@@ -47,7 +47,7 @@
 				iframe = null;
 
 			
-				// Per http://j.mp/kn9EPh, not taking any chances. Flushing the ActiveXObject
+				// Per https://j.mp/kn9EPh, not taking any chances. Flushing the ActiveXObject
 				if (AXO) {
 					AXO = null;
 
@@ -66,7 +66,7 @@
 		win.setTimeout(checkFrameName, 500);
 	}
 
-    // http://stackoverflow.com/a/472729
+    // https://stackoverflow.com/a/472729
 	function checkBaseURL(href) {
         var el = document.createElement('div'),
         escapedURL = href.split('&').join('&amp;').
@@ -79,7 +79,7 @@
 	
 	function checkRedirectURL() {
 		// IE6 & IE7 don't build out absolute urls in <link /> attributes.
-		// So respond.proxy.gif remains relative instead of http://example.com/respond.proxy.gif.
+		// So respond.proxy.gif remains relative instead of https://example.com/respond.proxy.gif.
 		// This trickery resolves that issue.
 		if (~ !redirectURL.indexOf(location.host)) {
 
