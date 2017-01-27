@@ -33,4 +33,4 @@
 		};
 
 	}( w.document ));
-}( this ));
+}( window ));
