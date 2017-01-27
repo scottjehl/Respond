@@ -25,8 +25,30 @@
 			};
 		})(),
 
+		xmlHttpExternal = (function() {
+			var xmlhttpmethod = false;
+			try {
+				xmlhttpmethod = new w.XDomainRequest();
+			}
+			catch( e ){
+				// Do nothing
+			}
+			return function(){
+				return xmlhttpmethod;
+			};
+		})(),
+
+		//check if an URL is external
+		//http://stackoverflow.com/questions/6238351/fastest-way-to-detect-external-urls
+		isExternalUrl = function( url ) {
+			var domain = function ( url ) {
+				return url.toLowerCase().replace(/([a-z])?:\/\//,'$1').split('/')[0];
+			};
+			return ( ( url.indexOf(':') > -1 || url.indexOf('//') > -1 ) && domain(w.location.href) !== domain(url) );
+		},
+
 		//tweaked Ajax functions from Quirksmode
-		ajax = function( url, callback ) {
+		ajaxInternal = function( url, callback ) {
 			var req = xmlHttp();
 			if (!req){
 				return;
@@ -43,6 +65,29 @@
 			}
 			req.send( null );
 		},
+
+		//external ajax function
+		ajaxExternal = function( url, callback ) {
+			var req = xmlHttpExternal();
+			if (!req){
+				return;
+			}
+			req.open( "GET", url );
+			req.onload = function () {
+				callback( req.responseText );
+			};
+			req.send();
+		},
+
+		//ajax wrapper
+		ajax = function( url, callback ) {
+			if ( isExternalUrl( url ) ) {
+				ajaxExternal( url, callback );
+			} else {
+				ajaxInternal( url, callback );
+			}
+		},
+
 		isUnsupportedMediaQuery = function( query ) {
 			return query.replace( respond.regex.minmaxwh, '' ).match( respond.regex.other );
 		};
@@ -314,16 +359,13 @@
 						translate( sheet.styleSheet.rawCssText, href, media );
 						parsedSheets[ href ] = true;
 					} else {
-						if( (!/^([a-zA-Z:]*\/\/)/.test( href ) && !base) ||
-							href.replace( RegExp.$1, "" ).split( "/" )[0] === w.location.host ){
-							// IE7 doesn't handle urls that start with '//' for ajax request
-							// manually add in the protocol
-							if ( href.substring(0,2) === "//" ) { href = w.location.protocol + href; }
-							requestQueue.push( {
-								href: href,
-								media: media
-							} );
-						}
+						// IE7 doesn't handle urls that start with '//' for ajax request
+						// manually add in the protocol
+						if ( href.substring(0,2) === "//" ) { href = w.location.protocol + href; }
+						requestQueue.push( {
+							href: href,
+							media: media
+						} );
 					}
 				}
 			}
