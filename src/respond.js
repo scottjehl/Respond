@@ -324,6 +324,9 @@
 								media: media
 							} );
 						}
+						else {
+							break;
+						}
 					}
 				}
 			}

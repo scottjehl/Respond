@@ -102,10 +102,12 @@
 		
 		for( var i = 0, linkl = links.length; i < linkl; i++ ){
 			
-			var thislink	= links[i],
-				href		= links[i].href,
-				extreg		= (/^([a-zA-Z:]*\/\/(www\.)?)/).test( href ),
-				ext			= (baseElem && !extreg) || extreg;
+                        var baseURL     = checkBaseURL("/"),
+                                thislink        = links[i],
+                                href            = links[i].href,
+                                extreg          = (/^([a-zA-Z:]*\/\/(www\.)?)/).test( href ),
+                                local           = (new RegExp("^" + baseURL)).test( href ),
+                                ext             = ((baseElem && !extreg) || extreg) && !local;
 
 			//make sure it's an external stylesheet
 			if( thislink.rel.indexOf( "stylesheet" ) >= 0 && ext ){
