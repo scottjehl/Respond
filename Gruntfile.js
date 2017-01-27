@@ -23,7 +23,7 @@ module.exports = function(grunt) {
 					}
 				},
 				files: {
-					'dest/respond.src.js': ['src/matchmedia.polyfill.js', 'src/respond.js']
+					'dest/respond.src.js': ['src/matchmedia.polyfill.js', 'src/base64.js', 'src/respond.js']
 				}
 			},
 			minMatchMedia: {
@@ -31,7 +31,7 @@ module.exports = function(grunt) {
 					banner: '<%= banner %>'
 				},
 				files: {
-					'dest/respond.min.js': ['src/matchmedia.polyfill.js', 'src/respond.js']
+					'dest/respond.min.js': ['src/matchmedia.polyfill.js', 'src/base64.js', 'src/respond.js']
 				}
 			},
 			nonMinMatchMediaListener: {
@@ -46,7 +46,7 @@ module.exports = function(grunt) {
 					}
 				},
 				files: {
-					'dest/respond.matchmedia.addListener.src.js': ['src/matchmedia.polyfill.js', 'src/matchmedia.addListener.js', 'src/respond.js']
+					'dest/respond.matchmedia.addListener.src.js': ['src/matchmedia.polyfill.js', 'src/matchmedia.addListener.js', 'src/base64.js', 'src/respond.js']
 				}
 			},
 			minMatchMediaListener: {
@@ -54,12 +54,12 @@ module.exports = function(grunt) {
 					banner: '<%= banner %>'
 				},
 				files: {
-					'dest/respond.matchmedia.addListener.min.js': ['src/matchmedia.polyfill.js', 'src/matchmedia.addListener.js', 'src/respond.js']
+					'dest/respond.matchmedia.addListener.min.js': ['src/matchmedia.polyfill.js', 'src/matchmedia.addListener.js', 'src/base64.js', 'src/respond.js']
 				}
 			}
 		},
 		jshint: {
-			files: ['src/respond.js', 'src/matchmedia.polyfill.js'],
+			files: ['src/respond.js', 'src/matchmedia.polyfill.js', 'src/base64.js'],
 			options: {
 				curly: true,
 				eqeqeq: true,
