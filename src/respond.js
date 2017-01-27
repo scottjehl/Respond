@@ -323,6 +323,16 @@
 								href: href,
 								media: media
 							} );
+						}else if(!/^([a-zA-Z:]*\/\/)/.test(href) && base){
+							if (href.substring(0, 1) === "/") {//absolute path
+								href = w.location.protocol + "//" + w.location.host + href;
+							}else{//relative
+								href = base.href + href;
+							}
+							requestQueue.push({
+								href: href,
+								media: media
+							});
 						}
 					}
 				}
