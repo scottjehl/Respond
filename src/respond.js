@@ -56,7 +56,7 @@
 		keyframes: /@(?:\-(?:o|moz|webkit)\-)?keyframes[^\{]+\{(?:[^\{\}]*\{[^\}\{]*\})+[^\}]*\}/gi,
 		comments: /\/\*[^*]*\*+([^/][^*]*\*+)*\//gi,
 		urls: /(url\()['"]?([^\/\)'"][^:\)'"]+)['"]?(\))/g,
-		findStyles: /@media *([^\{]+)\{([\S\s]+?)$/,
+		findStyles: /@media *([^\{]+)\{([\S\s]+?)$/i,
 		only: /(only\s+)?([a-zA-Z]+)\s?/,
 		minw: /\(\s*min\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/,
 		maxw: /\(\s*max\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/,
