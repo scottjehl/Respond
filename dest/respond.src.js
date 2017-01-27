@@ -24,7 +24,7 @@
       };
     };
   }(w.document);
-})(this);
+})(typeof window !== "undefined" ? window : this);
 
 (function(w) {
   "use strict";
@@ -234,4 +234,4 @@
   } else if (w.attachEvent) {
     w.attachEvent("onresize", callMedia);
   }
-})(this);
+})(typeof window !== "undefined" ? window : this);

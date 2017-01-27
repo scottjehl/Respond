@@ -73,4 +73,4 @@
 
 		return mql;
 	};
-}( this ));
+}( typeof window !== "undefined" ? window : this ));
