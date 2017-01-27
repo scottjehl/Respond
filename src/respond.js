@@ -283,20 +283,24 @@
 		},
 
 		//recurse through request queue, get css text
-		makeRequests = function(){
-			if( requestQueue.length ){
-				var thisRequest = requestQueue.shift();
+        makeRequests = function () {
+            if (requestQueue.length) {
+                var thisRequest = requestQueue.shift();
 
-				ajax( thisRequest.href, function( styles ){
-					translate( styles, thisRequest.href, thisRequest.media );
-					parsedSheets[ thisRequest.href ] = true;
+                return ajax(thisRequest.href, function (styles) {
+                    translate(styles, thisRequest.href, thisRequest.media);
+                    parsedSheets[thisRequest.href] = true;
 
-					// by wrapping recursive function call in setTimeout
-					// we prevent "Stack overflow" error in IE7
-					w.setTimeout(function(){ makeRequests(); },0);
-				} );
-			}
-		},
+                    // by wrapping recursive function call in setTimeout
+                    // we prevent "Stack overflow" error in IE7
+                    w.setTimeout(function () { makeRequests(); }, 0);
+                });
+            }
+
+            if (typeof respond.onRespondComplete === "function") {
+                respond.onRespondComplete.call(w);
+            }
+        },
 
 		//loop stylesheets, send text content to translate
 		ripCSS = function(){

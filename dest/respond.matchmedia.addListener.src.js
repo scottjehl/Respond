@@ -1,5 +1,5 @@
 /*! Respond.js v1.4.2: min/max-width media query polyfill
- * Copyright 2014 Scott Jehl
+ * Copyright 2015 Scott Jehl
  * Licensed under MIT
  * http://j.mp/respondjs */
 
@@ -242,13 +242,16 @@
   }, makeRequests = function() {
     if (requestQueue.length) {
       var thisRequest = requestQueue.shift();
-      ajax(thisRequest.href, function(styles) {
+      return ajax(thisRequest.href, function(styles) {
         translate(styles, thisRequest.href, thisRequest.media);
         parsedSheets[thisRequest.href] = true;
         w.setTimeout(function() {
           makeRequests();
         }, 0);
       });
+    }
+    if (typeof respond.onRespondComplete === "function") {
+      respond.onRespondComplete.call(w);
     }
   }, ripCSS = function() {
     for (var i = 0; i < links.length; i++) {
