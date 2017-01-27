@@ -62,7 +62,7 @@ respond with a 200 status.
 
 - If you have more than 32 stylesheets referenced, IE will throw an error, `Invalid procedure call or argument`. Concatenate your CSS and the issue should go away.
 
-- Sass/SCSS source maps are not supported; `@media -sass-debug-info` will break respond.js. Noted in issue [#148](https://github.com/scottjehl/Respond/issues/148)
+- Sass/SCSS source maps are not supported; `@media -sass-debug-info` will break respond.js. Noted in issue [#148](https://github.com/scottjehl/Respond/issues/148). Source maps may be enabled by default in apps produced by the [Yeoman webapp generator](https://github.com/yeoman/generator-webapp) but can be disabled by removing the `debugInfo` override in the Gruntfile.
 
 - Internet Explorer 9 supports css3 media queries, but not within frames when the CSS containing the media query is in an external file (this appears to be a bug in IE9 — see https://stackoverflow.com/questions/10316247/media-queries-fail-inside-ie9-iframe). See this commit for a fix if you're having this problem. https://github.com/NewSignature/Respond/commit/1c86c66075f0a2099451eb426702fc3540d2e603
 
