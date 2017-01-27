@@ -111,6 +111,9 @@
 			if( thislink.rel.indexOf( "stylesheet" ) >= 0 && ext ){
 				(function( link ){			
 					fakejax( href, function( css ){
+						if (typeof(link.styleSheet) == 'undefined') {
+							link.styleSheet = {};
+						}
 						link.styleSheet.rawCssText = css;
 						respond.update();
 					} );
