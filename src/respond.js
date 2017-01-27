@@ -328,6 +328,7 @@
 				}
 			}
 			makeRequests();
+			callMedia();
 		};
 
 	//translate CSS
