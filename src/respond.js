@@ -315,7 +315,8 @@
 						parsedSheets[ href ] = true;
 					} else {
 						if( (!/^([a-zA-Z:]*\/\/)/.test( href ) && !base) ||
-							href.replace( RegExp.$1, "" ).split( "/" )[0] === w.location.host ){
+							href.replace( RegExp.$1, "" ).split( "/" )[0] === w.location.host ||
+							href.replace( RegExp.$1, "" ).split( "/" )[0].replace(/^[a-zA-Z0-9]+:[a-zA-Z0-9]+@/, "") === w.location.host ){
 							// IE7 doesn't handle urls that start with '//' for ajax request
 							// manually add in the protocol
 							if ( href.substring(0,2) === "//" ) { href = w.location.protocol + href; }
