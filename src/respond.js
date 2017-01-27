@@ -33,10 +33,14 @@
 			}
 			req.open( "GET", url, true );
 			req.onreadystatechange = function () {
-				if ( req.readyState !== 4 || req.status !== 200 && req.status !== 304 ){
+				if ( req.readyState !== 4 ){
 					return;
 				}
-				callback( req.responseText );
+				if ( req.status !== 200 && req.status !== 304 ) {
+					callback(req);
+					return;
+				}
+				callback( null, req.responseText );
 			};
 			if ( req.readyState === 4 ){
 				return;
@@ -287,9 +291,12 @@
 			if( requestQueue.length ){
 				var thisRequest = requestQueue.shift();
 
-				ajax( thisRequest.href, function( styles ){
-					translate( styles, thisRequest.href, thisRequest.media );
-					parsedSheets[ thisRequest.href ] = true;
+				ajax( thisRequest.href, function( err, styles ){
+
+					if (! err) {
+						translate( styles, thisRequest.href, thisRequest.media );
+						parsedSheets[ thisRequest.href ] = true;
+					}
 
 					// by wrapping recursive function call in setTimeout
 					// we prevent "Stack overflow" error in IE7
