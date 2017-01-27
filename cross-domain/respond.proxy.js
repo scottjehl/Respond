@@ -1,20 +1,54 @@
 /*! Respond.js: min/max-width media query polyfill. Remote proxy (c) Scott Jehl. MIT/GPLv2 Lic. j.mp/respondjs  */
 (function(win, doc, undefined){
 	var docElem			= doc.documentElement,
-		proxyURL		= doc.getElementById("respond-proxy").href,
 		redirectURL		= (doc.getElementById("respond-redirect") || location).href,
 		baseElem		= doc.getElementsByTagName("base")[0],
 		urls			= [],
+		proxyHostMap 	= {},
 		refNode;
+
+	function getProxyHostMap() {
+		var links = doc.getElementsByTagName("link"),
+			parser, 
+			link;
+
+		for( var l = links.length; l--; ) {
+			link = links[l];
+			if ( link.rel != "respond-proxy" || link.href == null ) {
+				continue;
+			}
+			parser = getURLParser(link.href);
+			proxyHostMap[parser.host] = parser.href;
+		}
+	}
+
+	function getURLParser(url) {
+		var a = doc.createElement('a');
+		a.href = url;
+		return a;
+	}
+
+	function getProxyURL(url) {
+		var parser = getURLParser(url);
+		return proxyHostMap[parser.host];
+	}
 
 	function encode(url){
 		return win.encodeURIComponent(url);
 	}
 
-	 function fakejax( url, callback ){
+	function fakejax( url, callback ){
 
 		var iframe,
-			AXO;
+			AXO,
+			proxyURL;
+
+		url = checkBaseURL(url);
+		proxyURL = getProxyURL(url);
+
+		if ( proxyURL == null ) {
+			return;
+		}
 		
 		// All hail Google https://j.mp/iKMI19
 		// Behold, an iframe proxy without annoying clicky noises.
@@ -30,7 +64,7 @@
 			docElem.insertBefore(iframe, docElem.firstElementChild || docElem.firstChild );
 		}
 
-		iframe.src = checkBaseURL(proxyURL) + "?url=" + encode(redirectURL) + "&css=" + encode(checkBaseURL(url));
+		iframe.src = checkBaseURL(proxyURL) + "?url=" + encode(redirectURL) + "&css=" + encode(url);
 		
 		function checkFrameName() {
 			var cssText;
@@ -81,7 +115,7 @@
 		// IE6 & IE7 don't build out absolute urls in <link /> attributes.
 		// So respond.proxy.gif remains relative instead of https://example.com/respond.proxy.gif.
 		// This trickery resolves that issue.
-		if (~ !redirectURL.indexOf(location.host)) {
+		if (!~redirectURL.indexOf(location.host)) {
 
 			var fakeLink = doc.createElement("div");
 
@@ -123,6 +157,7 @@
 	
 	if( !respond.mediaQueriesSupported ){
 		checkRedirectURL();
+		getProxyHostMap();
 		buildUrls();
 	}
 
