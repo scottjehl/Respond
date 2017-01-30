@@ -198,24 +198,45 @@
 			for( var k in styleBlocks ){
 				if( styleBlocks.hasOwnProperty( k ) ){
 					var ss = doc.createElement( "style" ),
-						css = styleBlocks[ k ].join( "\n" );
-
-					ss.type = "text/css";
-					ss.media = k;
-
-					//originally, ss was appended to a documentFragment and sheets were appended in bulk.
-					//this caused crashes in IE in a number of circumstances, such as when the HTML element had a bg image set, so appending beforehand seems best. Thanks to @dvelyk for the initial research on this one!
-					head.insertBefore( ss, lastLink.nextSibling );
-
-					if ( ss.styleSheet ){
-						ss.styleSheet.cssText = css;
+						css = styleBlocks[ k ].join( "\n" ),
+						numberOfSplits,
+						tmpStyleBlocks;
+						
+					numberOfSplits = 1; //We default this to 1 so we always create a style tag
+					
+					//When we have over 4095 lines in a style tag, the following styles are clipped: https://github.com/scottjehl/Respond/issues/282#issuecomment-46213626
+					//Set our threshold
+					var styleLengthThreshold = 15;
+					
+					if(styleBlocks[k].length > styleLengthThreshold){
+						//How many times we split depends on how many times our length is compared to threshold
+						numberOfSplits = Math.ceil(styleBlocks[k].length/styleLengthThreshold);
+						
 					}
-					else {
-						ss.appendChild( doc.createTextNode( css ) );
+					
+					//Split out block into chunks, create a style tag for each, and append
+					for(var i = 0; i < numberOfSplits*styleLengthThreshold; i+= styleLengthThreshold){
+						ss = doc.createElement( "style" );
+						tmpStyleBlocks = styleBlocks[ k ].slice(i, i+styleLengthThreshold);
+						css = tmpStyleBlocks.join( "\n" );
+						
+						ss.type = "text/css";
+						ss.media = k;
+						
+						//originally, ss was appended to a documentFragment and sheets were appended in bulk.
+						//this caused crashes in IE in a number of circumstances, such as when the HTML element had a bg image set, so appending beforehand seems best. Thanks to @dvelyk for the initial research on this one!
+						head.insertBefore( ss, lastLink.nextSibling );
+						
+						if ( ss.styleSheet ){
+							ss.styleSheet.cssText = css;
+						}
+						else {
+							ss.appendChild( doc.createTextNode( css ) );
+						}
+	
+						//push to appendedEls to track for later removal
+						appendedEls.push( ss );
 					}
-
-					//push to appendedEls to track for later removal
-					appendedEls.push( ss );
 				}
 			}
 		},
