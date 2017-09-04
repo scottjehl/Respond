@@ -1,6 +1,7 @@
 {
 	"name": "Respond.js",
 	"description": "min/max-width media query polyfill",
+	"jsdelivr": "dest/respond.min.js",
 	"version": "1.4.2",
 	"homepage": "https://github.com/scottjehl/Respond",
 	"homepageShortened": "https://j.mp/respondjs",
