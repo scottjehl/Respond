@@ -15,16 +15,21 @@ If you're unfamiliar with the concepts surrounding Responsive Web Design, you ca
 Usage Instructions
 ======
 
-1. Craft your CSS with min/max-width media queries to adapt your layout from mobile (first) all the way up to desktop
+1. Include this in your html:
+```html
+<script src="https://cdn.jsdelivr.net/npm/respond.js@1/dest/respond.min.js"></script>
+```
+
+2. Craft your CSS with min/max-width media queries to adapt your layout from mobile (first) all the way up to desktop
 ```css
     @media screen and (min-width: 480px){
         /** ...styles for 480px and up go here **/
     }
 ```
 
-2. Reference the respond.min.js script (1kb min/gzipped) after all of your CSS (the earlier it runs, the greater chance IE users will not see a flash of un-media'd content)
+3. Reference the respond.min.js script (1kb min/gzipped) after all of your CSS (the earlier it runs, the greater chance IE users will not see a flash of un-media'd content)
 
-3. Crack open Internet Explorer and pump fists in delight
+4. Crack open Internet Explorer and pump fists in delight
 
 
 CDN/X-Domain Setup
