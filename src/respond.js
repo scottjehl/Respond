@@ -52,16 +52,16 @@
 	respond.queue = requestQueue;
 	respond.unsupportedmq = isUnsupportedMediaQuery;
 	respond.regex = {
-		media: /@media[^\{]+\{([^\{\}]*\{[^\}\{]*\})+/gi,
-		keyframes: /@(?:\-(?:o|moz|webkit)\-)?keyframes[^\{]+\{(?:[^\{\}]*\{[^\}\{]*\})+[^\}]*\}/gi,
+		media: /@media[^{]+{([^{}]*{[^}{]*})+/gi,
+		keyframes: /@(?:-(?:o|moz|webkit)-)?keyframes[^{]+{(?:[^{}]*{[^}{]*})+[^}]*}/gi,
 		comments: /\/\*[^*]*\*+([^/][^*]*\*+)*\//gi,
-		urls: /(url\()['"]?([^\/\)'"][^:\)'"]+)['"]?(\))/g,
-		findStyles: /@media *([^\{]+)\{([\S\s]+?)$/,
+		urls: /(url\()['"]?([^/)'"][^:)'"]+)['"]?(\))/g,
+		findStyles: /@media *([^{]+){([\S\s]+?)$/,
 		only: /(only\s+)?([a-zA-Z]+)\s?/,
-		minw: /\(\s*min\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/,
-		maxw: /\(\s*max\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/,
-		minmaxwh: /\(\s*m(in|ax)\-(height|width)\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/gi,
-		other: /\([^\)]*\)/g
+		minw: /\(\s*min-width\s*:\s*(\s*[0-9.]+)(px|em)\s*\)/,
+		maxw: /\(\s*max-width\s*:\s*(\s*[0-9.]+)(px|em)\s*\)/,
+		minmaxwh: /\(\s*m(in|ax)-(height|width)\s*:\s*(\s*[0-9.]+)(px|em)\s*\)/gi,
+		other: /\([^)]*\)/g
 	};
 
 	//expose media query support flag for external use
